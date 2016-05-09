@@ -14,6 +14,7 @@ unsigned char uart_recieve (void);
 void uart_print(char *str);
 void uart_println(char *str) {
 	uart_print(str);
+	uart_transmit('\r');
 	uart_transmit('\n');
 }
 void uart_printlong(long l);

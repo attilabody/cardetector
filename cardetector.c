@@ -13,15 +13,16 @@
 
 #include "serial.h"
 
-volatile unsigned long g_timerCounts;
-volatile unsigned char g_counterReady;
+volatile uint16_t	g_timerCounts;
+volatile uint8_t	g_counterReady;
+volatile uint8_t	g_overrun;
 
 // internal to counting routine
-volatile unsigned long g_overflowCount;
-volatile unsigned int g_timerTicks;
-unsigned int g_timerPeriod;
+volatile uint8_t g_overflowCount;
+volatile uint16_t g_timerTicks;
+uint16_t g_timerPeriod;
 
-void startCounting(unsigned int ms);
+void startCounting(uint8_t ms);
 
 #ifdef DUMPINFO
 void dumpinfo();
@@ -36,28 +37,30 @@ int main(void)
 
 	sei();
 
+	startCounting(250);  // how many ms to count for
+
 	while(1)
 	{
-		startCounting(200);  // how many ms to count for
-
 		while (!g_counterReady) {
 		}  // loop until count over
 
 		// adjust counts by counting interval to give frequency in Hz
 		float frq = (g_timerCounts * 1000.0) / g_timerPeriod;
 
+		g_counterReady = 0;
+
 		unsigned long lf = (unsigned long)frq;
 
-		uart_print("Frequency: ");
+		uart_print("Freq: ");
 		uart_printlong(lf);
-		uart_print(" Hz. Raw counter value:");
+		uart_print(" Hz. Raw:");
 		uart_printlong(g_timerCounts);
 		uart_println("");
 	}
 }
 
 //******************************************************************
-void startCounting(unsigned int ms)
+void startCounting(uint8_t ms)
 {
 	g_counterReady = 0;         // time not up yet
 	g_timerPeriod = ms;             // how many 1 ms counts to do
@@ -104,32 +107,30 @@ ISR(TIMER0_OVF_vect)
 //******************************************************************
 //  Timer2 Interrupt Service is invoked by hardware Timer 2 every 1 ms = 1000 Hz
 //  16Mhz / 128 / 125 = 1000 Hz
-
 ISR (TIMER2_COMPA_vect)
 {
 	// grab counter value before it changes any more
-	unsigned char counterValue = TCNT0;
-	unsigned long overflowCopy = g_overflowCount;
+	uint8_t		counterValue = TCNT0;
+	uint8_t	overflowCopy = g_overflowCount;
 
 	// see if we have reached timing period
 	if (++g_timerTicks < g_timerPeriod)
 		return;  // not yet
+
+	TCNT0 = 0;
+	g_timerTicks = 0;
+	g_overflowCount = 0;
+
+	if(g_counterReady) {
+		g_overrun = 1;
+		return;
+	}
 
 	// if just missed an overflow
 	if ((TIFR0 & _BV(TOV0)) && counterValue < 128)
 		overflowCopy++;
 
 	// end of gate time, measurement ready
-
-	TCCR0A = 0;    // stop timer 0
-	TCCR0B = 0;
-
-	TCCR2A = 0;    // stop timer 2
-	TCCR2B = 0;
-
-	TIMSK0 = 0;    // disable Timer0 Interrupt
-	TIMSK2 = 0;    // disable Timer2 Interrupt
-
 	// calculate total count
 	g_timerCounts = (overflowCopy << 8) + counterValue; // each overflow is 256 more
 	g_counterReady = 1;              // set global flag for end count period
