@@ -38,12 +38,7 @@ int main(void)
 
 	while(1)
 	{
-		unsigned char oldTCCR0A = TCCR0A;
-		unsigned char oldTCCR0B = TCCR0B;
-		TCCR0A = 0;    // stop timer 0
-		TCCR0B = 0;
-
-		startCounting(500);  // how many ms to count for
+		startCounting(200);  // how many ms to count for
 
 		while (!g_counterReady) {
 		}  // loop until count over
@@ -58,13 +53,6 @@ int main(void)
 		uart_print(" Hz. Raw counter value:");
 		uart_printlong(g_timerCounts);
 		uart_println("");
-
-		// restart timer 0
-		TCCR0A = oldTCCR0A;
-		TCCR0B = oldTCCR0B;
-
-		// let serial stuff finish
-		_delay_ms(200);
 	}
 }
 
@@ -76,14 +64,14 @@ void startCounting(unsigned int ms)
 	g_timerTicks = 0;               // reset interrupt counter
 	g_overflowCount = 0;            // no overflows yet
 
-	// reset Timer 1 and Timer 2
-	TCCR1A = 0;
-	TCCR1B = 0;
+	// reset Timer 0 and Timer 2
+	TCCR0A = 0;
+	TCCR0B = 0;
 	TCCR2A = 0;
 	TCCR2B = 0;
 
-	// Timer 1 - counts events on pin D5
-	TIMSK1 = _BV(TOIE1);   // interrupt on Timer 1 overflow
+	// Timer 0 - counts events on pin D4
+	TIMSK0 = _BV(TOIE0);   // interrupt on Timer 0 overflow
 
 	// Timer 2 - gives us our 1 ms counting interval
 	// 16 MHz clock (62.5 ns per tick) - prescaled by 128
@@ -95,20 +83,20 @@ void startCounting(unsigned int ms)
 	// Timer 2 - interrupt on match (ie. every 1 ms)
 	TIMSK2 = _BV(OCIE2A);   // enable Timer2 Interrupt
 
-	TCNT1 = 0;      // Both counters to zero
+	TCNT0 = 0;      // Both counters to zero
 	TCNT2 = 0;
 
 	// Reset prescalers
 	GTCCR = _BV(PSRASY);        // reset prescaler now
 	// start Timer 2
 	TCCR2B = _BV (CS20) | _BV(CS22);  // prescaler of 128
-	// start Timer 1
-	// External clock source on T1 pin (D5). Clock on rising edge.
-	TCCR1B = _BV (CS10) | _BV(CS11) | _BV(CS12);
+	// start Timer 0
+	// External clock source on T0 pin (D4). Clock on rising edge.
+	TCCR0B = _BV (CS00) | _BV(CS01) | _BV(CS02);
 }  // end of startCounting
 
 //******************************************************************
-ISR(TIMER1_OVF_vect)
+ISR(TIMER0_OVF_vect)
 {
 	++g_overflowCount;               // count number of Counter1 overflows
 }  // end of TIMER1_OVF_vect
@@ -119,31 +107,31 @@ ISR(TIMER1_OVF_vect)
 
 ISR (TIMER2_COMPA_vect)
 {
+	// grab counter value before it changes any more
+	unsigned char counterValue = TCNT0;
+	unsigned long overflowCopy = g_overflowCount;
+
 	// see if we have reached timing period
 	if (++g_timerTicks < g_timerPeriod)
 		return;  // not yet
 
-	// grab counter value before it changes any more
-	unsigned int counterValue = TCNT1; // see datasheet, page 117 (accessing 16-bit registers)
-	unsigned long overflowCopy = g_overflowCount;
-
 	// if just missed an overflow
-	if ((TIFR1 & _BV(TOV1)) && counterValue < 256)
+	if ((TIFR0 & _BV(TOV0)) && counterValue < 128)
 		overflowCopy++;
 
 	// end of gate time, measurement ready
 
-	TCCR1A = 0;    // stop timer 1
-	TCCR1B = 0;
+	TCCR0A = 0;    // stop timer 0
+	TCCR0B = 0;
 
 	TCCR2A = 0;    // stop timer 2
 	TCCR2B = 0;
 
-	TIMSK1 = 0;    // disable Timer1 Interrupt
+	TIMSK0 = 0;    // disable Timer0 Interrupt
 	TIMSK2 = 0;    // disable Timer2 Interrupt
 
 	// calculate total count
-	g_timerCounts = (overflowCopy << 16) + counterValue; // each overflow is 65536 more
+	g_timerCounts = (overflowCopy << 8) + counterValue; // each overflow is 256 more
 	g_counterReady = 1;              // set global flag for end count period
 }  // end of TIMER2_COMPA_vect
 
