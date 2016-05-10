@@ -16,6 +16,7 @@
 volatile uint16_t	g_timerCounts;
 volatile uint8_t	g_counterReady;
 volatile uint8_t	g_overrun;
+volatile uint32_t	g_ms = 0;
 
 // internal to counting routine
 volatile uint8_t g_overflowCount;
@@ -31,30 +32,59 @@ void dumpinfo();
 //******************************************************************
 int main(void)
 {
+	uint16_t	count;
+	uint32_t	sum = 0;
+
 	uart_init();
 
 	DDRB |= (1<<DDB5); //Set the 6th bit on PORTB (i.e. PB5) to 1 => output
+	PORTB |= (1 << PORTB5);
 
 	sei();
 
 	startCounting(250);  // how many ms to count for
+
+	uart_print("Calibrating: ");
+	//calibration
+	for(count = 0; count < 64; ++count)
+	{
+		while(!g_counterReady);
+		sum += g_timerCounts;
+		g_counterReady = 0;
+		PORTB ^= (1 << PORTB5);
+		uart_transmit('.');
+	}
+	sum <<= 2;
+	uart_println("");
+
+
+	uart_print("Sum: ");
+	uart_printlong(sum);
+	uart_println("");
+
 
 	while(1)
 	{
 		while (!g_counterReady) {
 		}  // loop until count over
 
-		// adjust counts by counting interval to give frequency in Hz
-		float frq = (g_timerCounts * 1000.0) / g_timerPeriod;
-
+		uint32_t	timerCopy = g_timerCounts;
 		g_counterReady = 0;
 
+		// adjust counts by counting interval to give frequency in Hz
+		float frq = (timerCopy * 1000.0) / g_timerPeriod;
+
+
 		unsigned long lf = (unsigned long)frq;
+		sum -= (sum >> 8);
+		sum += timerCopy;
 
 		uart_print("Freq: ");
 		uart_printlong(lf);
-		uart_print(" Hz. Raw:");
+		uart_print(" Hz. Raw: ");
 		uart_printlong(g_timerCounts);
+		uart_print(" Avg: ");
+		uart_printlong(sum >> 8);
 		uart_println("");
 	}
 }
@@ -110,9 +140,10 @@ ISR(TIMER0_OVF_vect)
 ISR (TIMER2_COMPA_vect)
 {
 	// grab counter value before it changes any more
-	uint8_t		counterValue = TCNT0;
+	uint8_t	counterValue = TCNT0;
 	uint8_t	overflowCopy = g_overflowCount;
 
+	++g_ms;
 	// see if we have reached timing period
 	if (++g_timerTicks < g_timerPeriod)
 		return;  // not yet
