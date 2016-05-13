@@ -25,15 +25,94 @@ uint16_t g_timerPeriod;
 
 void startCounting(uint8_t ms);
 
-#ifdef DUMPINFO
+#ifdef DEBUG_TIMERS
 void dumpinfo();
 #endif	//	DUMPINFO
 
-//******************************************************************
+enum STATES
+{
+	BELOW,
+	ABOVE,
+	ACTIVE,
+	TOUT
+};
+
+#define SHIFT_BELOW		5
+#define SHIFT_ABOVE		3
+#define SHIFT_ACTIVE	0
+#define	SHIFT_TOUT		8
+
+#define LIMITSHIFT	5
+#define TLIMIT 		40
+#define SHIFT		8
+
+uint32_t		g_sum = 0;
+
+
+////////////////////////////////////////////////////////////////////
+uint8_t	detect(uint16_t counter)
+{
+	static uint16_t			time=0;
+	static const uint8_t	shifts[4] = {SHIFT_BELOW, SHIFT_ABOVE, SHIFT_ACTIVE, SHIFT_TOUT};
+
+	uint16_t		debugavg, debugth;
+	int32_t			debugmod;
+
+	enum STATES		state;
+	int32_t			diff;
+
+	diff = (int32_t)counter - (int32_t)(debugavg = (g_sum >> SHIFT));		// adjust counts by counting interval to give frequency in Hz
+
+	if (diff < 0)
+		state = BELOW;
+	else if(diff < (g_sum >> (SHIFT + LIMITSHIFT)))
+		state = ABOVE;
+	else if (time < TLIMIT)
+		state = ACTIVE;
+	else
+		state = TOUT;
+
+	debugth = (g_sum >> (SHIFT + LIMITSHIFT));
+	debugmod = (diff << shifts[state]);
+
+	g_sum += debugmod;
+
+#ifdef DEBUG_DETECTOR
+	uart_print(" Sum: ");
+	uart_printlong(g_sum);
+	uart_print(" Raw: ");
+	uart_printlong(g_timerCounts);
+	uart_print(" Avg: ");
+	uart_printlong(debugavg);
+	uart_print(" Diff: ");
+	uart_printlong(diff);
+	uart_print(" Sta: ");
+	uart_printlong(state);
+	uart_print(" << : ");
+	uart_printlong(shifts[state]);
+	uart_print(" Mod: ");
+	uart_printlong(debugmod);
+	uart_print(" Th: ");
+	uart_printlong(debugth);
+	uart_println("");
+#endif	//	DEBUG_DETECTOR
+
+	if(state < ACTIVE) {
+		time = 0;
+		return 0;
+	} else {
+		++time;
+		return 1;
+	}
+
+
+}
+
+////////////////////////////////////////////////////////////////////
 int main(void)
 {
-	uint16_t	count;
-	uint32_t	sum = 0;
+	uint8_t			prevactive = 0;
+	uint8_t			count;
 
 	uart_init();
 
@@ -46,20 +125,30 @@ int main(void)
 
 	uart_print("Calibrating: ");
 	//calibration
-	for(count = 0; count < 64; ++count)
+	for(count = 0; count < 4; ++count)
 	{
 		while(!g_counterReady);
-		sum += g_timerCounts;
+		g_counterReady = 0;
+		PORTB ^= (1 << PORTB5);
+		uart_transmit('x');
+	}
+
+	for(count = 0; count < 16; ++count)
+	{
+		while(!g_counterReady);
+		g_sum += g_timerCounts;
 		g_counterReady = 0;
 		PORTB ^= (1 << PORTB5);
 		uart_transmit('.');
 	}
-	sum <<= 2;
+	g_sum <<= 4;
 	uart_println("");
+
+	PORTB &= ~(1<<PORTB5);
 
 
 	uart_print("Sum: ");
-	uart_printlong(sum);
+	uart_printlong(g_sum);
 	uart_println("");
 
 
@@ -68,28 +157,33 @@ int main(void)
 		while (!g_counterReady) {
 		}  // loop until count over
 
-		uint32_t	timerCopy = g_timerCounts;
+		uint32_t	countercopy = g_timerCounts;
 		g_counterReady = 0;
 
-		// adjust counts by counting interval to give frequency in Hz
-		float frq = (timerCopy * 1000.0) / g_timerPeriod;
-
-
+#ifdef DEBUG_DETECTOR
+		float frq = (countercopy * 1000.0) / g_timerPeriod;
 		unsigned long lf = (unsigned long)frq;
-		sum -= (sum >> 8);
-		sum += timerCopy;
 
 		uart_print("Freq: ");
 		uart_printlong(lf);
-		uart_print(" Hz. Raw: ");
-		uart_printlong(g_timerCounts);
-		uart_print(" Avg: ");
-		uart_printlong(sum >> 8);
-		uart_println("");
+#endif	//	DEBUG_DETECTOR
+
+		if(detect(countercopy)) {
+			if(!prevactive) {
+				prevactive = 1;
+				PORTB |= (1<<PORTB5);
+			}
+		} else {
+			if(prevactive) {
+				prevactive = 0;
+				PORTB &= ~(1<<PORTB5);
+			}
+		}
+
 	}
 }
 
-//******************************************************************
+////////////////////////////////////////////////////////////////////
 void startCounting(uint8_t ms)
 {
 	g_counterReady = 0;         // time not up yet
@@ -128,13 +222,13 @@ void startCounting(uint8_t ms)
 	TCCR0B = _BV (CS00) | _BV(CS01) | _BV(CS02);
 }  // end of startCounting
 
-//******************************************************************
+////////////////////////////////////////////////////////////////////
 ISR(TIMER0_OVF_vect)
 {
 	++g_overflowCount;               // count number of Counter1 overflows
 }  // end of TIMER1_OVF_vect
 
-//******************************************************************
+////////////////////////////////////////////////////////////////////
 //  Timer2 Interrupt Service is invoked by hardware Timer 2 every 1 ms = 1000 Hz
 //  16Mhz / 128 / 125 = 1000 Hz
 ISR (TIMER2_COMPA_vect)
@@ -167,8 +261,8 @@ ISR (TIMER2_COMPA_vect)
 	g_counterReady = 1;              // set global flag for end count period
 }  // end of TIMER2_COMPA_vect
 
-#ifdef DUMPINFO
-//******************************************************************
+#ifdef DEBUG_TIMERS
+////////////////////////////////////////////////////////////////////
 void dumpreg16(char *name, unsigned int value )
 {
 	char			buffer[sizeof(value)*8+1];
@@ -190,7 +284,7 @@ void dumpreg16(char *name, unsigned int value )
 	uart_println(")");
 }
 
-//******************************************************************
+////////////////////////////////////////////////////////////////////
 void dumpreg(char *name, unsigned char value )
 {
 	char			buffer[sizeof(value)*8+1];
@@ -212,7 +306,7 @@ void dumpreg(char *name, unsigned char value )
 	uart_println(")");
 }
 
-//******************************************************************
+////////////////////////////////////////////////////////////////////
 void dumpvar32(char *name, unsigned long value)
 {
 	char buffer[sizeof(value)*8+1];
@@ -224,7 +318,7 @@ void dumpvar32(char *name, unsigned long value)
 	uart_println("");
 }
 
-//******************************************************************
+////////////////////////////////////////////////////////////////////
 void dumpinfo()
 {
 	uart_println("\n-----------------------------------------------------");

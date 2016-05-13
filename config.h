@@ -11,4 +11,7 @@
 #define F_CPU 16000000UL
 #define BAUD 115200
 
+//#define DEBUG_TIMERS
+#define DEBUG_DETECTOR
+
 #endif /* CONFIG_H_ */
