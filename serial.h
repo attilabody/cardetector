@@ -5,8 +5,9 @@
  *      Author: compi
  */
 
-#ifndef SERIAL_H_
+#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && !defined(SERIAL_H_)
 #define SERIAL_H_
+
 
 void uart_init(void);
 void uart_transmit (unsigned char data);

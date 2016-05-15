@@ -8,6 +8,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <avr/eeprom.h>
 
 #include <stdlib.h>
 
@@ -37,43 +38,70 @@ enum STATES
 	TOUT
 };
 
-#define SHIFT_BELOW		5
-#define SHIFT_ABOVE		3
-#define SHIFT_ACTIVE	0
-#define	SHIFT_TOUT		8
+typedef struct
+{
+	uint8_t	shifts[4];
+	uint8_t	shift, limitshift, tlimit;
+} PARAMS;
 
-#define LIMITSHIFT	5
-#define TLIMIT 		40
-#define SHIFT		8
+const PARAMS EEMEM ee_params =
+{
+	  {5, 3, 0, 8}	//below, above, active, timeout
+	, 8		//shift
+	, 5		//limithistf
+	, 40	//tlimit
+};
+
+
+
+
+const PARAMS g_params =
+{
+	  {5, 3, 0, 8}	//below, above, active, timeout
+	, 8		//shift
+	, 5		//limithistf
+	, 40	//tlimit
+};
 
 uint32_t		g_sum = 0;
 
 
 ////////////////////////////////////////////////////////////////////
+void init_config()
+{
+	eeprom_read_block((void*)&g_params, &ee_params, sizeof(g_params));
+}
+
+////////////////////////////////////////////////////////////////////
 uint8_t	detect(uint16_t counter)
 {
 	static uint16_t			time=0;
-	static const uint8_t	shifts[4] = {SHIFT_BELOW, SHIFT_ABOVE, SHIFT_ACTIVE, SHIFT_TOUT};
 
-	uint16_t		debugavg, debugth;
+	uint16_t		debugavg;
+#if defined(DEBUG_DETECTOR)
+	uint16_t		debugth;
+#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+
 	int32_t			debugmod;
 
 	enum STATES		state;
 	int32_t			diff;
 
-	diff = (int32_t)counter - (int32_t)(debugavg = (g_sum >> SHIFT));		// adjust counts by counting interval to give frequency in Hz
+	diff = (int32_t)counter - (int32_t)(debugavg = (g_sum >> g_params.shift));		// adjust counts by counting interval to give frequency in Hz
 
 	if (diff < 0)
 		state = BELOW;
-	else if(diff < (g_sum >> (SHIFT + LIMITSHIFT)))
+	else if(diff < (g_sum >> (g_params.shift + g_params.limitshift)))
 		state = ABOVE;
-	else if (time < TLIMIT)
+	else if (time < ((uint16_t)g_params.tlimit) << 2)
 		state = ACTIVE;
 	else
 		state = TOUT;
 
-	debugth = (g_sum >> (SHIFT + LIMITSHIFT));
-	debugmod = (diff << shifts[state]);
+#if defined(DEBUG_DETECTOR)
+	debugth = (g_sum >> (g_params.shift + g_params.limitshift));
+#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+	debugmod = (diff << g_params.shifts[state]);
 
 	g_sum += debugmod;
 
@@ -89,7 +117,7 @@ uint8_t	detect(uint16_t counter)
 	uart_print(" Sta: ");
 	uart_printlong(state);
 	uart_print(" << : ");
-	uart_printlong(shifts[state]);
+	uart_printlong(g_params.shifts[state]);
 	uart_print(" Mod: ");
 	uart_printlong(debugmod);
 	uart_print(" Th: ");
@@ -114,7 +142,9 @@ int main(void)
 	uint8_t			prevactive = 0;
 	uint8_t			count;
 
+#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 	uart_init();
+#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 
 	DDRB |= (1<<DDB5); //Set the 6th bit on PORTB (i.e. PB5) to 1 => output
 	PORTB |= (1 << PORTB5);
@@ -123,14 +153,19 @@ int main(void)
 
 	startCounting(250);  // how many ms to count for
 
+#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 	uart_print("Calibrating: ");
+#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+
 	//calibration
 	for(count = 0; count < 4; ++count)
 	{
 		while(!g_counterReady);
 		g_counterReady = 0;
 		PORTB ^= (1 << PORTB5);
+#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 		uart_transmit('x');
+#endif
 	}
 
 	for(count = 0; count < 16; ++count)
@@ -139,18 +174,22 @@ int main(void)
 		g_sum += g_timerCounts;
 		g_counterReady = 0;
 		PORTB ^= (1 << PORTB5);
+#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 		uart_transmit('.');
+#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 	}
-	g_sum <<= 4;
+	g_sum <<= (g_params.shift - 4);
+#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 	uart_println("");
+#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 
 	PORTB &= ~(1<<PORTB5);
 
-
+#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 	uart_print("Sum: ");
 	uart_printlong(g_sum);
 	uart_println("");
-
+#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 
 	while(1)
 	{

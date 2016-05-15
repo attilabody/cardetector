@@ -5,6 +5,7 @@
  *      Author: compi
  */
 #include "config.h"
+#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 #include <avr/io.h>
 #include <util/setbaud.h>
 
@@ -57,3 +58,4 @@ void uart_printlong(long l)
 	ltoa(l, buffer, 10);
 	uart_print(buffer);
 }
+#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)

@@ -12,6 +12,6 @@
 #define BAUD 115200
 
 //#define DEBUG_TIMERS
-#define DEBUG_DETECTOR
+//#define DEBUG_DETECTOR
 
 #endif /* CONFIG_H_ */
