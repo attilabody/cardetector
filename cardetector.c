@@ -15,16 +15,16 @@
 #include "serial.h"
 
 volatile uint16_t	g_timerCounts;
-volatile uint8_t	g_counterReady;
-volatile uint8_t	g_overrun;
+volatile uint8_t	g_counterReady = 0;
+volatile uint8_t	g_overrun = 0;
 volatile uint32_t	g_ms = 0;
 
 // internal to counting routine
-volatile uint8_t g_overflowCount;
-volatile uint16_t g_timerTicks;
-uint16_t g_timerPeriod;
+volatile uint8_t g_overflowCount = 0;
+volatile uint16_t g_timerTicks = 0;
+uint16_t g_timerPeriod = 250;
 
-void startCounting(uint8_t ms);
+void setup(uint8_t ms);
 
 #ifdef DEBUG_TIMERS
 void dumpinfo();
@@ -146,12 +146,13 @@ int main(void)
 	uart_init();
 #endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 
-	DDRB |= (1<<DDB5); //Set the 6th bit on PORTB (i.e. PB5) to 1 => output
-	PORTB |= (1 << PORTB5);
+	DDRB |= _BV(DD_LED) | _BV(DD_OUT);
+	PORTB |= _BV(PORT_LED);
+	PORTB &= ~_BV(PORT_OUT);
 
 	sei();
 
-	startCounting(250);  // how many ms to count for
+	setup(250);  // ms
 
 #if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 	uart_print("Calibrating: ");
@@ -162,7 +163,7 @@ int main(void)
 	{
 		while(!g_counterReady);
 		g_counterReady = 0;
-		PORTB ^= (1 << PORTB5);
+		PORTB ^= _BV(PORT_LED);
 #if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 		uart_transmit('x');
 #endif
@@ -173,7 +174,7 @@ int main(void)
 		while(!g_counterReady);
 		g_sum += g_timerCounts;
 		g_counterReady = 0;
-		PORTB ^= (1 << PORTB5);
+		PORTB ^= _BV(PORT_LED);
 #if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 		uart_transmit('.');
 #endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
@@ -183,7 +184,7 @@ int main(void)
 	uart_println("");
 #endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 
-	PORTB &= ~(1<<PORTB5);
+	PORTB &= ~_BV(PORT_LED);
 
 #if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 	uart_print("Sum: ");
@@ -193,8 +194,7 @@ int main(void)
 
 	while(1)
 	{
-		while (!g_counterReady) {
-		}  // loop until count over
+		while (!g_counterReady);
 
 		uint32_t	countercopy = g_timerCounts;
 		g_counterReady = 0;
@@ -210,12 +210,12 @@ int main(void)
 		if(detect(countercopy)) {
 			if(!prevactive) {
 				prevactive = 1;
-				PORTB |= (1<<PORTB5);
+				PORTB |= (_BV(PORT_LED) | _BV(PORT_OUT));
 			}
 		} else {
 			if(prevactive) {
 				prevactive = 0;
-				PORTB &= ~(1<<PORTB5);
+				PORTB &= ~(_BV(PORT_LED) | _BV(PORT_OUT));
 			}
 		}
 
@@ -223,54 +223,37 @@ int main(void)
 }
 
 ////////////////////////////////////////////////////////////////////
-void startCounting(uint8_t ms)
+void setup(uint8_t ms)
 {
-	g_counterReady = 0;         // time not up yet
 	g_timerPeriod = ms;             // how many 1 ms counts to do
-	g_timerTicks = 0;               // reset interrupt counter
-	g_overflowCount = 0;            // no overflows yet
 
-	// reset Timer 0 and Timer 2
-	TCCR0A = 0;
+	TCCR0A = 0;						//t0: stop
 	TCCR0B = 0;
-	TCCR2A = 0;
-	TCCR2B = 0;
+	TCNT0 = 0;						//t0: reset counter
 
-	// Timer 0 - counts events on pin D4
-	TIMSK0 = _BV(TOIE0);   // interrupt on Timer 0 overflow
+	TCCR1 = 0;						//t1: stop
+	GTCCR |= _BV(PSR1);				//t1: prescaler reset
+	TCNT1 = 0;						//t1: reset counter
+	OCR1C = 124;					//for counter autoreset
+	OCR1A = 124;					//for interrupt
 
-	// Timer 2 - gives us our 1 ms counting interval
-	// 16 MHz clock (62.5 ns per tick) - prescaled by 128
-	//  counter increments every 8 µs.
-	// So we count 125 of them, giving exactly 1000 µs (1 ms)
-	TCCR2A = _BV(WGM21);   // CTC mode
-	OCR2A = 124;            // count up to 125  (zero relative!!!!)
+	TIMSK = _BV(TOIE0) | _BV(OCIE1A);	//enable interrupts for t0 & t1
 
-	// Timer 2 - interrupt on match (ie. every 1 ms)
-	TIMSK2 = _BV(OCIE2A);   // enable Timer2 Interrupt
+	TCCR0B = _BV(CS00) | _BV(CS01) | _BV(CS02);	//t0: ext clk rising edge
+	TCCR1 |= _BV(CS13) | _BV(CTC1);	//t1: prescaler of 128
 
-	TCNT0 = 0;      // Both counters to zero
-	TCNT2 = 0;
-
-	// Reset prescalers
-	GTCCR = _BV(PSRASY);        // reset prescaler now
-	// start Timer 2
-	TCCR2B = _BV (CS20) | _BV(CS22);  // prescaler of 128
-	// start Timer 0
-	// External clock source on T0 pin (D4). Clock on rising edge.
-	TCCR0B = _BV (CS00) | _BV(CS01) | _BV(CS02);
-}  // end of startCounting
+}  // end of setup
 
 ////////////////////////////////////////////////////////////////////
-ISR(TIMER0_OVF_vect)
+ISR(COUNTERVECT)
 {
 	++g_overflowCount;               // count number of Counter1 overflows
 }  // end of TIMER1_OVF_vect
 
 ////////////////////////////////////////////////////////////////////
-//  Timer2 Interrupt Service is invoked by hardware Timer 2 every 1 ms = 1000 Hz
+//  Timer Interrupt Service is invoked every 1 ms = 1000 Hz
 //  16Mhz / 128 / 125 = 1000 Hz
-ISR (TIMER2_COMPA_vect)
+ISR (TIMERVECT)
 {
 	// grab counter value before it changes any more
 	uint8_t	counterValue = TCNT0;
@@ -291,7 +274,7 @@ ISR (TIMER2_COMPA_vect)
 	}
 
 	// if just missed an overflow
-	if ((TIFR0 & _BV(TOV0)) && counterValue < 128)
+	if ((TIFR & _BV(TOV0)) && counterValue < 128)
 		overflowCopy++;
 
 	// end of gate time, measurement ready
