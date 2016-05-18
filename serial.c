@@ -5,7 +5,7 @@
  *      Author: compi
  */
 #include "config.h"
-#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 #include <avr/io.h>
 #include <util/setbaud.h>
 

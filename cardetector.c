@@ -48,8 +48,8 @@ const PARAMS EEMEM ee_params =
 {
 	  {5, 3, 0, 8}	//below, above, active, timeout
 	, 8		//shift
-	, 5		//limithistf
-	, 40	//tlimit
+	, 6		//limithistf
+	, 60	//tlimit
 };
 
 
@@ -59,8 +59,8 @@ const PARAMS g_params =
 {
 	  {5, 3, 0, 8}	//below, above, active, timeout
 	, 8		//shift
-	, 5		//limithistf
-	, 40	//tlimit
+	, 6		//limithistf
+	, 60	//tlimit
 };
 
 uint32_t		g_sum = 0;
@@ -80,7 +80,7 @@ uint8_t	detect(uint16_t counter)
 	uint16_t		debugavg;
 #if defined(DEBUG_DETECTOR)
 	uint16_t		debugth;
-#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 
 	int32_t			debugmod;
 
@@ -100,12 +100,12 @@ uint8_t	detect(uint16_t counter)
 
 #if defined(DEBUG_DETECTOR)
 	debugth = (g_sum >> (g_params.shift + g_params.limitshift));
-#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 	debugmod = (diff << g_params.shifts[state]);
 
 	g_sum += debugmod;
 
-#ifdef DEBUG_DETECTOR
+#if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 	uart_print(" Sum: ");
 	uart_printlong(g_sum);
 	uart_print(" Raw: ");
@@ -142,9 +142,9 @@ int main(void)
 	uint8_t			prevactive = 0;
 	uint8_t			count;
 
-#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 	uart_init();
-#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 
 	DDRB |= _BV(DD_LED) | _BV(DD_OUT);
 	PORTB |= _BV(PORT_LED);
@@ -154,9 +154,9 @@ int main(void)
 
 	setup(250);  // ms
 
-#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 	uart_print("Calibrating: ");
-#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 
 	//calibration
 	for(count = 0; count < 4; ++count)
@@ -164,7 +164,7 @@ int main(void)
 		while(!g_counterReady);
 		g_counterReady = 0;
 		PORTB ^= _BV(PORT_LED);
-#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 		uart_transmit('x');
 #endif
 	}
@@ -175,22 +175,22 @@ int main(void)
 		g_sum += g_timerCounts;
 		g_counterReady = 0;
 		PORTB ^= _BV(PORT_LED);
-#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 		uart_transmit('.');
-#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 	}
 	g_sum <<= (g_params.shift - 4);
-#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 	uart_println("");
-#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 
 	PORTB &= ~_BV(PORT_LED);
 
-#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 	uart_print("Sum: ");
 	uart_printlong(g_sum);
 	uart_println("");
-#endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
+#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 
 	while(1)
 	{
@@ -199,7 +199,7 @@ int main(void)
 		uint32_t	countercopy = g_timerCounts;
 		g_counterReady = 0;
 
-#ifdef DEBUG_DETECTOR
+#if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 		float frq = (countercopy * 1000.0) / g_timerPeriod;
 		unsigned long lf = (unsigned long)frq;
 
@@ -227,6 +227,7 @@ void setup(uint8_t ms)
 {
 	g_timerPeriod = ms;             // how many 1 ms counts to do
 
+#if defined(__AVR_ATtiny85__)
 	TCCR0A = 0;						//t0: stop
 	TCCR0B = 0;
 	TCNT0 = 0;						//t0: reset counter
@@ -239,8 +240,29 @@ void setup(uint8_t ms)
 
 	TIMSK = _BV(TOIE0) | _BV(OCIE1A);	//enable interrupts for t0 & t1
 
-	TCCR0B = _BV(CS00) | _BV(CS01) | _BV(CS02);	//t0: ext clk rising edge
-	TCCR1 |= _BV(CS13) | _BV(CTC1);	//t1: prescaler of 128
+	TCCR0B = _BV(CS00) | _BV(CS01) | _BV(CS02);	//t0: ext clk rising edge (start)
+	TCCR1 |= _BV(CS13) | _BV(CTC1);	//t1: prescaler 128, CTC mode (start)
+#elif defined(__AVR_ATmega328P__)
+	TCCR0A = 0;				//t0: stop
+	TCCR0B = 0;
+	TCNT0 = 0;				//t0: reset counter
+
+	TIMSK0 = _BV(TOIE0);	//t0: overflow interrupt enable
+
+	TCCR2A = 0;				//t2: stop
+	TCCR2B = 0;
+	GTCCR = _BV(PSRASY);	//t2: prescaler reset
+	TCNT2 = 0;				//t2: reset counter
+
+	TCCR2A = _BV(WGM21);	//t2: CTC mode
+	OCR2A = 124;			//t2: 62.5*128*125 = 1000000 ns = 1 ms
+	TIMSK2 = _BV(OCIE2A);	//t2 enable Timer2 Interrupt
+
+	TCCR2B = _BV (CS20) | _BV(CS22);				//t2: prescaler 128 (start)
+	TCCR0B = _BV (CS00) | _BV(CS01) | _BV(CS02);	//t0: ext clk, rising edge(start)
+#else
+#error "Only ATmega 328P and ATtinyX5 are supported."
+#endif
 
 }  // end of setup
 
@@ -283,7 +305,7 @@ ISR (TIMERVECT)
 	g_counterReady = 1;              // set global flag for end count period
 }  // end of TIMER2_COMPA_vect
 
-#ifdef DEBUG_TIMERS
+#if defined(DEBUG_TIMERS) && defined(HAVE_SERIAL)
 ////////////////////////////////////////////////////////////////////
 void dumpreg16(char *name, unsigned int value )
 {

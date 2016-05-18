@@ -5,7 +5,7 @@
  *      Author: compi
  */
 
-#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && !defined(SERIAL_H_)
+#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL) && !defined(SERIAL_H_)
 #define SERIAL_H_
 
 
