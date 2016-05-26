@@ -14,15 +14,20 @@
 
 #include "serial.h"
 
-volatile uint16_t	g_timerCounts;
-volatile uint8_t	g_counterReady = 0;
+#if defined(DEBUG_DETECTOR)
+volatile uint16_t	g_badirq = 0;
+uint16_t			g_badirqcnt = 0;
+#endif
+volatile uint16_t	g_timer_counts;
+volatile uint8_t	g_counter_ready = 0;
 volatile uint8_t	g_overrun = 0;
 volatile uint32_t	g_ms = 0;
+volatile uint32_t	g_lastwtf = 0;
 
 // internal to counting routine
-volatile uint8_t g_overflowCount = 0;
-volatile uint16_t g_timerTicks = 0;
-uint16_t g_timerPeriod = 250;
+volatile uint8_t g_counter_overflows = 0;
+volatile uint16_t g_timer_overflows = 0;
+uint16_t g_counting_period = 250;
 
 void setup(uint8_t ms);
 
@@ -33,6 +38,7 @@ void dumpinfo();
 enum STATES
 {
 	BELOW,
+	BASE,
 	ABOVE,
 	ACTIVE,
 	TOUT
@@ -40,16 +46,17 @@ enum STATES
 
 typedef struct
 {
-	uint8_t	shifts[4];
-	uint8_t	shift, limitshift, tlimit;
+	uint8_t	shifts[5];
+	uint8_t	shift, tlimit;
+	uint16_t	divider;
 } PARAMS;
 
 const PARAMS EEMEM ee_params =
 {
-	  {5, 3, 0, 8}	//below, above, active, timeout
-	, 8		//shift
-	, 6		//limithistf
-	, 60	//tlimit
+	  {SHIFT_BELOW, SHIFT_BASE, SHIFT_ABOVE, SHIFT_ACTIVE, SHIFT_TIMEOUT}	//below, above, active, timeout
+	, SHIFT_SUM		//shift
+	, TIMELIMIT		//tlimit
+	, DIVIDER		//divider
 };
 
 
@@ -57,14 +64,25 @@ const PARAMS EEMEM ee_params =
 
 const PARAMS g_params =
 {
-	  {5, 3, 0, 8}	//below, above, active, timeout
-	, 8		//shift
-	, 6		//limithistf
-	, 60	//tlimit
+	  {SHIFT_BELOW, SHIFT_BASE, SHIFT_ABOVE, SHIFT_ACTIVE, SHIFT_TIMEOUT}	//below, above, active, timeout
+	, SHIFT_SUM		//shift
+	, TIMELIMIT		//tlimit
+	, DIVIDER		//divider
 };
 
 uint32_t		g_sum = 0;
 
+
+////////////////////////////////////////////////////////////////////
+void setleds(char red, char green, char blue)
+{
+	if(red|green|blue) PORTB |= _BV(PORT_LED1);
+	else PORTB &= ~ _BV(PORT_LED1);
+//	if(green) PORTB |= _BV(PORT_LED2);
+//	else PORTB &= ~ _BV(PORT_LED2);
+//	if(blue) PORTB |= _BV(PORT_LED3);
+//	else PORTB &= ~ _BV(PORT_LED3);
+}
 
 ////////////////////////////////////////////////////////////////////
 void init_config()
@@ -73,43 +91,40 @@ void init_config()
 }
 
 ////////////////////////////////////////////////////////////////////
-uint8_t	detect(uint16_t counter)
+enum STATES detect(uint16_t counter)
 {
-	static uint16_t			time=0;
+	static uint16_t			active_time=0;
 
-	uint16_t		debugavg;
-#if defined(DEBUG_DETECTOR)
-	uint16_t		debugth;
-#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
-
-	int32_t			debugmod;
+#if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
+	uint16_t		debugavg = g_sum >> g_params.shift;
+#endif
+	uint16_t		threshold = (g_sum >> g_params.shift) / g_params.divider;
+	int32_t			modifier = 0;
 
 	enum STATES		state;
-	int32_t			diff;
+	int32_t			diff = (int32_t)counter - (int32_t)(g_sum >> g_params.shift);
+	uint16_t		tolerance = threshold >> SHIFT_TOLERANCE;
 
-	diff = (int32_t)counter - (int32_t)(debugavg = (g_sum >> g_params.shift));		// adjust counts by counting interval to give frequency in Hz
 
 	if (diff < 0)
-		state = BELOW;
-	else if(diff < (g_sum >> (g_params.shift + g_params.limitshift)))
+		state = tolerance + diff < 0 ? BELOW : BASE;
+	else if( diff < tolerance)
+		state = BASE;
+	else if(diff < threshold)
 		state = ABOVE;
-	else if (time < ((uint16_t)g_params.tlimit) << 2)
+	else if (active_time < ((uint16_t)g_params.tlimit) << 2)
 		state = ACTIVE;
 	else
 		state = TOUT;
 
-#if defined(DEBUG_DETECTOR)
-	debugth = (g_sum >> (g_params.shift + g_params.limitshift));
-#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
-	debugmod = (diff << g_params.shifts[state]);
-
-	g_sum += debugmod;
+	modifier = (diff << g_params.shifts[state]);
+	g_sum += modifier;
 
 #if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 	uart_print(" Sum: ");
 	uart_printlong(g_sum);
 	uart_print(" Raw: ");
-	uart_printlong(g_timerCounts);
+	uart_printlong(g_timer_counts);
 	uart_print(" Avg: ");
 	uart_printlong(debugavg);
 	uart_print(" Diff: ");
@@ -119,36 +134,35 @@ uint8_t	detect(uint16_t counter)
 	uart_print(" << : ");
 	uart_printlong(g_params.shifts[state]);
 	uart_print(" Mod: ");
-	uart_printlong(debugmod);
+	uart_printlong(modifier);
 	uart_print(" Th: ");
-	uart_printlong(debugth);
+	uart_printlong(threshold);
+	uart_print(" To: ");
+	uart_printlong(tolerance);
+	uart_print(" BAD: ");
+	uart_printlong(g_badirq);
+
 	uart_println("");
 #endif	//	DEBUG_DETECTOR
 
-	if(state < ACTIVE) {
-		time = 0;
-		return 0;
-	} else {
-		++time;
-		return 1;
-	}
+	if(state < ACTIVE) active_time = 0;
+	else ++active_time;
 
-
+	return state;
 }
 
 ////////////////////////////////////////////////////////////////////
 int main(void)
 {
-	uint8_t			prevactive = 0;
 	uint8_t			count;
+	enum STATES		state;
 
 #if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 	uart_init();
 #endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 
-	DDRB |= _BV(DD_LED) | _BV(DD_OUT);
-	PORTB |= _BV(PORT_LED);
-	PORTB &= ~_BV(PORT_OUT);
+	DDRB |= _BV(DD_LED1) | _BV(DD_LED2) | _BV(DD_LED3) | _BV(DD_OUT);
+	PORTB = 0;
 
 	sei();
 
@@ -161,9 +175,10 @@ int main(void)
 	//calibration
 	for(count = 0; count < 4; ++count)
 	{
-		while(!g_counterReady);
-		g_counterReady = 0;
-		PORTB ^= _BV(PORT_LED);
+		while(!g_counter_ready);
+		g_counter_ready = 0;
+		if(count & 1) setleds(0, 0, 0);
+		else setleds(1,0,0);
 #if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 		uart_transmit('x');
 #endif
@@ -171,10 +186,11 @@ int main(void)
 
 	for(count = 0; count < 16; ++count)
 	{
-		while(!g_counterReady);
-		g_sum += g_timerCounts;
-		g_counterReady = 0;
-		PORTB ^= _BV(PORT_LED);
+		while(!g_counter_ready);
+		g_sum += g_timer_counts;
+		g_counter_ready = 0;
+		if(count & 1) setleds(0, 0, 0);
+		else setleds(1,1,0);
 #if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 		uart_transmit('.');
 #endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
@@ -184,7 +200,7 @@ int main(void)
 	uart_println("");
 #endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 
-	PORTB &= ~_BV(PORT_LED);
+	setleds(0,0,0);
 
 #if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 	uart_print("Sum: ");
@@ -194,38 +210,46 @@ int main(void)
 
 	while(1)
 	{
-		while (!g_counterReady);
+		while (!g_counter_ready);
 
-		uint32_t	countercopy = g_timerCounts;
-		g_counterReady = 0;
+		uint32_t	countercopy = g_timer_counts;
+		g_counter_ready = 0;
 
 #if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
-		float frq = (countercopy * 1000.0) / g_timerPeriod;
+		float frq = (countercopy * 1000.0) / g_counting_period;
 		unsigned long lf = (unsigned long)frq;
 
 		uart_print("Freq: ");
 		uart_printlong(lf);
 #endif	//	DEBUG_DETECTOR
 
-		if(detect(countercopy)) {
-			if(!prevactive) {
-				prevactive = 1;
-				PORTB |= (_BV(PORT_LED) | _BV(PORT_OUT));
-			}
+		if((state = detect(countercopy)) >= ACTIVE) {
+			setleds(1,1,1);
+			PORTB |= _BV(PORT_OUT);
 		} else {
-			if(prevactive) {
-				prevactive = 0;
-				PORTB &= ~(_BV(PORT_LED) | _BV(PORT_OUT));
-			}
+			PORTB &= ~_BV(PORT_OUT);
+			if(state == BELOW)
+				setleds(0,0,1);
+			else if(state == BASE)
+				setleds(0,0,0);
+			else	//ABOVE
+				setleds(1,0,0);
 		}
 
+#if defined(DEBUG_DETECTOR)
+		if(g_badirq && g_badirqcnt == g_badirq) {
+			PORTB ^= _BV(PORT_LED2);
+			g_badirqcnt = 0;
+			++g_badirqcnt;
+		}
+#endif	//	DEBUG_DETECTOR
 	}
 }
 
 ////////////////////////////////////////////////////////////////////
 void setup(uint8_t ms)
 {
-	g_timerPeriod = ms;             // how many 1 ms counts to do
+	g_counting_period = ms;             // how many 1 ms counts to do
 
 #if defined(__AVR_ATtiny85__)
 	TCCR0A = 0;						//t0: stop
@@ -269,7 +293,7 @@ void setup(uint8_t ms)
 ////////////////////////////////////////////////////////////////////
 ISR(COUNTERVECT)
 {
-	++g_overflowCount;               // count number of Counter1 overflows
+	++g_counter_overflows;               // count number of Counter1 overflows
 }  // end of TIMER1_OVF_vect
 
 ////////////////////////////////////////////////////////////////////
@@ -278,31 +302,41 @@ ISR(COUNTERVECT)
 ISR (TIMERVECT)
 {
 	// grab counter value before it changes any more
-	uint8_t	counterValue = TCNT0;
-	uint8_t	overflowCopy = g_overflowCount;
+	uint8_t	counter_copy = TCNT0;
+	uint8_t	tifr_copy = TIFR;
 
 	++g_ms;
+
 	// see if we have reached timing period
-	if (++g_timerTicks < g_timerPeriod)
+	if (++g_timer_overflows < g_counting_period)
 		return;  // not yet
 
 	TCNT0 = 0;
-	g_timerTicks = 0;
-	g_overflowCount = 0;
+	TIFR &= ~_BV(TOV0);
+	g_timer_overflows = 0;
 
-	if(g_counterReady) {
+	if(g_counter_ready) {
+		g_counter_overflows = 0;
 		g_overrun = 1;
 		return;
 	}
 
 	// if just missed an overflow
-	if ((TIFR & _BV(TOV0)) && counterValue < 128)
-		overflowCopy++;
+#if defined(DEBUG_DETECTOR)
+	if(tifr_copy & _BV(TOV0)) {
+		g_badirq++;
+		g_lastwtf = g_ms;
+	}
+#endif
+	if((tifr_copy & _BV(TOV0)) && counter_copy < 128)
+		g_counter_overflows++;
+
 
 	// end of gate time, measurement ready
 	// calculate total count
-	g_timerCounts = (overflowCopy << 8) + counterValue; // each overflow is 256 more
-	g_counterReady = 1;              // set global flag for end count period
+	g_timer_counts = (g_counter_overflows << 8) + counter_copy; // each overflow is 256 more
+	g_counter_ready = 1;              // set global flag for end count period
+	g_counter_overflows = 0;
 }  // end of TIMER2_COMPA_vect
 
 #if defined(DEBUG_TIMERS) && defined(HAVE_SERIAL)
@@ -379,8 +413,8 @@ void dumpinfo()
 	dumpreg16("OCR1A", OCR1A);
 	dumpreg16("ICR1", ICR1);
 	uart_println("");
-	dumpvar32("g_overflowCount", g_overflowCount);
-	dumpvar32("g_timerCounts", g_timerCounts);
+	dumpvar32("g_overflowCount", g_counter_overflows);
+	dumpvar32("g_timer_counts", g_timerCounts);
 	uart_println("");
 //	dumpreg("", );
 //	dumpreg("", );
