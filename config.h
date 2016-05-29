@@ -61,7 +61,7 @@
 #define SHIFT_TIMEOUT	8
 
 #define SHIFT_SUM		8
-#define	DIVIDER			200
+#define	DIVIDER			300
 #define	SHIFT_TOLERANCE	3
 
 #define TIMELIMIT		60

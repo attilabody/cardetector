@@ -251,11 +251,11 @@ void setup(uint8_t ms)
 {
 	g_counting_period = ms;             // how many 1 ms counts to do
 
-#if defined(__AVR_ATtiny85__)
 	TCCR0A = 0;						//t0: stop
 	TCCR0B = 0;
 	TCNT0 = 0;						//t0: reset counter
 
+#if defined(__AVR_ATtiny85__)
 	TCCR1 = 0;						//t1: stop
 	GTCCR |= _BV(PSR1);				//t1: prescaler reset
 	TCNT1 = 0;						//t1: reset counter
@@ -264,29 +264,24 @@ void setup(uint8_t ms)
 
 	TIMSK = _BV(TOIE0) | _BV(OCIE1A);	//enable interrupts for t0 & t1
 
-	TCCR0B = _BV(CS00) | _BV(CS01) | _BV(CS02);	//t0: ext clk rising edge (start)
 	TCCR1 |= _BV(CS13) | _BV(CTC1);	//t1: prescaler 128, CTC mode (start)
 #elif defined(__AVR_ATmega328P__)
-	TCCR0A = 0;				//t0: stop
-	TCCR0B = 0;
-	TCNT0 = 0;				//t0: reset counter
+	TIMSK0 = _BV(TOIE0);			//t0: overflow interrupt enable
 
-	TIMSK0 = _BV(TOIE0);	//t0: overflow interrupt enable
-
-	TCCR2A = 0;				//t2: stop
+	TCCR2A = 0;						//t2: stop
 	TCCR2B = 0;
-	GTCCR = _BV(PSRASY);	//t2: prescaler reset
-	TCNT2 = 0;				//t2: reset counter
+	GTCCR = _BV(PSRASY);			//t2: prescaler reset
+	TCNT2 = 0;						//t2: reset counter
 
-	TCCR2A = _BV(WGM21);	//t2: CTC mode
-	OCR2A = 124;			//t2: 62.5*128*125 = 1000000 ns = 1 ms
-	TIMSK2 = _BV(OCIE2A);	//t2 enable Timer2 Interrupt
+	TCCR2A = _BV(WGM21);			//t2: CTC mode
+	OCR2A = 124;					//t2: 62.5*128*125 = 1000000 ns = 1 ms
+	TIMSK2 = _BV(OCIE2A);			//t2 enable Timer2 Interrupt
 
-	TCCR2B = _BV (CS20) | _BV(CS22);				//t2: prescaler 128 (start)
-	TCCR0B = _BV (CS00) | _BV(CS01) | _BV(CS02);	//t0: ext clk, rising edge(start)
+	TCCR2B = _BV(CS20) | _BV(CS22);	//t2: prescaler 128 (start)
 #else
 #error "Only ATmega 328P and ATtinyX5 are supported."
 #endif
+	TCCR0B = _BV(CS00) | _BV(CS01) | _BV(CS02);	//t0: ext clk rising edge (start)
 
 }  // end of setup
 
@@ -312,7 +307,7 @@ ISR (TIMERVECT)
 		return;  // not yet
 
 	TCNT0 = 0;
-	TIFR &= ~_BV(TOV0);
+	TIFR |= _BV(TOV0);
 	g_timer_overflows = 0;
 
 	if(g_counter_ready) {
