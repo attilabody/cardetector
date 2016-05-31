@@ -6,5 +6,6 @@ Debug/
 Debug_AVaRICE/
 .metadata/
 **/.idea/workspace.xml
-*.s#?
-*.sch.lck
+*.?#?
+*.lck
+*.pdf
