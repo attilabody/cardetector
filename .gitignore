@@ -9,3 +9,5 @@ Debug_AVaRICE/
 *.?#?
 *.lck
 *.pdf
+*.job
+*.pro
