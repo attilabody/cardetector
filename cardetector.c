@@ -11,6 +11,7 @@
 #include <avr/eeprom.h>
 
 #include <stdlib.h>
+#include <limits.h>
 
 #include "serial.h"
 
@@ -46,7 +47,7 @@ enum STATES
 
 typedef struct
 {
-	uint8_t	shifts[5];
+	int8_t	shifts[5];
 	uint8_t	shift, tlimit;
 	uint16_t	divider;
 } PARAMS;
@@ -97,9 +98,10 @@ enum STATES detect(uint16_t counter)
 
 #if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 	uint16_t		debugavg = g_sum >> g_params.shift;
+	int32_t			modifier;
 #endif
 	uint16_t		threshold = (g_sum >> g_params.shift) / g_params.divider;
-	int32_t			modifier = 0;
+	int8_t			shift;
 
 	enum STATES		state;
 	int32_t			diff = (int32_t)counter - (int32_t)(g_sum >> g_params.shift);
@@ -117,10 +119,12 @@ enum STATES detect(uint16_t counter)
 	else
 		state = TOUT;
 
-	modifier = (diff << g_params.shifts[state]);
-	g_sum += modifier;
+	shift = g_params.shifts[state];
+	if(shift != SCHAR_MIN)
+		g_sum += (shift >= 0) ? (diff << shift) : (diff >> -shift);
 
 #if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
+	modifier = (shift >= 0) ? (diff << shift) : (diff >> -shift);
 	uart_print(" Sum: ");
 	uart_printlong(g_sum);
 	uart_print(" Raw: ");

@@ -8,6 +8,8 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+#include <limits.h>
+
 #define F_CPU 16000000UL
 #define BAUD 115200
 
@@ -57,12 +59,12 @@
 #define SHIFT_BELOW		5
 #define SHIFT_BASE		0	//not used
 #define SHIFT_ABOVE		3
-#define SHIFT_ACTIVE	0
+#define SHIFT_ACTIVE	SCHAR_MIN
 #define SHIFT_TIMEOUT	8
 
 #define SHIFT_SUM		8
 #define	DIVIDER			300
 #define	SHIFT_TOLERANCE	3
 
-#define TIMELIMIT		60
+#define TIMELIMIT		180
 #endif /* CONFIG_H_ */
