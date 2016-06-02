@@ -374,7 +374,7 @@ UsedLibrary="/home/compi/attila.body@gmail.com/eagle/libs/Atmel/Atmel_By_element
 
 [Win_1]
 Type="Schematic Editor"
-Loc="0 0 599 399"
+Loc="5760 1105 7679 2155"
 State=1
 Number=1
 File="detector_t85-pu.sch"
@@ -417,23 +417,23 @@ ArcDirection=0
 AddLevel=2
 PadsSameType=0
 Layer=91
-Views=" 1: -2.33729 -4.45256 124.648 64.1819"
+Views=" 1: 0.551719 5.77856 189.948 70.7148"
 Sheet="2"
 
 [Win_2]
 Type="Control Panel"
-Loc="0 174 1919 1199"
+Loc="0 1105 1919 2130"
 State=1
 Number=0
 
 [Win_3]
 Type="Board Editor"
-Loc="0 0 599 399"
+Loc="1920 1105 5759 2159"
 State=1
 Number=2
 File="detector_t85-pu.brd"
 View="29.3944 -1.99207 85.8456 49.2351"
-WireWidths=" 0 0.254 0.6096 0.8128 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 1.016 0.4064 0.3048"
+WireWidths=" 0 0.254 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 1.016 0.6096 0.8128 0.4064 0.3048"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.5 0.6 0.7 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.8"
 ViaDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
@@ -448,10 +448,10 @@ DimensionExtWidths=" 0.127 0.254 0.1 0.13 0.26 0"
 DimensionExtLengths=" 1.27 2.54 1 2 3 0"
 DimensionExtOffsets=" 1.27 2.54 1 2 3 0"
 SmdSizes=" 0.3048 0.1524 0.4064 0.2032 0.6096 0.3048 0.8128 0.4064 1.016 0.508 1.27 0.6604 1.4224 0.7112 1.6764 0.8128 1.778 0.9144 1.9304 0.9652 2.1844 1.0668 2.54 1.27 3.81 1.9304 5.08 2.54 6.4516 3.2512 1.27 0.635"
-WireBend=1
+WireBend=2
 WireBendSet=0
 WireCap=1
-MiterStyle=0
+MiterStyle=1
 PadShape=0
 ViaShape=1
 PolygonPour=0
@@ -473,7 +473,7 @@ PadsSameType=0
 Layer=16
 
 [Desktop]
-Screen="1920 1200"
+Screen="7680 2160"
 Window="Win_1"
 Window="Win_2"
 Window="Win_3"
