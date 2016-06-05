@@ -373,14 +373,8 @@ UsedLibrary="/home/compi/work/gate433/cardetector/cardetector/hardware/detector.
 UsedLibrary="/home/compi/attila.body@gmail.com/eagle/libs/Atmel/Atmel_By_element14_Batch_1-00.lbr"
 
 [Win_1]
-Type="Control Panel"
-Loc="0 1105 1919 2130"
-State=1
-Number=0
-
-[Win_2]
 Type="Schematic Editor"
-Loc="1920 0 5759 2130"
+Loc="1920 1105 5759 2159"
 State=1
 Number=1
 File="detector328p-au.sch"
@@ -423,7 +417,14 @@ ArcDirection=0
 AddLevel=2
 PadsSameType=0
 Layer=91
+Views=" 1: -3.85348 4.40696 201.973 140.666"
 Sheet="2"
+
+[Win_2]
+Type="Control Panel"
+Loc="0 1105 1919 2130"
+State=1
+Number=0
 
 [Desktop]
 Screen="7680 2160"
