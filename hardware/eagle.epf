@@ -369,7 +369,6 @@ UsedLibrary="/home/compi/Downloads/eagle/SparkFun-Eagle-Libraries/SparkFun-Retir
 UsedLibrary="/home/compi/Downloads/eagle/SparkFun-Eagle-Libraries/SparkFun-Sensors.lbr"
 UsedLibrary="/home/compi/Downloads/eagle/SparkFun-Eagle-Libraries/User-Submitted.lbr"
 UsedLibrary="detector.lbr"
-UsedLibrary="/home/compi/work/gate433/cardetector/cardetector/hardware/detector.lbr"
 UsedLibrary="/home/compi/attila.body@gmail.com/eagle/libs/Atmel/Atmel_By_element14_Batch_1-00.lbr"
 
 [Win_1]
