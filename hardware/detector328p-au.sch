@@ -16020,6 +16020,7 @@ W = angled&lt;p&gt;
 <part name="OUT" library="con-lstb" deviceset="MA03-1" device=""/>
 <part name="LCD" library="con-lstb" deviceset="MA04-1" device=""/>
 <part name="POWER" library="con-lstb" deviceset="MA03-2" device=""/>
+<part name="SERIAL" library="con-lstb" deviceset="MA03-1" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -16488,6 +16489,7 @@ W = angled&lt;p&gt;
 <instance part="RESET" gate="1" x="149.86" y="88.9" rot="R270"/>
 <instance part="OUT" gate="G$1" x="-2.54" y="38.1" rot="MR180"/>
 <instance part="LCD" gate="1" x="198.12" y="66.04" rot="R180"/>
+<instance part="SERIAL" gate="G$1" x="198.12" y="53.34" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -16584,13 +16586,17 @@ W = angled&lt;p&gt;
 </segment>
 <segment>
 <pinref part="GND25" gate="1" pin="GND"/>
-<wire x1="185.42" y1="12.7" x2="185.42" y2="71.12" width="0.1524" layer="91"/>
+<wire x1="185.42" y1="12.7" x2="185.42" y2="53.34" width="0.1524" layer="91"/>
+<wire x1="185.42" y1="53.34" x2="185.42" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="185.42" y1="71.12" x2="190.5" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="154.94" y1="88.9" x2="185.42" y2="88.9" width="0.1524" layer="91"/>
 <wire x1="185.42" y1="88.9" x2="185.42" y2="71.12" width="0.1524" layer="91"/>
 <junction x="185.42" y="71.12"/>
 <pinref part="RESET" gate="1" pin="S"/>
 <pinref part="LCD" gate="1" pin="1"/>
+<pinref part="SERIAL" gate="G$1" pin="2"/>
+<wire x1="190.5" y1="53.34" x2="185.42" y2="53.34" width="0.1524" layer="91"/>
+<junction x="185.42" y="53.34"/>
 </segment>
 </net>
 <net name="VCC" class="0">
@@ -16736,8 +16742,10 @@ W = angled&lt;p&gt;
 <net name="FREQ" class="0">
 <segment>
 <pinref part="R16" gate="G$1" pin="1"/>
-<wire x1="152.4" y1="45.72" x2="195.58" y2="45.72" width="0.1524" layer="91"/>
-<label x="187.198" y="46.228" size="1.778" layer="95"/>
+<wire x1="152.4" y1="45.72" x2="160.02" y2="45.72" width="0.1524" layer="91"/>
+<wire x1="160.02" y1="45.72" x2="160.02" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="160.02" y1="38.1" x2="195.58" y2="38.1" width="0.1524" layer="91"/>
+<label x="189.738" y="38.608" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$12" class="0">
@@ -16982,11 +16990,43 @@ W = angled&lt;p&gt;
 <junction x="35.56" y="63.5"/>
 </segment>
 </net>
+<net name="N$39" class="0">
+<segment>
+<pinref part="U1" gate="A" pin="PD0"/>
+<pinref part="SERIAL" gate="G$1" pin="1"/>
+<wire x1="137.16" y1="55.88" x2="190.5" y2="55.88" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$48" class="0">
+<segment>
+<pinref part="SERIAL" gate="G$1" pin="3"/>
+<wire x1="190.5" y1="50.8" x2="160.02" y2="50.8" width="0.1524" layer="91"/>
+<wire x1="160.02" y1="50.8" x2="160.02" y2="53.34" width="0.1524" layer="91"/>
+<pinref part="U1" gate="A" pin="PD1"/>
+<wire x1="160.02" y1="53.34" x2="137.16" y2="53.34" width="0.1524" layer="91"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>
 <errors>
-<approved hash="113,1,178.624,27.94,X2,,,,,"/>
+<approved hash="104,2,101.6,76.2,U1,VCC_2,VCC,,,"/>
+<approved hash="104,2,101.6,71.12,U1,AVCC,VCC,,,"/>
+<approved hash="202,2,101.6,66.04,U1,ADC6,,,,"/>
+<approved hash="202,2,101.6,63.5,U1,ADC7,,,,"/>
+<approved hash="202,2,101.6,58.42,U1,AREF,,,,"/>
+<approved hash="113,1,11.1919,38.1,X1,,,,,"/>
+<approved hash="113,1,184.388,33.02,X2,,,,,"/>
+<approved hash="113,2,120.845,99.06,J1,,,,,"/>
+<approved hash="113,2,43.18,63.0132,D5,,,,,"/>
+<approved hash="113,2,48.26,98.0281,X3,,,,,"/>
+<approved hash="113,1,91.7259,27.5505,JP1,,,,,"/>
+<approved hash="113,2,78.74,72.0005,TEST,,,,,"/>
+<approved hash="113,2,149.86,92.3205,RESET,,,,,"/>
+<approved hash="113,2,2.49767,36.6353,OUT,,,,,"/>
+<approved hash="113,2,193.082,65.8453,LCD,,,,,"/>
+<approved hash="113,1,165.1,42.1047,POWER,,,,,"/>
+<approved hash="113,2,193.082,51.8753,SERIAL,,,,,"/>
 </errors>
 </schematic>
 </drawing>
