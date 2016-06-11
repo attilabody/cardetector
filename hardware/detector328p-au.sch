@@ -15921,7 +15921,7 @@ W = angled&lt;p&gt;
 </classes>
 <parts>
 <part name="R6" library="resistor" deviceset="R-EU_" device="R0603" value="1k"/>
-<part name="R2" library="resistor" deviceset="R-EU_" device="R0603" value="470"/>
+<part name="R2" library="resistor" deviceset="R-EU_" device="R0603" value="1K"/>
 <part name="R5" library="resistor" deviceset="R-EU_" device="R0603" value="4k7"/>
 <part name="Q1" library="transistor-small-signal" deviceset="BSS123" device=""/>
 <part name="C1" library="resistor" deviceset="C-EU" device="C0603" value="100n"/>
@@ -15930,7 +15930,7 @@ W = angled&lt;p&gt;
 <part name="C4" library="resistor" deviceset="C-EU" device="C0603" value="22n"/>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
 <part name="P+1" library="supply1" deviceset="VCC" device=""/>
-<part name="T1" library="transistor-npn" deviceset="BC817*" device="SMD" technology="-40" value="BC817-40SMD"/>
+<part name="T1" library="transistor-npn" deviceset="BC817*" device="SMD" technology="-40" value="BC817"/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
