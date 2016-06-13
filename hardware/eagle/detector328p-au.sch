@@ -15937,8 +15937,8 @@ W = angled&lt;p&gt;
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
 <part name="R4" library="resistor" deviceset="R-EU_" device="R0603" value="150"/>
 <part name="GND6" library="supply1" deviceset="GND" device=""/>
-<part name="D1" library="diode" deviceset="ZENER-DIODE" device="SOD80C" value="5.1V 0.5W"/>
-<part name="D2" library="diode" deviceset="ZENER-DIODE" device="SOD80C" value="5.1V 0.5W"/>
+<part name="D1" library="diode" deviceset="ZENER-DIODE" device="SOD80C" value="20V 0.5W"/>
+<part name="D2" library="diode" deviceset="ZENER-DIODE" device="SOD80C" value="20V 0.5W"/>
 <part name="GND-ISO1" library="SparkFun-Aesthetics" deviceset="GND-ISO" device=""/>
 <part name="R1" library="resistor" deviceset="R-EU_" device="R0603" value="1M8"/>
 <part name="GDT2" library="supressor" deviceset="GDT-" device="CG5350L"/>
@@ -16021,6 +16021,7 @@ W = angled&lt;p&gt;
 <part name="LCD" library="con-lstb" deviceset="MA04-1" device=""/>
 <part name="POWER" library="con-lstb" deviceset="MA03-2" device=""/>
 <part name="SERIAL" library="con-lstb" deviceset="MA03-1" device=""/>
+<part name="R24" library="resistor" deviceset="R-EU_" device="R0603" value="10k"/>
 </parts>
 <sheets>
 <sheet>
@@ -16490,6 +16491,10 @@ W = angled&lt;p&gt;
 <instance part="OUT" gate="G$1" x="-2.54" y="38.1" rot="MR180"/>
 <instance part="LCD" gate="1" x="198.12" y="66.04" rot="R180"/>
 <instance part="SERIAL" gate="G$1" x="198.12" y="53.34" rot="R180"/>
+<instance part="R24" gate="G$1" x="25.4" y="55.88" smashed="yes" rot="R90">
+<attribute name="NAME" x="23.9014" y="52.07" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="28.702" y="52.07" size="1.778" layer="96" rot="R90"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -16635,7 +16640,12 @@ W = angled&lt;p&gt;
 <segment>
 <pinref part="R8" gate="G$1" pin="2"/>
 <pinref part="P+5" gate="VCC" pin="VCC"/>
-<wire x1="17.78" y1="71.12" x2="17.78" y2="83.82" width="0.1524" layer="91"/>
+<wire x1="17.78" y1="71.12" x2="17.78" y2="76.2" width="0.1524" layer="91"/>
+<pinref part="R24" gate="G$1" pin="2"/>
+<wire x1="17.78" y1="76.2" x2="17.78" y2="83.82" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="60.96" x2="25.4" y2="76.2" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="76.2" x2="17.78" y2="76.2" width="0.1524" layer="91"/>
+<junction x="17.78" y="76.2"/>
 </segment>
 <segment>
 <pinref part="P+9" gate="VCC" pin="VCC"/>
@@ -16677,6 +16687,9 @@ W = angled&lt;p&gt;
 <pinref part="OUT" gate="G$1" pin="2"/>
 <wire x1="5.08" y1="38.1" x2="17.78" y2="38.1" width="0.1524" layer="91"/>
 <junction x="17.78" y="38.1"/>
+<pinref part="R24" gate="G$1" pin="1"/>
+<wire x1="25.4" y1="50.8" x2="25.4" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="38.1" x2="17.78" y2="38.1" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$24" class="0">
