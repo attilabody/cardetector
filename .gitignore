@@ -12,6 +12,6 @@ Debug_AVaRICE/
 **/eagle/*.job
 **/eagle/*.bak
 **/eagle/*.pro
-**/kicad/*_log.txt
-**/kicad/*.*bak
-**/kicad/*.net
+**/kicad/**/*_log.txt
+**/kicad/**/*.*bak
+**/kicad/**/*.net
