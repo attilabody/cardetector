@@ -1,0 +1,318 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:transformer
+LIBS:gdt
+LIBS:button
+LIBS:cardetector_328p-au-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 2 2
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L R_Small R?
+U 1 1 575F77FE
+P 2150 4050
+F 0 "R?" V 2050 3950 50  0000 L CNN
+F 1 "1K" V 2050 4100 50  0000 L CNN
+F 2 "" H 2150 4050 50  0001 C CNN
+F 3 "" H 2150 4050 50  0000 C CNN
+	1    2150 4050
+	0    1    1    0   
+$EndComp
+$Comp
+L R_Small R?
+U 1 1 575F7805
+P 2600 4050
+F 0 "R?" V 2500 3850 50  0000 L CNN
+F 1 "4.7K" V 2500 4050 50  0000 L CNN
+F 2 "" H 2600 4050 50  0001 C CNN
+F 3 "" H 2600 4050 50  0000 C CNN
+	1    2600 4050
+	0    1    1    0   
+$EndComp
+$Comp
+L R_Small R?
+U 1 1 575F780C
+P 2600 3800
+F 0 "R?" V 2500 3600 50  0000 L CNN
+F 1 "4.7K" V 2500 3800 50  0000 L CNN
+F 2 "" H 2600 3800 50  0001 C CNN
+F 3 "" H 2600 3800 50  0000 C CNN
+	1    2600 3800
+	0    1    1    0   
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 575F7813
+P 4250 6200
+F 0 "#PWR?" H 4250 5950 50  0001 C CNN
+F 1 "GND" H 4250 6050 50  0000 C CNN
+F 2 "" H 4250 6200 50  0000 C CNN
+F 3 "" H 4250 6200 50  0000 C CNN
+	1    4250 6200
+	1    0    0    -1  
+$EndComp
+$Comp
+L Led_Small D?
+U 1 1 575F7819
+P 3850 3050
+F 0 "D?" V 3950 2900 50  0000 L CNN
+F 1 "B" V 3800 2950 50  0000 L CNN
+F 2 "" V 3850 3050 50  0001 C CNN
+F 3 "" V 3850 3050 50  0000 C CNN
+	1    3850 3050
+	0    -1   -1   0   
+$EndComp
+$Comp
+L R_Small R?
+U 1 1 575F7820
+P 3850 2800
+F 0 "R?" H 3880 2820 50  0000 L CNN
+F 1 "1k" H 3880 2760 50  0000 L CNN
+F 2 "" H 3850 2800 50  0001 C CNN
+F 3 "" H 3850 2800 50  0000 C CNN
+	1    3850 2800
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_01X03 P?
+U 1 1 575F7827
+P 4500 3500
+F 0 "P?" H 4500 3700 50  0000 C CNN
+F 1 "TTL OUT" V 4600 3500 50  0000 C CNN
+F 2 "" H 4500 3500 50  0001 C CNN
+F 3 "" H 4500 3500 50  0000 C CNN
+	1    4500 3500
+	1    0    0    -1  
+$EndComp
+$Comp
+L RELAY_1RT K?
+U 1 1 575F782E
+P 3100 2550
+F 0 "K?" H 3100 2700 50  0000 C CNN
+F 1 "RELAY_1RT" H 3250 2050 50  0000 C CNN
+F 2 "relays:SRD-SL-C" H 3050 2550 50  0001 C CNN
+F 3 "" H 3050 2550 50  0000 C CNN
+	1    3100 2550
+	-1   0    0    -1  
+$EndComp
+$Comp
+L +5V #PWR?
+U 1 1 575F7835
+P 3850 1900
+F 0 "#PWR?" H 3850 1750 50  0001 C CNN
+F 1 "+5V" H 3850 2040 50  0000 C CNN
+F 2 "" H 3850 1900 50  0000 C CNN
+F 3 "" H 3850 1900 50  0000 C CNN
+	1    3850 1900
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_01X03 P?
+U 1 1 575F783B
+P 2850 2100
+F 0 "P?" H 2850 2300 50  0000 C CNN
+F 1 "RELAY OUT" V 2950 2100 50  0000 C CNN
+F 2 "" H 2850 2100 50  0001 C CNN
+F 3 "" H 2850 2100 50  0000 C CNN
+	1    2850 2100
+	0    -1   -1   0   
+$EndComp
+$Comp
+L TACTILE_SW SW?
+U 1 1 575F7842
+P 2100 3500
+F 0 "SW?" H 2250 3610 50  0000 C CNN
+F 1 "TACTILE_SW" H 2120 3360 50  0001 C CNN
+F 2 "" H 2100 3500 50  0001 C CNN
+F 3 "" H 2100 3500 50  0000 C CNN
+	1    2100 3500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2250 4050 2350 4050
+Wire Wire Line
+	2350 4050 2500 4050
+Wire Wire Line
+	2350 3500 2350 3600
+Wire Wire Line
+	2350 3600 2350 3800
+Wire Wire Line
+	2350 3800 2350 4050
+Wire Wire Line
+	2350 3800 2500 3800
+Connection ~ 2350 4050
+Wire Wire Line
+	2700 3800 3550 3800
+Wire Wire Line
+	3850 3150 3850 3200
+Wire Wire Line
+	3850 3200 3850 3500
+Wire Wire Line
+	3850 3500 3850 3600
+Wire Wire Line
+	3850 2950 3850 2900
+Wire Wire Line
+	3500 2550 3850 2550
+Wire Wire Line
+	3850 2550 4050 2550
+Wire Wire Line
+	4050 2550 4250 2550
+Wire Wire Line
+	3850 1900 3850 2550
+Wire Wire Line
+	3850 2550 3850 2700
+Wire Wire Line
+	4300 3500 3850 3500
+Connection ~ 3850 3500
+Wire Wire Line
+	3500 3850 3500 2900
+Wire Wire Line
+	3500 2800 3500 2550
+Connection ~ 3850 2550
+Wire Wire Line
+	2950 2300 2950 2500
+Wire Wire Line
+	2850 2300 2850 2600
+Wire Wire Line
+	2850 2600 2950 2600
+Wire Wire Line
+	2750 2300 2750 2700
+Wire Wire Line
+	2750 2700 2950 2700
+Wire Wire Line
+	1600 4050 2050 4050
+Wire Wire Line
+	4250 3600 4250 4400
+Wire Wire Line
+	4250 4400 4250 6200
+Wire Wire Line
+	4250 3600 4300 3600
+Wire Wire Line
+	4250 3400 4300 3400
+Wire Wire Line
+	3500 4400 3500 4250
+Wire Wire Line
+	3850 4000 3850 4400
+Wire Wire Line
+	2300 3500 2350 3500
+Connection ~ 2350 3800
+Wire Wire Line
+	2300 3600 2350 3600
+Connection ~ 2350 3600
+Wire Wire Line
+	1850 3600 1900 3600
+Wire Wire Line
+	1850 2950 1850 3500
+Wire Wire Line
+	1850 3500 1850 3600
+Wire Wire Line
+	1850 3500 1900 3500
+$Comp
+L +5V #PWR?
+U 1 1 575F7873
+P 1850 2950
+F 0 "#PWR?" H 1850 2800 50  0001 C CNN
+F 1 "+5V" H 1850 3090 50  0000 C CNN
+F 2 "" H 1850 2950 50  0000 C CNN
+F 3 "" H 1850 2950 50  0000 C CNN
+	1    1850 2950
+	1    0    0    -1  
+$EndComp
+Connection ~ 1850 3500
+$Comp
+L R_Small R?
+U 1 1 575F787A
+P 4050 2800
+F 0 "R?" H 4080 2820 50  0000 L CNN
+F 1 "10k" H 4080 2760 50  0000 L CNN
+F 2 "" H 4050 2800 50  0001 C CNN
+F 3 "" H 4050 2800 50  0000 C CNN
+	1    4050 2800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4050 2700 4050 2550
+Connection ~ 4050 2550
+Wire Wire Line
+	4050 2900 4050 3200
+Wire Wire Line
+	4050 3200 3850 3200
+Connection ~ 3850 3200
+Wire Wire Line
+	3500 2800 3300 2800
+Wire Wire Line
+	3500 2900 3300 2900
+$Comp
+L BC817-40 Q?
+U 1 1 575F7888
+P 3400 4050
+F 0 "Q?" H 3250 4200 50  0000 L CNN
+F 1 "BC817-40" H 3050 3800 50  0000 L CNN
+F 2 "SOT-23" H 3600 3975 50  0001 L CIN
+F 3 "" H 3400 4050 50  0000 L CNN
+	1    3400 4050
+	1    0    0    -1  
+$EndComp
+$Comp
+L BC817-40 Q?
+U 1 1 575F788F
+P 3750 3800
+F 0 "Q?" H 3600 3950 50  0000 L CNN
+F 1 "BC817-40" H 3400 3550 50  0000 L CNN
+F 2 "SOT-23" H 3950 3725 50  0001 L CIN
+F 3 "" H 3750 3800 50  0000 L CNN
+	1    3750 3800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2700 4050 3200 4050
+Wire Wire Line
+	4250 2550 4250 3400
+Wire Wire Line
+	3500 4400 3850 4400
+Wire Wire Line
+	3850 4400 4250 4400
+Connection ~ 4250 4400
+Connection ~ 3850 4400
+Text HLabel 1600 4050 0    50   Input ~ 0
+out
+$EndSCHEMATC
