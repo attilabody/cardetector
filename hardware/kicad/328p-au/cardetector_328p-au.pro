@@ -1,4 +1,4 @@
-update=2016. jún. 13., hétfő, 07:00:29 CEST
+update=2016. jún. 17., péntek, 20:15:01 CEST
 version=1
 last_client=kicad
 [general]
@@ -63,3 +63,4 @@ LibName29=valves
 LibName30=/home/compi/work/kicad/libs/transformer
 LibName31=/home/compi/work/kicad/libs/gdt
 LibName32=/home/compi/work/kicad/libs/button
+LibName33=/home/compi/work/kicad/libs/jumpers
