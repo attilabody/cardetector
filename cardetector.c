@@ -1,5 +1,5 @@
 /*
- * cardetector.c
+ * cardetector.cpp
  *
  *  Created on: Apr 29, 2016
  *      Author: compi
@@ -14,6 +14,7 @@
 #include <limits.h>
 
 #include "serial.h"
+#include "i2c.h"
 
 #if defined(DEBUG_DETECTOR)
 volatile uint16_t	g_badirq = 0;
@@ -73,6 +74,16 @@ const PARAMS g_params =
 
 uint32_t		g_sum = 0;
 
+
+////////////////////////////////////////////////////////////////////
+uint32_t	millis()
+{
+	uint32_t	tmp;
+	cli();
+	tmp = g_ms;
+	sei();
+	return tmp;
+}
 
 ////////////////////////////////////////////////////////////////////
 void setleds(char red, char green, char blue)
@@ -420,3 +431,7 @@ void dumpinfo()
 //	dumpreg("", );
 }
 #endif	//	DUMPINFO
+
+
+
+
