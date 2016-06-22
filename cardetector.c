@@ -15,21 +15,28 @@
 
 #include "serial.h"
 #include "i2c.h"
+#include "pcf8574.h"
+#include "i2c_lcd.h"
 
 #if defined(DEBUG_DETECTOR)
 volatile uint16_t	g_badirq = 0;
 uint16_t			g_badirqcnt = 0;
 #endif
+
 volatile uint16_t	g_timer_counts;
 volatile uint8_t	g_counter_ready = 0;
 volatile uint8_t	g_overrun = 0;
 volatile uint32_t	g_ms = 0;
 volatile uint32_t	g_lastwtf = 0;
 
-// internal to counting routine
-volatile uint8_t g_counter_overflows = 0;
-volatile uint16_t g_timer_overflows = 0;
-uint16_t g_counting_period = 250;
+volatile uint8_t	g_counter_overflows = 0;
+volatile uint16_t	g_timer_overflows = 0;
+uint16_t 			g_counting_period = 250;
+uint16_t			g_active_time = 0;
+
+#if defined(HAVE_I2C) && defined(USE_I2C)
+PCF8574_STATUS	g_ps;
+#endif	//	defined(HAVE_I2C) && defined(USE_I2C)
 
 void setup(uint8_t ms);
 
@@ -105,8 +112,6 @@ void init_config()
 ////////////////////////////////////////////////////////////////////
 enum STATES detect(uint16_t counter)
 {
-	static uint16_t			active_time=0;
-
 #if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 	uint16_t		debugavg = g_sum >> g_params.shift;
 	int32_t			modifier;
@@ -125,7 +130,7 @@ enum STATES detect(uint16_t counter)
 		state = BASE;
 	else if(diff < threshold)
 		state = ABOVE;
-	else if (active_time < ((uint16_t)g_params.tlimit) << 2)
+	else if (g_active_time < ((uint16_t)g_params.tlimit) << 2)
 		state = ACTIVE;
 	else
 		state = TOUT;
@@ -160,8 +165,8 @@ enum STATES detect(uint16_t counter)
 	uart_println("");
 #endif	//	DEBUG_DETECTOR
 
-	if(state < ACTIVE) active_time = 0;
-	else ++active_time;
+	if(state < ACTIVE) g_active_time = 0;
+	else ++g_active_time;
 
 	return state;
 }
@@ -230,13 +235,47 @@ int main(void)
 		uint32_t	countercopy = g_timer_counts;
 		g_counter_ready = 0;
 
-#if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
+#if (defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)) ||(defined(HAVE_I2C) && defined(USE_I2C))
 		float frq = (countercopy * 1000.0) / g_counting_period;
 		unsigned long lf = (unsigned long)frq;
 
+#if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 		uart_print("Freq: ");
 		uart_printlong(lf);
-#endif	//	DEBUG_DETECTOR
+#endif	//	defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
+#endif	//	#if (defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)) ||(defined(HAVE_I2C) && defined(USE_I2C))
+#if defined(HAVE_I2C) && defined(USE_I2C)
+		int32_t		diff = (int32_t)countercopy - (int32_t)(g_sum >> g_params.shift);
+		uint16_t	threshold = (g_sum >> g_params.shift) / g_params.divider;
+		uint8_t		neg = diff < 0, chars;
+		if(neg) diff = -diff;
+		i2clcd_setcursor(&g_ps,0,1);
+		i2clcd_printlong(&g_ps, g_sum >> g_params.shift);
+		i2clcd_printchar(&g_ps, neg ? '-' : '+');
+		i2clcd_printlong(&g_ps, diff);
+		i2clcd_printchar(&g_ps, '=');
+		i2clcd_printlong(&g_ps, countercopy);
+		i2clcd_printchar(&g_ps, ' ');
+		chars = diff * 13 / threshold;
+		if(chars > 16) chars = 16;
+		if(diff && !chars) ++chars;
+		i2clcd_setcursor(&g_ps, 0, 0);
+
+		uint8_t	pos = 0;
+		if(neg) {
+			while(pos<16-chars) {
+				i2clcd_printchar(&g_ps, ' ');
+				++pos;
+			}
+			while(chars--) i2clcd_printchar(&g_ps, '<');
+		} else {
+			while(chars--) {
+				i2clcd_printchar(&g_ps, '>');
+				++pos;
+			}
+			while(pos++ < 16) i2clcd_printchar(&g_ps, ' ');
+		}
+#endif	//	defined(HAVE_I2C) && defined(USE_I2C)
 
 		if((state = detect(countercopy)) >= ACTIVE) {
 			setleds(1,1,1);
@@ -297,6 +336,11 @@ void setup(uint8_t ms)
 #error "Only ATmega 328P and ATtinyX5 are supported."
 #endif
 	TCCR0B = _BV(CS00) | _BV(CS01) | _BV(CS02);	//t0: ext clk rising edge (start)
+#if defined(HAVE_I2C) && defined(USE_I2C)
+	i2c_init();
+	i2clcd_init(&g_ps, LCD_I2C_ADDRESS);
+#endif	//	defined(HAVE_I2C) && defined(USE_I2C)
+
 
 }  // end of setup
 

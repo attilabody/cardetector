@@ -54,7 +54,7 @@ void uart_print(char *str)
 //******************************************************************
 void uart_printlong(long l)
 {
-	char	buffer[sizeof(l)*8+1];
+	char	buffer[sizeof(l)*3+1];
 	ltoa(l, buffer, 10);
 	uart_print(buffer);
 }

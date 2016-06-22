@@ -16,12 +16,13 @@
 //        value() does not always reflect the latest state of the pins!
 // 0.1.00 initial version
 //
-
+#include "config.h"
+#if defined(HAVE_I2C) && defined(USE_I2C)
 #include "pcf8574.h"
 
 #include "i2c.h"
 
-static uint8_t	_pcf8574_read(PCF8574_STATUS *st)
+uint8_t	pcf8574_read_st(PCF8574_STATUS *st)
 {
 	st->error = i2c_read(st->address, 1);
 	if(!st->error) {
@@ -30,7 +31,7 @@ static uint8_t	_pcf8574_read(PCF8574_STATUS *st)
 	return st->error;
 }
 
-static uint8_t	_pcf8574_write(PCF8574_STATUS *st)
+uint8_t	pcf8574_write_st(PCF8574_STATUS *st)
 {
 	return (st->error = i2c_write(st->address, st->data));
 }
@@ -45,13 +46,13 @@ void	pcf8574_init(PCF8574_STATUS *st, uint8_t address, uint8_t value)
 uint8_t pcf8574_write8(PCF8574_STATUS *st, uint8_t value)
 {
 	st->data = value;
-    return _pcf8574_write(st);
+    return pcf8574_write_st(st);
 }
 
 // pin should be 0..7
 uint8_t pcf8574_read(PCF8574_STATUS *st, uint8_t pin, uint8_t *value)
 {
-    if(!_pcf8574_read(st)) {
+    if(!pcf8574_read_st(st)) {
     	*value = (st->data & (1<<pin)) > 0;
     }
     return st->error;
@@ -93,17 +94,19 @@ uint8_t pcf8574_shiftLeft(PCF8574_STATUS *st, uint8_t n)
 {
     if (n == 0 || n > 7) return 0xff;
 	st->data <<= n;
-	return _pcf8574_write(st);
+	return pcf8574_write_st(st);
 }
 
 uint8_t pcf8574_read8(PCF8574_STATUS *st, uint8_t* value)
 {
-	_pcf8574_read(st);
+	pcf8574_read_st(st);
 	if (!st->error) {
 		*value = st->data;
 	}
 	return st->error;
 }
+
+#endif	//	#if defined(HAVE_I2C) && defined(USE_I2C)
 //
 // END OF FILE
 //

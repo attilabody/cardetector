@@ -13,12 +13,13 @@
 #define F_CPU 16000000UL
 #define BAUD 115200
 
+#define USE_I2C
+
 //#define DEBUG_TIMERS
 #define DEBUG_DETECTOR
 
 
 #if defined(__AVR_ATtiny85__)
-
 #define DD_LED1		DDB1
 //#define DD_LED2		DDB4
 //#define DD_LED3		DDB3
@@ -51,6 +52,7 @@
 #define COUNTERVECT	TIMER0_OVF_vect
 #define	TIFR		TIFR0
 #define	HAVE_SERIAL	1
+#define HAVE_I2C	1
 
 #else
 #error "Only ATmega 328P and ATtinyx5 are supported."
@@ -67,4 +69,7 @@
 #define	SHIFT_TOLERANCE	3
 
 #define TIMELIMIT		180
+
+#define LCD_I2C_ADDRESS	0x27
+
 #endif /* CONFIG_H_ */

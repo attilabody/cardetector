@@ -9,3 +9,4 @@ Debug_AVaRICE/
 **/.idea/workspace.xml
 *.s#?
 *.sch.lck
+/Release ATTiny/

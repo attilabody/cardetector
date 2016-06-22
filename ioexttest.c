@@ -16,6 +16,9 @@
 #include "serial.h"
 #include "i2c.h"
 #include "pcf8574.h"
+#include "i2c_lcd.h"
+
+PCF8574_STATUS g_lcdps;
 
 volatile uint32_t	g_ms = 0;
 
@@ -32,6 +35,15 @@ uint32_t	millis()
 ISR (TIMER2_COMPA_vect)
 {
 	++g_ms;
+}
+
+////////////////////////////////////////////////////////////////////
+void display(char *string)
+{
+	int count = 0;
+
+	while(*string && count++ < 16)
+		lcd_sendbyte(*string++, 1);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -55,14 +67,25 @@ int main(void)
 
 	TCCR2B = _BV(CS20) | _BV(CS22);	//t2: prescaler 128 (start)
 
-	pcf8574_init(&st, 0x20, 0xff);
+//	pcf8574_init(&st, 0x20, 0xff);
+
+	_delay_ms(500);  //Initiaize LCD
+	lcd_init();
+	_delay_ms(200);
+	lcd_clear();
+	lcd_setcursor(1, 0);
+	display("Hi");
+	display(" There....");
+	lcd_setcursor(0, 1);
+	display("Circuits4You.com");
+
 
 	while(1)
 	{
-		pcf8574_write8(&st, data);
-		pcf8574_read8(&st, &data);
-		data ^= 0xff;
-		while(millis() - prevms < 1000 );
-		prevms += 1000;
+//		pcf8574_write8(&st, data);
+//		pcf8574_read8(&st, &data);
+//		data ^= 0xff;
+//		while(millis() - prevms < 1000 );
+//		prevms += 1000;
 	}
 }

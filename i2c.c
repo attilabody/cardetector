@@ -54,6 +54,8 @@
 */
 
 
+#include "config.h"
+#if defined(HAVE_I2C) && defined(USE_I2C)
 #include "i2c.h"
 #include <inttypes.h>
 #include <string.h>
@@ -96,7 +98,7 @@ static uint16_t	g_i2c_timeOutDelay = 0;
 
 
 
-void i2c_begin()
+void i2c_init()
 {
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega328P__)
 	// activate internal pull-ups for twi
@@ -646,3 +648,4 @@ void i2c_lockUp()
 	TWCR = _BV(TWEN) | _BV(TWEA); //reinitialize TWI
 }
 
+#endif	//	#if defined(HAVE_I2C) && defined(USE_I2C)

@@ -10,7 +10,7 @@
 // see PCF8574.cpp file
 //
 
-#ifndef _PCF8574_H
+#if !defined(_PCF8574_H) && defined(HAVE_I2C) && defined(USE_I2C)
 #define _PCF8574_H
 #include <stdint.h>
 
@@ -31,6 +31,10 @@ uint8_t pcf8574_toggle(PCF8574_STATUS *st, uint8_t pin);
 uint8_t pcf8574_shiftRight(PCF8574_STATUS *st, uint8_t n);
 uint8_t pcf8574_shiftLeft(PCF8574_STATUS *st, uint8_t n);
 
+uint8_t	pcf8574_read_st(PCF8574_STATUS *st);
+uint8_t	pcf8574_write_st(PCF8574_STATUS *st);
+
+inline uint8_t	pcf8574_lastval(PCF8574_STATUS *st) { return st->data; }
 #endif
 //
 // END OF FILE

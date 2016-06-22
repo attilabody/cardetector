@@ -53,7 +53,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef I2C_H_
+#if !defined(I2C_H_) && defined(HAVE_I2C) && defined(USE_I2C)
 #define I2C_H_
 
 #include <inttypes.h>
@@ -81,7 +81,7 @@
 extern "C" {
 #endif	//	__cplusplus
 
-void i2c_begin();
+void i2c_init();
 void i2c_end();
 void i2c_timeOut(uint16_t);
 void i2c_setSpeed(uint8_t);
