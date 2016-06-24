@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.6.0">
+<eagle version="7.1.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -16411,9 +16411,9 @@ W = angled&lt;p&gt;
 <attribute name="NAME" x="117.7036" y="49.1744" size="2.0828" layer="95" ratio="10" rot="SR0"/>
 <attribute name="VALUE" x="106.8832" y="17.399" size="2.0828" layer="96" ratio="10" rot="SR0"/>
 </instance>
-<instance part="R16" gate="G$1" x="198.12" y="45.72" smashed="yes" rot="R180">
-<attribute name="NAME" x="196.85" y="49.3014" size="1.778" layer="95" rot="R180"/>
-<attribute name="VALUE" x="201.93" y="49.022" size="1.778" layer="96" rot="R180"/>
+<instance part="R16" gate="G$1" x="195.58" y="45.72" smashed="yes" rot="R180">
+<attribute name="NAME" x="194.31" y="49.3014" size="1.778" layer="95" rot="R180"/>
+<attribute name="VALUE" x="199.39" y="49.022" size="1.778" layer="96" rot="R180"/>
 </instance>
 <instance part="GND16" gate="1" x="88.9" y="10.16"/>
 <instance part="GND17" gate="1" x="99.06" y="10.16"/>
@@ -16733,7 +16733,7 @@ W = angled&lt;p&gt;
 <segment>
 <pinref part="R16" gate="G$1" pin="2"/>
 <pinref part="U1" gate="A" pin="PD4"/>
-<wire x1="193.04" y1="45.72" x2="137.16" y2="45.72" width="0.1524" layer="91"/>
+<wire x1="190.5" y1="45.72" x2="137.16" y2="45.72" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$8" class="0">
@@ -16763,7 +16763,7 @@ W = angled&lt;p&gt;
 <net name="FREQ" class="0">
 <segment>
 <pinref part="R16" gate="G$1" pin="1"/>
-<wire x1="203.2" y1="45.72" x2="218.44" y2="45.72" width="0.1524" layer="91"/>
+<wire x1="200.66" y1="45.72" x2="218.44" y2="45.72" width="0.1524" layer="91"/>
 <label x="210.058" y="43.688" size="1.778" layer="95"/>
 </segment>
 </net>
@@ -17033,26 +17033,27 @@ W = angled&lt;p&gt;
 <segment>
 <pinref part="U1" gate="A" pin="PD2"/>
 <pinref part="B1" gate="1" pin="P"/>
-<wire x1="137.16" y1="50.8" x2="190.5" y2="50.8" width="0.1524" layer="91"/>
-<wire x1="190.5" y1="50.8" x2="190.5" y2="35.56" width="0.1524" layer="91"/>
+<wire x1="137.16" y1="50.8" x2="187.96" y2="50.8" width="0.1524" layer="91"/>
+<wire x1="187.96" y1="50.8" x2="187.96" y2="35.56" width="0.1524" layer="91"/>
+<wire x1="187.96" y1="35.56" x2="190.5" y2="35.56" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$50" class="0">
 <segment>
 <pinref part="U1" gate="A" pin="PD3"/>
-<wire x1="137.16" y1="48.26" x2="187.96" y2="48.26" width="0.1524" layer="91"/>
-<wire x1="187.96" y1="48.26" x2="187.96" y2="25.4" width="0.1524" layer="91"/>
+<wire x1="137.16" y1="48.26" x2="185.42" y2="48.26" width="0.1524" layer="91"/>
+<wire x1="185.42" y1="48.26" x2="185.42" y2="25.4" width="0.1524" layer="91"/>
 <pinref part="B2" gate="1" pin="P"/>
-<wire x1="187.96" y1="25.4" x2="190.5" y2="25.4" width="0.1524" layer="91"/>
+<wire x1="185.42" y1="25.4" x2="190.5" y2="25.4" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$51" class="0">
 <segment>
 <pinref part="U1" gate="A" pin="PD5"/>
-<wire x1="137.16" y1="43.18" x2="185.42" y2="43.18" width="0.1524" layer="91"/>
-<wire x1="185.42" y1="43.18" x2="185.42" y2="15.24" width="0.1524" layer="91"/>
+<wire x1="137.16" y1="43.18" x2="182.88" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="182.88" y1="43.18" x2="182.88" y2="15.24" width="0.1524" layer="91"/>
 <pinref part="B3" gate="1" pin="P"/>
-<wire x1="185.42" y1="15.24" x2="190.5" y2="15.24" width="0.1524" layer="91"/>
+<wire x1="182.88" y1="15.24" x2="190.5" y2="15.24" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
@@ -17073,9 +17074,12 @@ W = angled&lt;p&gt;
 <approved hash="113,2,78.74,72.0005,TEST,,,,,"/>
 <approved hash="113,2,149.86,92.3205,RESET,,,,,"/>
 <approved hash="113,2,2.49767,36.6353,OUT,,,,,"/>
-<approved hash="113,2,193.082,65.8453,LCD,,,,,"/>
+<approved hash="113,2,210.862,70.9253,LCD,,,,,"/>
 <approved hash="113,1,165.1,42.1047,POWER,,,,,"/>
-<approved hash="113,2,193.082,51.8753,SERIAL,,,,,"/>
+<approved hash="113,2,210.862,54.4153,SERIAL,,,,,"/>
+<approved hash="113,2,195.58,38.9805,B1,,,,,"/>
+<approved hash="113,2,195.58,28.8205,B2,,,,,"/>
+<approved hash="113,2,195.58,18.6605,B3,,,,,"/>
 </errors>
 </schematic>
 </drawing>
