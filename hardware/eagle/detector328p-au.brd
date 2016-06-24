@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.1.0">
+<eagle version="7.6.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -3444,6 +3444,24 @@ design rules under a new name.</description>
 <attribute name="NAME" x="13.335" y="41.148" size="0.8128" layer="25" font="vector" ratio="10" rot="R270"/>
 <attribute name="VALUE" x="13.081" y="42.926" size="1.27" layer="27" ratio="10" rot="R270"/>
 </element>
+<element name="B1" library="detector" package="B3F-10XX" value="" x="-16.256" y="5.588">
+<attribute name="OC_NEWARK" value="36M3542" x="-16.256" y="5.588" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="-16.256" y="5.588" size="1.778" layer="27" display="off"/>
+<attribute name="OC_FARNELL" value="176432" x="-16.256" y="5.588" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="B3F-1000" x="-16.256" y="5.588" size="1.778" layer="27" display="off"/>
+</element>
+<element name="B2" library="detector" package="B3F-10XX" value="" x="-26.924" y="5.588">
+<attribute name="OC_NEWARK" value="36M3542" x="-26.924" y="5.588" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="-26.924" y="5.588" size="1.778" layer="27" display="off"/>
+<attribute name="OC_FARNELL" value="176432" x="-26.924" y="5.588" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="B3F-1000" x="-26.924" y="5.588" size="1.778" layer="27" display="off"/>
+</element>
+<element name="B3" library="detector" package="B3F-10XX" value="" x="-37.592" y="5.588">
+<attribute name="OC_NEWARK" value="36M3542" x="-37.592" y="5.588" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="-37.592" y="5.588" size="1.778" layer="27" display="off"/>
+<attribute name="OC_FARNELL" value="176432" x="-37.592" y="5.588" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="B3F-1000" x="-37.592" y="5.588" size="1.778" layer="27" display="off"/>
+</element>
 </elements>
 <signals>
 <signal name="N$3">
@@ -3618,6 +3636,15 @@ design rules under a new name.</description>
 <wire x1="12.87" y1="44.516" x2="12.87" y2="39.2" width="0.254" layer="1"/>
 <wire x1="12.87" y1="39.2" x2="12.954" y2="39.116" width="0.254" layer="1"/>
 <wire x1="12.954" y1="39.116" x2="16.002" y2="39.116" width="0.254" layer="1"/>
+<contactref element="B1" pad="3" route="any" routetag="1.S"/>
+<contactref element="B1" pad="4" route="any" routetag="1.S"/>
+<contactref element="B2" pad="3" route="any" routetag="1.S"/>
+<contactref element="B2" pad="4" route="any" routetag="1.S"/>
+<contactref element="B3" pad="3" route="any" routetag="1.S"/>
+<contactref element="B3" pad="4" route="any" routetag="1.S"/>
+<wire x1="-13.0048" y1="3.3274" x2="1.69" y2="37.084" width="0" layer="19" extent="1-1"/>
+<wire x1="-23.6728" y1="3.3274" x2="-19.5072" y2="3.3274" width="0" layer="19" extent="1-1"/>
+<wire x1="-34.3408" y1="3.3274" x2="-30.1752" y2="3.3274" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="VCC">
 <contactref element="D3" pad="A"/>
@@ -4160,6 +4187,24 @@ design rules under a new name.</description>
 <wire x1="18.542" y1="43.942" x2="18.034" y2="43.434" width="0.254" layer="16"/>
 <wire x1="18.034" y1="43.434" x2="18.034" y2="38.608" width="0.254" layer="16"/>
 <wire x1="18.034" y1="38.608" x2="16.002" y2="36.576" width="0.254" layer="16"/>
+</signal>
+<signal name="N$49">
+<contactref element="U1" pad="32"/>
+<contactref element="B1" pad="1" route="any" routetag="1.P"/>
+<contactref element="B1" pad="2" route="any" routetag="1.P"/>
+<wire x1="-13.0048" y1="7.8486" x2="19.93" y2="43.682" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="N$50">
+<contactref element="U1" pad="1"/>
+<contactref element="B2" pad="1" route="any" routetag="1.P"/>
+<contactref element="B2" pad="2" route="any" routetag="1.P"/>
+<wire x1="-23.6728" y1="7.8486" x2="21.33" y2="42.282" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="N$51">
+<contactref element="U1" pad="9"/>
+<contactref element="B3" pad="1" route="any" routetag="1.P"/>
+<contactref element="B3" pad="2" route="any" routetag="1.P"/>
+<wire x1="-34.3408" y1="7.8486" x2="28.33" y2="43.682" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 <errors>
