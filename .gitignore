@@ -1,12 +1,11 @@
-Release/
-Release Nano/
-Debug/
+Release*/
+Debug*/
 .ino.cpp
 *.d
 .settings/
-Debug_AVaRICE/
 .metadata/
 **/.idea/workspace.xml
 *.s#?
 *.sch.lck
-/Release ATTiny/
+*.componentinfo.xml
+.vs/
