@@ -5,54 +5,37 @@
  *      Author: compi
  */
 #include "config.h"
-#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR) || defined(SRIAL_COMMANDS)) && defined(HAVE_SERIAL)
+#if defined(HAVE_SERIAL)
 #include <avr/io.h>
-#include <util/setbaud.h>
 #include <avr/interrupt.h>
-#include <string.h>
+#include <avr/pgmspace.h>
 
+#include <string.h>
 #include <stdlib.h>
 
 #include "serial.h"
 
-#define	RXBSMASK 0x0f
-#define TXBSMASK 0x0f
-volatile unsigned char	g_rxbuffer[RXBSMASK + 1];
+volatile unsigned char	g_rxbuffer[SERIAL_RX_BUFFER_SIZE];
 volatile unsigned char	g_rxstart = 0, g_rxcount = 0, g_rxoverrun = 0;
-volatile unsigned char	g_txbuffer[TXBSMASK + 1];
+volatile unsigned char	g_txbuffer[SERIAL_TX_BUFFER_SIZE];
 volatile unsigned char	g_txstart = 0, g_txcount = 0;
 
 
 //******************************************************************
-void uart_init(void)
+void uart_init(unsigned long baud_rate)
 {
-    UBRR0H = UBRRH_VALUE;
-    UBRR0L = UBRRL_VALUE;
+	unsigned int prescaler = (F_CPU / 4 / baud_rate - 1) / 2;
+	UCSR0A = 1 << U2X0;
 
-#if USE_2X
-    UCSR0A |= _BV(U2X0);
-#else
-    UCSR0A &= ~(_BV(U2X0));
-#endif
+	if(((F_CPU == 16000000UL) && (baud_rate == 57600)) || (prescaler > 4095)) {
+		UCSR0A = 0;
+		prescaler = (F_CPU / 8 / baud_rate - 1) / 2;
+	}
+	UBRR0H = prescaler >> 8;
+	UBRR0L = prescaler;
 
-    UCSR0C = _BV(UCSZ01) | _BV(UCSZ00); /* 8-bit data */
-    UCSR0B = _BV(RXEN0) | _BV(TXEN0) | _BV(RXCIE0);   /* Enable RX and TX */
-}
-
-//******************************************************************
-// function to send data
-void uart_transmit_direct (unsigned char data)
-{
-    while (!(UCSR0A & _BV(UDRE0)));	// wait while register is free
-    UDR0 = data;					// load data in the register
-}
-
-//******************************************************************
-// function to receive data
-unsigned char uart_recieve (void)
-{
-    while(!(UCSR0A & _BV(RXC0)));	// wait while data is being received
-    return UDR0;					// return 8-bit data
+    UCSR0C = _BV(UCSZ01) | _BV(UCSZ00);				// N81
+    UCSR0B = _BV(RXEN0) | _BV(TXEN0) | _BV(RXCIE0);	// Enable RX and TX
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -63,6 +46,23 @@ void uart_printlong(long l)
 	uart_send(buffer, strlen(buffer), 1);
 }
 
+
+////////////////////////////////////////////////////////////////////
+void uart_printstr(const char *str)
+{
+	uart_send((void*)str, strlen(str), 1);
+}
+
+
+////////////////////////////////////////////////////////////////////
+void uart_printstr_p(const char *str)
+{
+	char c;
+	while((c = pgm_read_byte(str++)))
+		uart_send(&c, 1, 1);
+}
+
+
 ////////////////////////////////////////////////////////////////////
 int	uart_receive()
 {
@@ -71,18 +71,23 @@ int	uart_receive()
 	if(!g_rxcount) return -1;
 	cli();
 	tmp = g_rxbuffer[g_rxstart++];
-	g_rxstart &= RXBSMASK;
+	if(g_rxstart == SERIAL_RX_BUFFER_SIZE)
+		g_rxstart = 0;
 	--g_rxcount;
 	sei();
 	return tmp;
 }
+
 
 ////////////////////////////////////////////////////////////////////
 ISR(USART_RX_vect)
 {
 	unsigned char	r = UDR0;
 	if(g_rxcount < sizeof(g_rxbuffer)) {
-		g_rxbuffer[(g_rxstart + g_rxcount++) & RXBSMASK] = r;
+		unsigned char pos = g_rxstart + g_rxcount++;
+		if(pos >= SERIAL_RX_BUFFER_SIZE)
+			pos -= SERIAL_RX_BUFFER_SIZE;
+		g_rxbuffer[pos] = r;
 	} else {
 		g_rxoverrun = 1;
 	}
@@ -90,11 +95,14 @@ ISR(USART_RX_vect)
 
 
 ////////////////////////////////////////////////////////////////////
-size_t filltxbuffer(unsigned char *buffer, size_t count)
+static size_t filltxbuffer(unsigned char *buffer, size_t count)
 {
 	size_t	copied = 0;
 	while(g_txcount < sizeof(g_txbuffer) && count--) {
-		g_txbuffer[(g_txstart + g_txcount++) & TXBSMASK] = *buffer++;
+		unsigned char pos = g_txstart + g_txcount++;
+		if(pos >= SERIAL_RX_BUFFER_SIZE)
+			pos -= SERIAL_RX_BUFFER_SIZE;
+		g_txbuffer[pos] = *buffer++;
 		++copied;
 	}
 	return copied;
@@ -121,18 +129,18 @@ size_t	uart_send(void *buffer, size_t count, unsigned char block)
 }
 
 ////////////////////////////////////////////////////////////////////
-#if 1
 ISR(USART_UDRE_vect)
 {
 	if(g_txcount) {
 		UDR0 = g_txbuffer[g_txstart++];
-		g_txstart &= TXBSMASK;
+		if(g_txstart == SERIAL_TX_BUFFER_SIZE )
+		g_txstart = 0;
 		--g_txcount;
 	} else {
 		UCSR0B &= ~_BV(UDRIE0);
 	}
 }
-#endif
+
 
 #endif	//	#if defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)
 

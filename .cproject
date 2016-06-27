@@ -52,7 +52,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="cardetector.c|lcdtest.c|ioexttest.c|ext|lcdpcf8574.c|ext/twimaster.c|ext/pcf8574.c|cardetector.cpp|timer2test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="txtest.c|lcdtest.c|ioexttest.c|ext|lcdpcf8574.c|ext/twimaster.c|ext/pcf8574.c|cardetector.cpp|timer2test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -110,7 +110,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="cardetector.c|lcdtest.c|ioexttest.c|ext|lcdpcf8574.c|ext/twimaster.c|ext/pcf8574.c|cardetector.cpp|timer2test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="txtest.c|lcdtest.c|ioexttest.c|ext|lcdpcf8574.c|ext/twimaster.c|ext/pcf8574.c|cardetector.cpp|timer2test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -169,7 +169,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="cardetector.c|lcdtest.c|ioexttest.c|ext|lcdpcf8574.c|ext/twimaster.c|ext/pcf8574.c|cardetector.cpp|timer2test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="txtest.c|lcdtest.c|ioexttest.c|ext|lcdpcf8574.c|ext/twimaster.c|ext/pcf8574.c|cardetector.cpp|timer2test.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

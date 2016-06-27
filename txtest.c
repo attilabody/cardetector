@@ -4,47 +4,33 @@
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
 
-#define BAUD 115200
-
-#include <util/setbaud.h>
-
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 
 #include "serial.h"
+#include "utils.h"
+#include "commsyms.h"
 
-char 	txstr[] = "lofaszbingo\r\n";
-uint8_t	txidx = 0;
-uint8_t	txstrlen = 0;
-
-//#define OWN_ISR
+unsigned char 	g_linebuffer[128];
+unsigned char	g_lineidx;
 
 ////////////////////////////////////////////////////////////////////
 int main(void)
 {
-	uart_init();
-
-    txstrlen =  strlen(txstr);
+	uart_init(BAUD);
 
     sei();
 
     while(1)
 	{
-    	uart_send(txstr, txstrlen, 1);
-    	_delay_ms(100);
+    	while(!getlinefromserial(g_linebuffer, sizeof(g_linebuffer), &g_lineidx));
+    	uart_printchar(CMNT);
+    	uart_send(g_linebuffer, g_lineidx, 1);
+    	g_lineidx = 0;
 	}
 	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////
-#ifdef OWN_ISR
-ISR(USART_UDRE_vect)
-{
-	UDR0 = txstr[txidx++];
-	if(txidx == txstrlen) {
-		txidx = 0;
-		UCSR0B &= ~_BV(UDRIE0);
-	}
-}
-#endif
+

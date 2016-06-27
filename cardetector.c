@@ -9,6 +9,7 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
+#include <avr/pgmspace.h>
 
 #include <stdlib.h>
 #include <limits.h>
@@ -17,6 +18,8 @@
 #include "i2c.h"
 #include "pcf8574.h"
 #include "i2c_lcd.h"
+#include "utils.h"
+#include "commsyms.h"
 
 #if defined(DEBUG_DETECTOR)
 volatile uint16_t	g_badirq = 0;
@@ -34,11 +37,17 @@ volatile uint16_t	g_timer_overflows = 0;
 uint16_t 			g_counting_period = 250;
 uint16_t			g_active_time = 0;
 
+#if defined(HAVE_SERIAL)
+unsigned char 	g_linebuffer[64];
+unsigned char	g_lineidx;
+#endif
+
 #if defined(HAVE_I2C) && defined(USE_I2C)
 PCF8574_STATUS	g_ps;
 #endif	//	defined(HAVE_I2C) && defined(USE_I2C)
 
 void setup(uint8_t ms);
+void processinput();
 
 #ifdef DEBUG_TIMERS
 void dumpinfo();
@@ -141,25 +150,25 @@ enum STATES detect(uint16_t counter)
 
 #if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 	modifier = (shift >= 0) ? (diff << shift) : (diff >> -shift);
-	uart_print(" Sum: ");
+	uart_printstr(" Sum: ");
 	uart_printlong(g_sum);
-	uart_print(" Raw: ");
+	uart_printstr(" Raw: ");
 	uart_printlong(g_timer_counts);
-	uart_print(" Avg: ");
+	uart_printstr(" Avg: ");
 	uart_printlong(debugavg);
-	uart_print(" Diff: ");
+	uart_printstr(" Diff: ");
 	uart_printlong(diff);
-	uart_print(" Sta: ");
+	uart_printstr(" Sta: ");
 	uart_printlong(state);
-	uart_print(" << : ");
+	uart_printstr(" << : ");
 	uart_printlong(g_params.shifts[state]);
-	uart_print(" Mod: ");
+	uart_printstr(" Mod: ");
 	uart_printlong(modifier);
-	uart_print(" Th: ");
+	uart_printstr(" Th: ");
 	uart_printlong(threshold);
-	uart_print(" To: ");
+	uart_printstr(" To: ");
 	uart_printlong(tolerance);
-	uart_print(" BAD: ");
+	uart_printstr(" BAD: ");
 	uart_printlong(g_badirq);
 
 	uart_println("");
@@ -177,19 +186,14 @@ int main(void)
 	uint8_t			count;
 	enum STATES		state;
 
-#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
-	uart_init();
-#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
-
 	DDRB |= _BV(DD_LED1) | _BV(DD_LED2) | _BV(DD_LED3) | _BV(DD_OUT);
 	PORTB = 0;
 
+	setup(250);  // ms
 	sei();
 
-	setup(250);  // ms
-
-#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
-	uart_print("Calibrating: ");
+#if defined(HAVE_SERIAL)
+	uart_printstr("Calibrating: ");
 #endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 
 	//calibration
@@ -199,8 +203,8 @@ int main(void)
 		g_counter_ready = 0;
 		if(count & 1) setleds(0, 0, 0);
 		else setleds(1,0,0);
-#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
-		uart_transmit('x');
+#if defined(HAVE_SERIAL)
+		uart_printchar('x');
 #endif
 	}
 
@@ -211,39 +215,41 @@ int main(void)
 		g_counter_ready = 0;
 		if(count & 1) setleds(0, 0, 0);
 		else setleds(1,1,0);
-#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
-		uart_transmit('.');
+#if defined(HAVE_SERIAL)
+		uart_printchar('.');
 #endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 	}
 	g_sum <<= (g_params.shift - 4);
-#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
+#if defined(HAVE_SERIAL)
 	uart_println("");
 #endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 
 	setleds(0,0,0);
 
-#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
-	uart_print("Sum: ");
+#if defined(HAVE_SERIAL)
+	uart_printstr("Sum: ");
 	uart_printlong(g_sum);
 	uart_println("");
 #endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 
 	while(1)
 	{
-		while (!g_counter_ready);
+		while(!g_counter_ready) {
+			if( getlinefromserial( g_linebuffer, sizeof( g_linebuffer ), &g_lineidx) ) {
+				processinput();
+				g_lineidx = 0;
+			}
+		}
 
 		uint32_t	countercopy = g_timer_counts;
 		g_counter_ready = 0;
 
-#if (defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)) ||(defined(HAVE_I2C) && defined(USE_I2C))
+#if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 		float frq = (countercopy * 1000.0) / g_counting_period;
 		unsigned long lf = (unsigned long)frq;
-
-#if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
-		uart_print("Freq: ");
+		uart_printstr("Freq: ");
 		uart_printlong(lf);
 #endif	//	defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
-#endif	//	#if (defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)) ||(defined(HAVE_I2C) && defined(USE_I2C))
 #if defined(HAVE_I2C) && defined(USE_I2C)
 		int32_t		diff = (int32_t)countercopy - (int32_t)(g_sum >> g_params.shift);
 		uint16_t	threshold = (g_sum >> g_params.shift) / g_params.divider;
@@ -340,7 +346,9 @@ void setup(uint8_t ms)
 	i2c_init();
 	i2clcd_init(&g_ps, LCD_I2C_ADDRESS);
 #endif	//	defined(HAVE_I2C) && defined(USE_I2C)
-
+#if defined(HAVE_SERIAL)
+	uart_init(BAUD);
+#endif
 
 }  // end of setup
 
@@ -393,6 +401,19 @@ ISR (TIMERVECT)
 	g_counter_overflows = 0;
 }  // end of TIMER2_COMPA_vect
 
+
+//////////////////////////////////////////////////////////////////////////////
+const char PROGMEM CMD_SHOW[] = "show";
+
+//////////////////////////////////////////////////////////////////////////////
+void processinput()
+{
+	const char	*inptr = (const char*) g_linebuffer;
+
+	uart_printchar(CMNT);
+	uart_println(inptr);
+}
+
 #if defined(DEBUG_TIMERS) && defined(HAVE_SERIAL)
 ////////////////////////////////////////////////////////////////////
 void dumpreg16(char *name, unsigned int value )
@@ -407,12 +428,12 @@ void dumpreg16(char *name, unsigned int value )
 	}
 	buffer[i] = 0;
 
-	uart_print(name);
-	uart_print(": ");
-	uart_print(buffer);
-	uart_print(" (0x");
+	uart_printstr(name);
+	uart_printstr(": ");
+	uart_printstr(buffer);
+	uart_printstr(" (0x");
 	itoa(value, buffer, 16);
-	uart_print(buffer);
+	uart_printstr(buffer);
 	uart_println(")");
 }
 
@@ -429,12 +450,12 @@ void dumpreg(char *name, unsigned char value )
 	}
 	buffer[i] = 0;
 
-	uart_print(name);
-	uart_print(": ");
-	uart_print(buffer);
-	uart_print(" (0x");
+	uart_printstr(name);
+	uart_printstr(": ");
+	uart_printstr(buffer);
+	uart_printstr(" (0x");
 	itoa(value, buffer, 16);
-	uart_print(buffer);
+	uart_printstr(buffer);
 	uart_println(")");
 }
 
@@ -443,10 +464,10 @@ void dumpvar32(char *name, unsigned long value)
 {
 	char buffer[sizeof(value)*8+1];
 
-	uart_print(name);
-	uart_print(": 0x");
+	uart_printstr(name);
+	uart_printstr(": 0x");
 	itoa(value, buffer, 16);
-	uart_print(buffer);
+	uart_printstr(buffer);
 	uart_println("");
 }
 

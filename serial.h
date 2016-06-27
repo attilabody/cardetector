@@ -5,24 +5,35 @@
  *      Author: compi
  */
 
-#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR) || defined(DEBUG_LCD))&& defined(HAVE_SERIAL) && !defined(SERIAL_H_)
+#if defined(HAVE_SERIAL) && !defined(SERIAL_H_)
 #define SERIAL_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif	//	__cplusplus
-#include "string.h"
 
-void uart_init(void);
+#include <stddef.h>
+
+extern volatile unsigned char g_rxcount;
+
+#ifndef SERIAL_RX_BUFFER_SIZE
+#define SERIAL_RX_BUFFER_SIZE 16
+#endif	//	SERIAL_RX_BUFFER_SIZE
+#ifndef SERIAL_TX_BUFFER_SIZE
+#define SERIAL_TX_BUFFER_SIZE 16
+#endif	//	SERIAL_TX_BUFFER_SIZE
+
+void uart_init(unsigned long baud_rate);
 size_t	uart_send(void *buffer, size_t count, unsigned char block);
 unsigned char uart_recieve (void);
-inline void uart_print(const char *str) { uart_send((void*)str, strlen(str), 1); }
-inline void uart_transmit (unsigned char data) { uart_send((void*)&data, 1, 1); }
+void uart_printstr(const char *str);
+void uart_printstr_p(const char *str);
+inline void uart_printchar (unsigned char data) { uart_send((void*)&data, 1, 1); }
 inline void uart_println(const char *str) {
-	uart_print(str);
-	uart_transmit('\r');
-	uart_transmit('\n');
+	uart_printstr(str);
+	uart_printstr("\r\n");
 }
+inline unsigned char uart_available() { return g_rxcount != 0; }
 void uart_printlong(long l);
 int uart_receive();
 
