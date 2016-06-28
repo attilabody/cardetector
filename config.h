@@ -17,7 +17,7 @@
 
 //#define DEBUG_TIMERS
 //#define DEBUG_DETECTOR
-#define DEBUG_SERIALIN
+//#define DEBUG_SERIALIN
 
 
 #if defined(__AVR_ATtiny85__)

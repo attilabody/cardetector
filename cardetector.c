@@ -30,7 +30,9 @@ volatile uint16_t	g_timer_counts;
 volatile uint8_t	g_counter_ready = 0;
 volatile uint8_t	g_overrun = 0;
 volatile uint32_t	g_ms = 0;
+#if defined(DEBUG_DETECTOR)
 volatile uint32_t	g_lastwtf = 0;
+#endif
 
 volatile uint8_t	g_counter_overflows = 0;
 volatile uint16_t	g_timer_overflows = 0;
@@ -55,17 +57,18 @@ void dumpinfo();
 
 enum STATES
 {
-	BELOW,
+	BELOW = 0,
 	BASE,
 	ABOVE,
 	ACTIVE,
-	TOUT
+	TOUT,
+	STATECOUNT
 };
 
 typedef struct
 {
-	int8_t	shifts[5];
-	uint8_t	shift, tlimit;
+	int8_t		shifts[5];
+	uint8_t		sumshift, tlimit;
 	uint16_t	divider;
 } PARAMS;
 
@@ -76,9 +79,6 @@ const PARAMS EEMEM ee_params =
 	, TIMELIMIT		//tlimit
 	, DIVIDER		//divider
 };
-
-
-
 
 const PARAMS g_params =
 {
@@ -122,14 +122,14 @@ void init_config()
 enum STATES detect(uint16_t counter)
 {
 #if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
-	uint16_t		debugavg = g_sum >> g_params.shift;
+	uint16_t		debugavg = g_sum >> g_params.sumshift;
 	int32_t			modifier;
 #endif
-	uint16_t		threshold = (g_sum >> g_params.shift) / g_params.divider;
+	uint16_t		threshold = (g_sum >> g_params.sumshift) / g_params.divider;
 	int8_t			shift;
 
 	enum STATES		state;
-	int32_t			diff = (int32_t)counter - (int32_t)(g_sum >> g_params.shift);
+	int32_t			diff = (int32_t)counter - (int32_t)(g_sum >> g_params.sumshift);
 	uint16_t		tolerance = threshold >> SHIFT_TOLERANCE;
 
 
@@ -149,7 +149,7 @@ enum STATES detect(uint16_t counter)
 		g_sum += (shift >= 0) ? (diff << shift) : (diff >> -shift);
 
 #if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
-	modifier = (shift >= 0) ? (diff << shift) : (diff >> -shift);
+	modifier = (sumshift >= 0) ? (diff << sumshift) : (diff >> -sumshift);
 	uart_printstr(" Sum: ");
 	uart_printlong(g_sum);
 	uart_printstr(" Raw: ");
@@ -219,7 +219,7 @@ int main(void)
 		uart_printchar('.');
 #endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 	}
-	g_sum <<= (g_params.shift - 4);
+	g_sum <<= (g_params.sumshift - 4);
 #if defined(HAVE_SERIAL)
 	uart_println("");
 #endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
@@ -251,12 +251,12 @@ int main(void)
 		uart_printlong(lf);
 #endif	//	defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 #if defined(HAVE_I2C) && defined(USE_I2C)
-		int32_t		diff = (int32_t)countercopy - (int32_t)(g_sum >> g_params.shift);
-		uint16_t	threshold = (g_sum >> g_params.shift) / g_params.divider;
+		int32_t		diff = (int32_t)countercopy - (int32_t)(g_sum >> g_params.sumshift);
+		uint16_t	threshold = (g_sum >> g_params.sumshift) / g_params.divider;
 		uint8_t		neg = diff < 0, chars;
 		if(neg) diff = -diff;
 		i2clcd_setcursor(&g_ps,0,1);
-		i2clcd_printlong(&g_ps, g_sum >> g_params.shift);
+		i2clcd_printlong(&g_ps, g_sum >> g_params.sumshift);
 		i2clcd_printchar(&g_ps, neg ? '-' : '+');
 		i2clcd_printlong(&g_ps, diff);
 		i2clcd_printchar(&g_ps, '=');
@@ -309,6 +309,8 @@ int main(void)
 ////////////////////////////////////////////////////////////////////
 void setup(uint8_t ms)
 {
+	init_config();
+
 	g_counting_period = ms;             // how many 1 ms counts to do
 
 	TCCR0A = 0;						//t0: stop
@@ -403,15 +405,48 @@ ISR (TIMERVECT)
 
 
 //////////////////////////////////////////////////////////////////////////////
-const char PROGMEM CMD_SHOW[] = "show";
+const char CMD_SHOW[] PROGMEM = "show";
+
+const char PROGMEM shift_below[] = "below :";
+const char PROGMEM shift_base[] = "base: ";
+const char PROGMEM shift_above[] = "above: ";
+const char PROGMEM shift_active[] = "active: ";
+const char PROGMEM shift_tout[] = "timedout: ";
+
+const char PROGMEM shiftvalues[] = "Diff shift values:\r\n";
+const char PROGMEM crlf[] = "\r\n";
+const char*	const shiftnames[] PROGMEM = { shift_below, shift_base, shift_above, shift_active, shift_tout };
+const char PROGMEM sumshift[] = "sumshift: ";
+const char PROGMEM tlimit[] = "timelimit: ";
+const char PROGMEM divider[] = "divider";
+
+//////////////////////////////////////////////////////////////////////////////
+static void printparam(const char *name, long value)
+{
+	uart_printstr_p(name);
+	uart_printlong(value);
+	uart_printstr_p(crlf);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 void processinput()
 {
-	const char	*inptr = (const char*) g_linebuffer;
+	char	*inptr = (char*) g_linebuffer;
 
 	uart_printchar(CMNT);
 	uart_println(inptr);
+
+	if( iscommand( &inptr, CMD_SHOW, 1)) {	//	get
+		uart_printstr_p(shiftvalues);
+		for(uint8_t  c = 0; c < STATECOUNT; ++c ) {
+			uart_printchar('\t');
+			printparam(pgm_read_ptr(shiftnames + c), g_params.shifts[c]);
+		}
+		printparam(sumshift, g_params.sumshift);
+		printparam(tlimit, g_params.tlimit);
+		printparam(divider, g_params.divider);
+		uart_printstr_p(crlf);
+	}
 }
 
 #if defined(DEBUG_TIMERS) && defined(HAVE_SERIAL)

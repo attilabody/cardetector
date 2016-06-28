@@ -13,7 +13,6 @@
 #include "utils.h"
 #include "commsyms.h"
 
-//#define DEBUG_SERIALIN
 //////////////////////////////////////////////////////////////////////////////
 unsigned char getlinefromserial( unsigned char *buffer, unsigned char buflen, unsigned char *idx )
 {
@@ -71,17 +70,17 @@ unsigned char iscommand( char **inptr, const char *cmd, unsigned char pgmspace )
 	size_t n = 0;
 	char x;
 	if( pgmspace )
-		while((x = pgm_read_byte( cmd++ )) && x == *inptr[n] )
+		while((x = pgm_read_byte( cmd++ )) && x == (*inptr)[n] )
 			++n;
 	else
-		while((x = *cmd++) && x == *inptr[n] )
+		while((x = *cmd++) && x == (*inptr)[n] )
 			++n;
-	char y = *inptr[n];
+	char y = (*inptr)[n];
 	if( x || !(isspace(y) || ispunct(y) || y == '\n' || !y ))
 		return 0;
-	inptr += n;
+	*inptr += n;
 	while( **inptr && (isspace(**inptr)))
-		++inptr;
+		++*inptr;
 	return 1;
 }
 
