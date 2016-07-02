@@ -14,6 +14,7 @@
 #include "commsyms.h"
 
 //////////////////////////////////////////////////////////////////////////////
+#if defined(HAVE_SERIAL)
 unsigned char getlinefromserial( unsigned char *buffer, unsigned char buflen, unsigned char *idx )
 {
 #if defined(DEBUG_SERIALIN)
@@ -63,6 +64,7 @@ unsigned char getlinefromserial( unsigned char *buffer, unsigned char buflen, un
 	}
 	return lineready;
 }
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 unsigned char iscommand( char **inptr, const char *cmd, unsigned char pgmspace )

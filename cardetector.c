@@ -49,7 +49,9 @@ PCF8574_STATUS	g_ps;
 #endif	//	defined(HAVE_I2C) && defined(USE_I2C)
 
 void setup(uint8_t ms);
+#if defined(HAVE_SERIAL)
 void processinput();
+#endif
 
 #ifdef DEBUG_TIMERS
 void dumpinfo();
@@ -228,10 +230,12 @@ int main(void)
 	while(1)
 	{
 		while(!g_counter_ready) {
+#if defined(HAVE_SERIAL)
 			if( getlinefromserial( g_linebuffer, sizeof( g_linebuffer ), &g_lineidx) ) {
 				processinput();
 				g_lineidx = 0;
 			}
+#endif
 		}
 
 		uint32_t	countercopy = g_timer_counts;
@@ -417,6 +421,7 @@ const char PROGMEM valsep[] = ": ";
 const char*	const shiftnames[] PROGMEM = { CMD_BELOW, CMD_BASE, CMD_ABOVE, CMD_ACTIVE, CMD_TIMEDOUT };
 
 //////////////////////////////////////////////////////////////////////////////
+#if defined(HAVE_SERIAL)
 static void printparam(const char *name, long value)
 {
 	uart_printstr_p(name);
@@ -424,8 +429,10 @@ static void printparam(const char *name, long value)
 	uart_printlong(value);
 	uart_printstr_p(crlf);
 }
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
+#if defined(HAVE_SERIAL)
 void processinput()
 {
 	char	*inptr = (char*) g_linebuffer;
@@ -475,6 +482,7 @@ void processinput()
 
 //	if( iscommand(&inptr,CMD_BASE, 1))
 }
+#endif
 
 #if defined(DEBUG_TIMERS) && defined(HAVE_SERIAL)
 ////////////////////////////////////////////////////////////////////
