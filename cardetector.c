@@ -20,6 +20,7 @@
 #include "i2c_lcd.h"
 #include "utils.h"
 #include "commsyms.h"
+#include "setup.h"
 
 #if defined(DEBUG_DETECTOR)
 volatile uint16_t	g_badirq = 0;
@@ -44,11 +45,15 @@ unsigned char 	g_linebuffer[64];
 unsigned char	g_lineidx;
 #endif
 
+uint16_t		g_threshold = 0;
+int16_t			g_diff = 0;
+uint16_t		g_avg;
+int16_t			g_tolerance;
+
 #if defined(HAVE_I2C) && defined(USE_I2C)
 PCF8574_STATUS	g_ps;
 #endif	//	defined(HAVE_I2C) && defined(USE_I2C)
 
-void setup(uint8_t ms);
 #if defined(HAVE_SERIAL)
 void processinput();
 #endif
@@ -69,6 +74,7 @@ enum STATES
 
 typedef struct
 {
+	uint8_t		magic;
 	int8_t		shifts[5];
 	uint8_t		sumshift, tlimit;
 	uint16_t	divider;
@@ -76,13 +82,22 @@ typedef struct
 
 CONFIG EEMEM ee_config =
 {
-	  {SHIFT_BELOW, SHIFT_BASE, SHIFT_ABOVE, SHIFT_ACTIVE, SHIFT_TIMEOUT}	//below, above, active, timeout
+	  0xA5
+	, {SHIFT_BELOW, SHIFT_BASE, SHIFT_ABOVE, SHIFT_ACTIVE, SHIFT_TIMEOUT}	//below, above, active, timeout
 	, SHIFT_SUM		//shift
 	, TIMELIMIT		//tlimit
 	, DIVIDER		//divider
 };
 
-CONFIG 		g_config;
+CONFIG 		g_config =
+{
+	  0xA5
+	, {SHIFT_BELOW, SHIFT_BASE, SHIFT_ABOVE, SHIFT_ACTIVE, SHIFT_TIMEOUT}	//below, above, active, timeout
+	, SHIFT_SUM		//shift
+	, TIMELIMIT		//tlimit
+	, DIVIDER		//divider
+};
+
 uint32_t	g_sum = 0;
 
 
@@ -97,20 +112,10 @@ uint32_t	millis()
 }
 
 ////////////////////////////////////////////////////////////////////
-void setleds(char red, char green, char blue)
-{
-	if(red|green|blue) PORTB |= _BV(PORT_LED1);
-	else PORTB &= ~ _BV(PORT_LED1);
-//	if(green) PORTB |= _BV(PORT_LED2);
-//	else PORTB &= ~ _BV(PORT_LED2);
-//	if(blue) PORTB |= _BV(PORT_LED3);
-//	else PORTB &= ~ _BV(PORT_LED3);
-}
-
-////////////////////////////////////////////////////////////////////
 void init_config()
 {
-	eeprom_read_block((void*)&g_config, &ee_config, sizeof(g_config));
+	if(eeprom_read_byte((uint8_t*)&ee_config) == 0xA5)
+		eeprom_read_block((void*)&g_config, &ee_config, sizeof(g_config));
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -120,19 +125,15 @@ enum STATES detect(uint16_t counter)
 	uint16_t		debugavg = g_sum >> g_config.sumshift;
 	int32_t			modifier;
 #endif
-	uint16_t		threshold = (g_sum >> g_config.sumshift) / g_config.divider;
 	int8_t			shift;
 
 	enum STATES		state;
-	int32_t			diff = (int32_t)counter - (int32_t)(g_sum >> g_config.sumshift);
-	uint16_t		tolerance = threshold >> SHIFT_TOLERANCE;
 
-
-	if (diff < 0)
-		state = tolerance + diff < 0 ? BELOW : BASE;
-	else if( diff < tolerance)
+	if (g_diff < 0)
+		state = g_tolerance + g_diff < 0 ? BELOW : BASE;
+	else if( g_diff < g_tolerance)
 		state = BASE;
-	else if(diff < threshold)
+	else if(g_diff < g_threshold)
 		state = ABOVE;
 	else if (g_active_time < ((uint16_t)g_config.tlimit) << 2)
 		state = ACTIVE;
@@ -141,10 +142,10 @@ enum STATES detect(uint16_t counter)
 
 	shift = g_config.shifts[state];
 	if(shift != SCHAR_MIN)
-		g_sum += (shift >= 0) ? (diff << shift) : (diff >> -shift);
+		g_sum += (shift >= 0) ? (((int32_t)g_diff) << shift) : (((int32_t)g_diff) >> -shift);
 
 #if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
-	modifier = (sumshift >= 0) ? (diff << sumshift) : (diff >> -sumshift);
+	modifier = (shift >= 0) ? (g_diff << shift) : (g_diff >> -shift);
 	uart_printstr(" Sum: ");
 	uart_printlong(g_sum);
 	uart_printstr(" Raw: ");
@@ -152,7 +153,7 @@ enum STATES detect(uint16_t counter)
 	uart_printstr(" Avg: ");
 	uart_printlong(debugavg);
 	uart_printstr(" Diff: ");
-	uart_printlong(diff);
+	uart_printlong(g_diff);
 	uart_printstr(" Sta: ");
 	uart_printlong(state);
 	uart_printstr(" << : ");
@@ -160,9 +161,9 @@ enum STATES detect(uint16_t counter)
 	uart_printstr(" Mod: ");
 	uart_printlong(modifier);
 	uart_printstr(" Th: ");
-	uart_printlong(threshold);
+	uart_printlong(g_threshold);
 	uart_printstr(" To: ");
-	uart_printlong(tolerance);
+	uart_printlong(g_tolerance);
 	uart_printstr(" BAD: ");
 	uart_printlong(g_badirq);
 
@@ -176,56 +177,172 @@ enum STATES detect(uint16_t counter)
 }
 
 ////////////////////////////////////////////////////////////////////
-int main(void)
-{
-	uint8_t			count;
-	enum STATES		state;
-
-	DDRB |= _BV(DD_LED1) | _BV(DD_LED2) | _BV(DD_LED3) | _BV(DD_OUT);
-	PORTB = 0;
-
-	setup(250);  // ms
-	sei();
-
-#if defined(HAVE_SERIAL)
-	uart_printstr("Calibrating: ");
-#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
-
-	//calibration
-	for(count = 0; count < 4; ++count)
-	{
-		while(!g_counter_ready);
-		g_counter_ready = 0;
-		if(count & 1) setleds(0, 0, 0);
-		else setleds(1,0,0);
-#if defined(HAVE_SERIAL)
-		uart_printchar('x');
+#ifdef __AVR_ATmega328P__
+PORTBIT g_leds[] = {
+	  { PORT_LED1, _BV(BIT_LED1) }
+	, { PORT_LED2, _BV(BIT_LED2) }
+	, { PORT_LED3, _BV(BIT_LED3) }
+	, { PORT_LED4, _BV(BIT_LED4) }
+	, { PORT_LED5, _BV(BIT_LED5) }
+	, { PORT_LED6, _BV(BIT_LED6) }
+	, { PORT_LED7, _BV(BIT_LED7) }
+	, { PORT_LED8, _BV(BIT_LED8) }
+};
 #endif
+
+////////////////////////////////////////////////////////////////////
+void updateledbar(int8_t value)	//-2 ... 6
+{
+#if defined(__AVR_ATmega328P__)
+	int8_t	led;
+	for(led = -2; led < 0; ++led) {
+		if(value <= led) _SFR_IO8(g_leds[led+2].port) |= g_leds[led+2].bitmask;
+		else _SFR_IO8(g_leds[led+2].port) &= ~g_leds[led+2].bitmask;
 	}
 
-	for(count = 0; count < 16; ++count)
+	for(led = 0; led < 6; ++led) {
+		if(led < value) _SFR_IO8(g_leds[led+2].port) |= g_leds[led+2].bitmask;
+		else _SFR_IO8(g_leds[led+2].port) &= ~g_leds[led+2].bitmask;
+	}
+#elif defined(__AVR_ATtiny85__)
+	if(value) PORT_LED1 |= _BV(BIT_LED1);
+	else PORT_LED1 &= ~_BV(BIT_LED1);
+#endif
+}
+
+////////////////////////////////////////////////////////////////////
+int8_t calcbar(const uint8_t top, uint8_t limit)
+{
+	if(!g_diff) return 0;
+
+	uint8_t	neg = g_diff < 0;
+	int16_t	absdiff = !neg ? g_diff : -g_diff;
+	int16_t	ret = 0;
+
+	if(absdiff < g_tolerance) return 0;
+
+	absdiff -= g_tolerance;
+	int16_t	threshold = g_threshold - g_tolerance;
+
+	ret = ((int32_t)absdiff * (top - 1))/threshold + 1;
+	if(ret > limit) ret = limit;
+	return neg ? -ret : ret;
+}
+
+////////////////////////////////////////////////////////////////////
+inline void __attribute__((always_inline)) calculatemetrics(uint16_t counter)
+{
+	g_threshold = (g_sum >> g_config.sumshift) / g_config.divider;
+	g_avg = g_sum >> g_config.sumshift;
+	g_diff = (int32_t)counter - g_avg;
+	g_tolerance = g_threshold >> SHIFT_TOLERANCE;
+}
+
+////////////////////////////////////////////////////////////////////
+inline void __attribute__((always_inline)) setoutput(uint8_t value)
+{
+	if(value) PORT_OUT |= _BV(BIT_OUT);
+	else PORT_OUT &= ~_BV(BIT_OUT);
+}
+
+
+////////////////////////////////////////////////////////////////////
+#if defined(HAVE_I2C) && defined(USE_I2C)
+void updatelcdbar(int8_t chars)
+{
+	i2clcd_setcursor(&g_ps, 0, 0);
+	int8_t pos;
+	if (chars < 0) {
+		pos = -16;
+		while (pos < chars) {
+			i2clcd_printchar(&g_ps, ' ');
+			++pos;
+		}
+		while (chars++ < 0)
+			i2clcd_printchar(&g_ps, '<');
+	} else {
+		pos = 0;
+		while (chars--) {
+			i2clcd_printchar(&g_ps, '>');
+			++pos;
+		}
+		while (pos++ < 16)
+			i2clcd_printchar(&g_ps, ' ');
+	}
+}
+#else
+static inline void updatelcdbar(int8_t chars) {}
+#endif	//	defined(HAVE_I2C) && defined(USE_I2C)
+
+////////////////////////////////////////////////////////////////////
+void updatedisplays(uint16_t counter, enum STATES state )
+{
+#if defined(HAVE_I2C) && defined(USE_I2C)
+	uint8_t	neg = g_diff < 0;
+	int16_t absdiff = neg ? -g_diff : g_diff;
+	int8_t	chars = calcbar(13,16);
+
+	i2clcd_setcursor(&g_ps,0,1);
+	i2clcd_printlong(&g_ps, g_sum >> g_config.sumshift);
+	i2clcd_printchar(&g_ps, neg ? '-' : '+');
+	i2clcd_printlong(&g_ps, absdiff);
+	i2clcd_printchar(&g_ps, '=');
+	i2clcd_printlong(&g_ps, counter);
+	i2clcd_printchar(&g_ps, ' ');
+
+	updatelcdbar(chars);
+#endif	//	defined(HAVE_I2C) && defined(USE_I2C)
+	updateledbar(calcbar(5,6));
+}
+
+////////////////////////////////////////////////////////////////////
+void calibrate()
+{
+	uart_printstr("Calibrating: ");
+	for (uint8_t count = 0; count < 2; ++count)
 	{
-		while(!g_counter_ready);
+		while (!g_counter_ready)
+			;
+		g_counter_ready = 0;
+		updatelcdbar((count&1) ? -16 : 16 );
+		updateledbar((count&1) ? -2 : 6 );
+
+		uart_printchar('x');
+	}
+	for (uint8_t count = 0; count < 8; ++count)
+	{
+		while (!g_counter_ready)
+			;
 		g_sum += g_timer_counts;
 		g_counter_ready = 0;
-		if(count & 1) setleds(0, 0, 0);
-		else setleds(1,1,0);
-#if defined(HAVE_SERIAL)
+		updatelcdbar((count&1) ? -16 : 16 );
+		updateledbar((count&1) ? -2 : 6 );
+
 		uart_printchar('.');
-#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
 	}
-	g_sum <<= (g_config.sumshift - 4);
-#if defined(HAVE_SERIAL)
-	uart_println("");
-#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
-
-	setleds(0,0,0);
-
-#if defined(HAVE_SERIAL)
-	uart_printstr("Sum: ");
+	g_sum <<= (g_config.sumshift - 3);
+	uart_printstr("\r\nSum: ");
 	uart_printlong(g_sum);
 	uart_println("");
-#endif	//	#if (defined(DEBUG_TIMERS) || defined(DEBUG_DETECTOR)) && defined(HAVE_SERIAL)
+}
+
+////////////////////////////////////////////////////////////////////
+int main(void)
+{
+	enum STATES		state;
+
+	init_config();
+	setup();
+#if defined(HAVE_I2C) && defined(USE_I2C)
+	i2c_init();
+	i2clcd_init(&g_ps, LCD_I2C_ADDRESS);
+#endif	//	defined(HAVE_I2C) && defined(USE_I2C)
+#if defined(HAVE_SERIAL)
+	uart_init(BAUD);
+#endif
+
+	sei();
+	calibrate();
 
 	while(1)
 	{
@@ -238,60 +355,18 @@ int main(void)
 #endif
 		}
 
-		uint32_t	countercopy = g_timer_counts;
+		uint16_t	countercopy = g_timer_counts;
 		g_counter_ready = 0;
 
 #if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
-		float frq = (countercopy * 1000.0) / g_counting_period;
-		unsigned long lf = (unsigned long)frq;
+		float frq = ((uint32_t)countercopy * 1000.0) / g_counting_period;
 		uart_printstr("Freq: ");
-		uart_printlong(lf);
+		uart_printlong((unsigned long)frq);
 #endif	//	defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
-#if defined(HAVE_I2C) && defined(USE_I2C)
-		int32_t		diff = (int32_t)countercopy - (int32_t)(g_sum >> g_config.sumshift);
-		uint16_t	threshold = (g_sum >> g_config.sumshift) / g_config.divider;
-		uint8_t		neg = diff < 0, chars;
-		if(neg) diff = -diff;
-		i2clcd_setcursor(&g_ps,0,1);
-		i2clcd_printlong(&g_ps, g_sum >> g_config.sumshift);
-		i2clcd_printchar(&g_ps, neg ? '-' : '+');
-		i2clcd_printlong(&g_ps, diff);
-		i2clcd_printchar(&g_ps, '=');
-		i2clcd_printlong(&g_ps, countercopy);
-		i2clcd_printchar(&g_ps, ' ');
-		chars = diff * 13 / threshold;
-		if(chars > 16) chars = 16;
-		if(diff && !chars) ++chars;
-		i2clcd_setcursor(&g_ps, 0, 0);
-
-		uint8_t	pos = 0;
-		if(neg) {
-			while(pos<16-chars) {
-				i2clcd_printchar(&g_ps, ' ');
-				++pos;
-			}
-			while(chars--) i2clcd_printchar(&g_ps, '<');
-		} else {
-			while(chars--) {
-				i2clcd_printchar(&g_ps, '>');
-				++pos;
-			}
-			while(pos++ < 16) i2clcd_printchar(&g_ps, ' ');
-		}
-#endif	//	defined(HAVE_I2C) && defined(USE_I2C)
-
-		if((state = detect(countercopy)) >= ACTIVE) {
-			setleds(1,1,1);
-			PORTB |= _BV(PORT_OUT);
-		} else {
-			PORTB &= ~_BV(PORT_OUT);
-			if(state == BELOW)
-				setleds(0,0,1);
-			else if(state == BASE)
-				setleds(0,0,0);
-			else	//ABOVE
-				setleds(1,0,0);
-		}
+		calculatemetrics(countercopy);
+		state = detect(countercopy);
+		setoutput(state == ACTIVE);
+		updatedisplays(countercopy, state);
 
 #if defined(DEBUG_DETECTOR)
 		if(g_badirq && g_badirqcnt == g_badirq) {
@@ -302,54 +377,6 @@ int main(void)
 #endif	//	DEBUG_DETECTOR
 	}
 }
-
-////////////////////////////////////////////////////////////////////
-void setup(uint8_t ms)
-{
-	init_config();
-
-	g_counting_period = ms;             // how many 1 ms counts to do
-
-	TCCR0A = 0;						//t0: stop
-	TCCR0B = 0;
-	TCNT0 = 0;						//t0: reset counter
-
-#if defined(__AVR_ATtiny85__)
-	TCCR1 = 0;						//t1: stop
-	GTCCR |= _BV(PSR1);				//t1: prescaler reset
-	TCNT1 = 0;						//t1: reset counter
-	OCR1C = 124;					//for counter autoreset
-	OCR1A = 124;					//for interrupt
-
-	TIMSK = _BV(TOIE0) | _BV(OCIE1A);	//enable interrupts for t0 & t1
-
-	TCCR1 |= _BV(CS13) | _BV(CTC1);	//t1: prescaler 128, CTC mode (start)
-#elif defined(__AVR_ATmega328P__)
-	TIMSK0 = _BV(TOIE0);			//t0: overflow interrupt enable
-
-	TCCR2A = 0;						//t2: stop
-	TCCR2B = 0;
-	GTCCR = _BV(PSRASY);			//t2: prescaler reset
-	TCNT2 = 0;						//t2: reset counter
-
-	TCCR2A = _BV(WGM21);			//t2: CTC mode
-	OCR2A = 124;					//t2: 62.5*128*125 = 1000000 ns = 1 ms
-	TIMSK2 = _BV(OCIE2A);			//t2 enable Timer2 Interrupt
-
-	TCCR2B = _BV(CS20) | _BV(CS22);	//t2: prescaler 128 (start)
-#else
-#error "Only ATmega 328P and ATtinyX5 are supported."
-#endif
-	TCCR0B = _BV(CS00) | _BV(CS01) | _BV(CS02);	//t0: ext clk rising edge (start)
-#if defined(HAVE_I2C) && defined(USE_I2C)
-	i2c_init();
-	i2clcd_init(&g_ps, LCD_I2C_ADDRESS);
-#endif	//	defined(HAVE_I2C) && defined(USE_I2C)
-#if defined(HAVE_SERIAL)
-	uart_init(BAUD);
-#endif
-
-}  // end of setup
 
 ////////////////////////////////////////////////////////////////////
 ISR(COUNTERVECT)
@@ -429,10 +456,8 @@ static void printparam(const char *name, long value)
 	uart_printlong(value);
 	uart_printstr_p(crlf);
 }
-#endif
 
 //////////////////////////////////////////////////////////////////////////////
-#if defined(HAVE_SERIAL)
 void processinput()
 {
 	char	*inptr = (char*) g_linebuffer;
@@ -479,8 +504,6 @@ void processinput()
 			}
 		}
 	}
-
-//	if( iscommand(&inptr,CMD_BASE, 1))
 }
 #endif
 

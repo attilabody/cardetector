@@ -14,59 +14,6 @@
 #include "commsyms.h"
 
 //////////////////////////////////////////////////////////////////////////////
-#if defined(HAVE_SERIAL)
-unsigned char getlinefromserial( unsigned char *buffer, unsigned char buflen, unsigned char *idx )
-{
-#if defined(DEBUG_SERIALIN)
-	if(uart_available())
-	{
-		uart_printstr(CMNTS "called with buflen ");
-		uart_printlong(buflen);
-		uart_printstr(" and idx ");
-		uart_printlong(*idx);
-	}
-#endif	//	DEBUG_SERIALIN
-	unsigned char lineready = 0;
-	while(uart_available() && !lineready ) {
-		char inc = uart_receive();
-#if defined(DEBUG_SERIALIN)
-		buffer[*idx ] = 0;
-		uart_printchar(CMNT);
-		uart_printstr( (char*)buffer );
-		uart_printchar(' ');
-		uart_printchar(inc);
-		uart_printchar(' ');
-		uart_printlong( *idx );
-		uart_printstr("\r\n");
-#endif	//	DEBUG_SERIALIN
-		if( inc == '\r' ) continue;
-		if( inc == '\n' ) inc = 0;
-		buffer[(*idx)++] = inc;
-		if( !inc || *idx >= buflen - 1 ) {
-			if( inc )
-				buffer[*idx] = 0;
-			lineready = 1;
-#if defined(DEBUG_SERIALIN)
-			uart_printstr(CMNTS "Line ready: ");
-			uart_printstr( (char*)buffer );
-			uart_printchar('|');
-			uart_printlong(inc);
-			uart_printchar(' ');
-			uart_printlong(*idx);
-			uart_printchar(CMNT);
-			for( unsigned char _idx = 0; _idx < *idx; ++_idx ) {
-				uart_printlong(buffer[_idx]);
-				uart_printchar(' ');
-			}
-			uart_printstr("\r\n");
-#endif	//	DEBUG_SERIALIN
-		}
-	}
-	return lineready;
-}
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
 unsigned char iscommand( char **inptr, const char *cmd, unsigned char pgmspace )
 {
 	size_t n = 0;

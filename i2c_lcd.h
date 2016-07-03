@@ -63,6 +63,6 @@ void 	i2clcd_home(PCF8574_STATUS *ps);
 void 	i2clcd_setcursor(PCF8574_STATUS *ps, uint8_t col, uint8_t row);
 void	i2clcd_print(PCF8574_STATUS *ps, const char *string);
 int		i2clcd_printlong(PCF8574_STATUS *ps, long l);
-inline void	i2clcd_printchar(PCF8574_STATUS *ps, char c) { i2clcd_sendbyte(ps, c, 1); }
+static inline void	i2clcd_printchar(PCF8574_STATUS *ps, char c) { i2clcd_sendbyte(ps, c, 1); }
 
 #endif /* I2C_LCD_H_ */
