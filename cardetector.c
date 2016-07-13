@@ -22,7 +22,7 @@
 #include "commsyms.h"
 #include "setup.h"
 
-#if defined(DEBUG_DETECTOR)
+#if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 volatile uint16_t	g_badirq = 0;
 uint16_t			g_badirqcnt = 0;
 #endif
@@ -31,7 +31,7 @@ volatile uint16_t	g_timer_counts;
 volatile uint8_t	g_counter_ready = 0;
 volatile uint8_t	g_overrun = 0;
 volatile uint32_t	g_ms = 0;
-#if defined(DEBUG_DETECTOR)
+#if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 volatile uint32_t	g_lastwtf = 0;
 #endif
 
@@ -43,6 +43,7 @@ uint16_t			g_active_time = 0;
 #if defined(HAVE_SERIAL)
 unsigned char 	g_linebuffer[64];
 unsigned char	g_lineidx;
+uint8_t			g_debug;
 #endif
 
 uint16_t		g_threshold = 0;
@@ -145,29 +146,32 @@ enum STATES detect(uint16_t counter)
 		g_sum += (shift >= 0) ? (((int32_t)g_diff) << shift) : (((int32_t)g_diff) >> -shift);
 
 #if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
-	modifier = (shift >= 0) ? (g_diff << shift) : (g_diff >> -shift);
-	uart_printstr(" Sum: ");
-	uart_printlong(g_sum);
-	uart_printstr(" Raw: ");
-	uart_printlong(g_timer_counts);
-	uart_printstr(" Avg: ");
-	uart_printlong(debugavg);
-	uart_printstr(" Diff: ");
-	uart_printlong(g_diff);
-	uart_printstr(" Sta: ");
-	uart_printlong(state);
-	uart_printstr(" << : ");
-	uart_printlong(g_config.shifts[state]);
-	uart_printstr(" Mod: ");
-	uart_printlong(modifier);
-	uart_printstr(" Th: ");
-	uart_printlong(g_threshold);
-	uart_printstr(" To: ");
-	uart_printlong(g_tolerance);
-	uart_printstr(" BAD: ");
-	uart_printlong(g_badirq);
+	if(g_debug)
+	{
+		modifier = (shift >= 0) ? (g_diff << shift) : (g_diff >> -shift);
+		uart_printstr(" Sum: ");
+		uart_printlong(g_sum);
+		uart_printstr(" Raw: ");
+		uart_printlong(g_timer_counts);
+		uart_printstr(" Avg: ");
+		uart_printlong(debugavg);
+		uart_printstr(" Diff: ");
+		uart_printlong(g_diff);
+		uart_printstr(" Sta: ");
+		uart_printlong(state);
+		uart_printstr(" << : ");
+		uart_printlong(g_config.shifts[state]);
+		uart_printstr(" Mod: ");
+		uart_printlong(modifier);
+		uart_printstr(" Th: ");
+		uart_printlong(g_threshold);
+		uart_printstr(" To: ");
+		uart_printlong(g_tolerance);
+		uart_printstr(" BAD: ");
+		uart_printlong(g_badirq);
 
-	uart_println("");
+		uart_println("");
+	}
 #endif	//	DEBUG_DETECTOR
 
 	if(state < ACTIVE) g_active_time = 0;
@@ -359,16 +363,19 @@ int main(void)
 		g_counter_ready = 0;
 
 #if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
-		float frq = ((uint32_t)countercopy * 1000.0) / g_counting_period;
-		uart_printstr("Freq: ");
-		uart_printlong((unsigned long)frq);
+		if(g_debug)
+		{
+			float frq = ((uint32_t)countercopy * 1000.0) / g_counting_period;
+			uart_printstr("Freq: ");
+			uart_printlong((unsigned long)frq);
+		}
 #endif	//	defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 		calculatemetrics(countercopy);
 		state = detect(countercopy);
 		setoutput(state == ACTIVE);
 		updatedisplays(countercopy, state);
 
-#if defined(DEBUG_DETECTOR)
+#if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 		if(g_badirq && g_badirqcnt == g_badirq) {
 			PORTB ^= _BV(PORT_LED2);
 			g_badirqcnt = 0;
@@ -410,7 +417,7 @@ ISR (TIMERVECT)
 	}
 
 	// if just missed an overflow
-#if defined(DEBUG_DETECTOR)
+#if defined(DEBUG_DETECTOR) && defined(HAVE_SERIAL)
 	if(tifr_copy & _BV(TOV0)) {
 		g_badirq++;
 		g_lastwtf = g_ms;
@@ -439,6 +446,7 @@ const char CMD_SHIFTSUM[] PROGMEM = "shiftsum";
 const char CMD_TIMELIMIT[] PROGMEM = "timelimit";
 const char CMD_DIVIDER[] PROGMEM = "divider";
 const char CMD_SAVE[] PROGMEM = "save";
+const char CMD_DEBUG[] PROGMEM = "debug";
 
 const char PARAMERROR[] PROGMEM = "!Parameter error!\r\n";
 
@@ -494,7 +502,12 @@ void processinput()
 	else if( iscommand(&inptr, CMD_SAVE, 1)) {
 		eeprom_update_block((void*)&g_config, (void*)&ee_config, sizeof(g_config));
 	}
-	else {
+	else if( iscommand(&inptr, CMD_DEBUG, 1)) {
+		long l = getintparam(&inptr, 1, 1, 0);
+		g_debug = l != 0;
+	}
+	else
+	{
 		for(uint8_t ds = 0; ds < sizeof(shiftnames)/sizeof(shiftnames[0]); ++ds) {
 			if(iscommand(&inptr, pgm_read_ptr(shiftnames + ds), 1)) {
 				long l = getintparam(&inptr, 1, 1, 1);
@@ -503,6 +516,7 @@ void processinput()
 				return;
 			}
 		}
+		uart_println("Unknown command.");
 	}
 }
 #endif

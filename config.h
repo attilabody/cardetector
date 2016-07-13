@@ -16,7 +16,7 @@
 #define USE_I2C
 
 //#define DEBUG_TIMERS
-//#define DEBUG_DETECTOR
+#define DEBUG_DETECTOR
 //#define DEBUG_SERIALIN
 
 
