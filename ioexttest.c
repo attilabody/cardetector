@@ -18,6 +18,8 @@
 #include "pcf8574.h"
 #include "i2c_lcd.h"
 
+#if defined(IOEXTTEST)
+
 PCF8574_STATUS g_lcdps;
 
 volatile uint32_t	g_ms = 0;
@@ -89,3 +91,4 @@ int main(void)
 //		prevms += 1000;
 	}
 }
+#endif	//	IOEXTTEST

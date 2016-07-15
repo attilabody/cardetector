@@ -8,6 +8,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+#if defined(TIMER2TEST)
+
 volatile uint16_t tel;
 
 ISR(TIMER2_COMPA_vect)
@@ -33,3 +35,4 @@ int main( void )
 	while ( 1 ) { ;; }
 	return 0;
 }
+#endif	//	TIMER2TEST
