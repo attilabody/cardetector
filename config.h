@@ -99,7 +99,8 @@ typedef struct {
 #define	DIVIDER			800
 #define	SHIFT_TOLERANCE	3
 
-#define TIMELIMIT		180
+#define CALIBRATE_LOOP_POW	2
+#define TIMELIMIT			180
 
 #define LCD_I2C_ADDRESS	0x27
 

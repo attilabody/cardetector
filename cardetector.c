@@ -10,6 +10,7 @@
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
 #include <avr/pgmspace.h>
+#include <avr/wdt.h>
 
 #include <stdlib.h>
 #include <limits.h>
@@ -305,26 +306,28 @@ void calibrate()
 	uart_printstr("Calibrating: ");
 	for (uint8_t count = 0; count < 2; ++count)
 	{
+		wdt_reset();
 		while (!g_counter_ready)
 			;
 		g_counter_ready = 0;
 		updatelcdbar((count&1) ? -16 : 16 );
-		updateledbar((count&1) ? -2 : 6 );
+		updateledbar((count&1) ? 0 : 6 );
 
 		uart_printchar('x');
 	}
-	for (uint8_t count = 0; count < 8; ++count)
+	for (uint8_t count = 0; count < (1 <<CALIBRATE_LOOP_POW); ++count)
 	{
+		wdt_reset();
 		while (!g_counter_ready)
 			;
 		g_sum += g_timer_counts;
 		g_counter_ready = 0;
 		updatelcdbar((count&1) ? -16 : 16 );
-		updateledbar((count&1) ? -2 : 6 );
+		updateledbar((count&1) ? -0 : 6 );
 
 		uart_printchar('.');
 	}
-	g_sum <<= (g_config.sumshift - 3);
+	g_sum <<= (g_config.sumshift - 2);
 	uart_printstr("\r\nSum: ");
 	uart_printlong(g_sum);
 	uart_println("");
@@ -348,8 +351,10 @@ int main(void)
 	sei();
 	calibrate();
 
+	wdt_enable(WDTO_500MS);
 	while(1)
 	{
+		wdt_reset();
 		while(!g_counter_ready) {
 #if defined(HAVE_SERIAL)
 			if( getlinefromserial( g_linebuffer, sizeof( g_linebuffer ), &g_lineidx) ) {
@@ -447,6 +452,7 @@ const char CMD_TIMELIMIT[] PROGMEM = "timelimit";
 const char CMD_DIVIDER[] PROGMEM = "divider";
 const char CMD_SAVE[] PROGMEM = "save";
 const char CMD_DEBUG[] PROGMEM = "debug";
+const char CMD_INFINITELOOP[] PROGMEM = "il";
 
 const char PARAMERROR[] PROGMEM = "!Parameter error!\r\n";
 
@@ -506,8 +512,13 @@ void processinput()
 		long l = getintparam(&inptr, 1, 1, 0);
 		g_debug = l != 0;
 	}
-	else
-	{
+	else if( iscommand(&inptr, CMD_INFINITELOOP, 1)) {
+		while(1) {
+			uart_printchar('.');
+			_delay_ms(250);
+		}
+	}
+	else {
 		for(uint8_t ds = 0; ds < sizeof(shiftnames)/sizeof(shiftnames[0]); ++ds) {
 			if(iscommand(&inptr, pgm_read_ptr(shiftnames + ds), 1)) {
 				long l = getintparam(&inptr, 1, 1, 1);

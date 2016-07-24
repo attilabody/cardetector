@@ -6,6 +6,7 @@
  */
 #include "config.h"
 #include <avr/io.h>
+#include <avr/wdt.h>
 
 #if defined(__AVR_ATmega328P__)
 ////////////////////////////////////////////////////////////////////
@@ -35,6 +36,8 @@ void setup()
 	TCCR2B = _BV(CS20) | _BV(CS22);	//t2: prescaler 128 (start)
 
 	TCCR0B = _BV(CS00) | _BV(CS01) | _BV(CS02);	//t0: ext clk rising edge (start)
+
+	wdt_enable(WDTO_1S);
 }  // end of setup
 
 #elif defined(__AVR_ATtiny85__)
