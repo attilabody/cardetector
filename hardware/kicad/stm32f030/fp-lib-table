@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name murata_pwr)(type KiCad)(uri /home/compi/work/kicad/footprints/murata_pwr.pretty)(options "")(descr ""))
+  (lib (name gdt)(type KiCad)(uri /home/compi/work/kicad/footprints/gdt.pretty)(options "")(descr ""))
+)
