@@ -271,13 +271,13 @@ $EndComp
 $Comp
 L CONN_01X03 P8
 U 1 1 5884E804
-P 3700 3450
-F 0 "P8" H 3700 3650 50  0000 C CNN
-F 1 "UART" V 3800 3450 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm" H 3700 3450 50  0001 C CNN
-F 3 "" H 3700 3450 50  0000 C CNN
-	1    3700 3450
-	-1   0    0    -1  
+P 3700 3350
+F 0 "P8" H 3700 3550 50  0000 C CNN
+F 1 "UART" V 3800 3350 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm" H 3700 3350 50  0001 C CNN
+F 3 "" H 3700 3350 50  0000 C CNN
+	1    3700 3350
+	-1   0    0    1   
 $EndComp
 Text HLabel 3050 3100 0    60   Output ~ 0
 scl
@@ -343,10 +343,36 @@ $EndComp
 NoConn ~ 4350 3150
 NoConn ~ 4350 3250
 NoConn ~ 4350 3550
+$Comp
+L R_Small R28
+U 1 1 58869728
+P 8550 4700
+F 0 "R28" H 8580 4720 50  0000 L CNN
+F 1 "10k" H 8580 4660 50  0000 L CNN
+F 2 "Resistors_SMD:R_0603_HandSoldering" H 8550 4700 50  0001 C CNN
+F 3 "" H 8550 4700 50  0000 C CNN
+	1    8550 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L Jumper_NO_Small JP3
+U 1 1 58869799
+P 8550 4400
+F 0 "JP3" H 8550 4480 50  0000 C CNN
+F 1 "boot0" H 8560 4340 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 8550 4400 50  0001 C CNN
+F 3 "" H 8550 4400 50  0000 C CNN
+	1    8550 4400
+	0    1    1    0   
+$EndComp
+Text Label 4000 3450 0    60   ~ 0
+RXD
+Text Label 4000 4400 0    60   ~ 0
+SWC
+Text Label 4000 4500 0    60   ~ 0
+SWD
 Wire Wire Line
-	6050 2600 6050 2650
-Wire Wire Line
-	6050 2650 6050 2750
+	6050 2600 6050 2750
 Wire Wire Line
 	6150 2750 6150 2650
 Wire Wire Line
@@ -359,41 +385,23 @@ Wire Wire Line
 Wire Wire Line
 	7750 4250 9450 4250
 Wire Wire Line
-	7750 3150 7950 3150
-Wire Wire Line
-	7950 3150 8350 3150
-Wire Wire Line
-	8350 3150 8400 3150
+	7750 3150 8400 3150
 Wire Wire Line
 	8950 3150 8950 3250
 Wire Wire Line
-	7950 2950 7950 3150
-Wire Wire Line
-	7950 3150 7950 4150
+	7950 2950 7950 4150
 Connection ~ 7950 3150
 Wire Wire Line
 	7950 2600 7950 2750
 Wire Wire Line
-	3950 3550 3950 3950
-Wire Wire Line
-	3950 3950 3950 4600
-Wire Wire Line
-	3950 4600 3950 4900
-Wire Wire Line
 	3950 4600 3900 4600
 Connection ~ 3950 4600
 Wire Wire Line
-	3900 3550 3950 3550
-Wire Wire Line
-	7850 4050 7850 4450
-Wire Wire Line
-	7850 4450 7850 4600
+	7850 4050 7850 4600
 Wire Wire Line
 	7850 4050 7750 4050
 Wire Wire Line
-	8150 3950 8150 4450
-Wire Wire Line
-	8150 4450 8150 4600
+	8150 3950 8150 4600
 Wire Wire Line
 	8150 3950 7750 3950
 Wire Wire Line
@@ -417,10 +425,6 @@ Wire Wire Line
 Wire Wire Line
 	3050 3650 4350 3650
 Wire Wire Line
-	3900 3450 4350 3450
-Wire Wire Line
-	3900 3350 4350 3350
-Wire Wire Line
 	7950 4150 9450 4150
 Wire Wire Line
 	3050 3100 4050 3100
@@ -428,15 +432,9 @@ Connection ~ 4050 3950
 Wire Wire Line
 	3050 3000 4250 3000
 Wire Wire Line
-	4250 2850 4250 3000
+	4250 2850 4250 4050
 Wire Wire Line
-	4250 3000 4250 4050
-Wire Wire Line
-	4050 2850 4050 3100
-Wire Wire Line
-	4050 3100 4050 3950
-Wire Wire Line
-	4050 3950 4050 4050
+	4050 2850 4050 4050
 Connection ~ 4050 3100
 Connection ~ 4250 3000
 Wire Wire Line
@@ -459,42 +457,16 @@ Connection ~ 3950 3950
 Wire Wire Line
 	4050 4050 3900 4050
 Wire Wire Line
-	4150 4050 4250 4050
-Wire Wire Line
-	4250 4050 4350 4050
+	4150 4050 4350 4050
 Wire Wire Line
 	4150 4050 4150 4150
 Wire Wire Line
 	4150 4150 3900 4150
 Connection ~ 4250 4050
-$Comp
-L R_Small R28
-U 1 1 58869728
-P 8550 4700
-F 0 "R28" H 8580 4720 50  0000 L CNN
-F 1 "10k" H 8580 4660 50  0000 L CNN
-F 2 "Resistors_SMD:R_0603_HandSoldering" H 8550 4700 50  0001 C CNN
-F 3 "" H 8550 4700 50  0000 C CNN
-	1    8550 4700
-	1    0    0    -1  
-$EndComp
-$Comp
-L Jumper_NO_Small JP3
-U 1 1 58869799
-P 8550 4400
-F 0 "JP3" H 8550 4480 50  0000 C CNN
-F 1 "boot0" H 8560 4340 50  0001 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 8550 4400 50  0001 C CNN
-F 3 "" H 8550 4400 50  0000 C CNN
-	1    8550 4400
-	0    1    1    0   
-$EndComp
 Wire Wire Line
 	8550 3750 8550 4300
 Wire Wire Line
-	8550 4500 8550 4550
-Wire Wire Line
-	8550 4550 8550 4600
+	8550 4500 8550 4600
 Wire Wire Line
 	8550 4900 8550 4800
 Wire Wire Line
@@ -504,18 +476,8 @@ Wire Wire Line
 Wire Wire Line
 	8350 3350 7750 3350
 Connection ~ 8550 4550
-Text Label 3950 3350 0    60   ~ 0
-TXD
-Text Label 3950 3450 0    60   ~ 0
-RXD
-Text Label 4000 4400 0    60   ~ 0
-SWC
-Text Label 4000 4500 0    60   ~ 0
-SWD
 Wire Wire Line
-	8800 3150 8850 3150
-Wire Wire Line
-	8850 3150 8950 3150
+	8800 3150 8950 3150
 Wire Wire Line
 	8400 3250 8350 3250
 Wire Wire Line
@@ -528,4 +490,17 @@ Wire Wire Line
 Connection ~ 8850 3150
 Wire Wire Line
 	6050 4900 6050 4650
+Wire Wire Line
+	3900 3350 4350 3350
+Wire Wire Line
+	3950 3250 3950 4900
+Wire Wire Line
+	3200 4750 3950 4750
+Connection ~ 3950 4750
+Wire Wire Line
+	3950 3250 3900 3250
+Wire Wire Line
+	3900 3450 4350 3450
+Text Label 4000 3350 0    60   ~ 0
+TXD
 $EndSCHEMATC
