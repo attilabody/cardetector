@@ -69,7 +69,7 @@
     (pad_drill 0.762)
     (pad_to_mask_clearance 0.2)
     (aux_axis_origin 0 0)
-    (visible_elements FFFFFF7F)
+    (visible_elements 7FFFFF7F)
     (pcbplotparams
       (layerselection 0x00030_80000001)
       (usegerberextensions false)
@@ -1353,13 +1353,13 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A2ACE) (tstamp 588512BD)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321EC) (tstamp 588512BD)
     (at 88.392 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/58853DCE)
     (attr smd)
-    (fp_text reference LED3 (at 3.937 -0.127 90) (layer F.SilkS)
+    (fp_text reference LED3 (at -3.937 0.508 90) (layer F.SilkS)
       (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
@@ -1391,14 +1391,14 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A2017) (tstamp 588512C3)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321F2) (tstamp 588512C3)
     (at 90.297 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/588570D4)
     (attr smd)
-    (fp_text reference LED4 (at 3.81 0 90) (layer F.SilkS) hide
-      (effects (font (size 1 1) (thickness 0.15)))
+    (fp_text reference LED4 (at -3.937 0.508 90) (layer F.SilkS)
+      (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
       (effects (font (size 1 1) (thickness 0.15)))
@@ -1429,14 +1429,14 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A2012) (tstamp 588512C9)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321F5) (tstamp 588512C9)
     (at 92.202 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/588570F3)
     (attr smd)
-    (fp_text reference LED5 (at 3.81 0 90) (layer F.SilkS) hide
-      (effects (font (size 1 1) (thickness 0.15)))
+    (fp_text reference LED5 (at -3.937 0.508 90) (layer F.SilkS)
+      (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
       (effects (font (size 1 1) (thickness 0.15)))
@@ -1467,13 +1467,13 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A2ACC) (tstamp 588512CF)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321F8) (tstamp 588512CF)
     (at 94.107 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/58857115)
     (attr smd)
-    (fp_text reference LED6 (at 3.937 -0.127 90) (layer F.SilkS)
+    (fp_text reference LED6 (at -3.937 0.508 90) (layer F.SilkS)
       (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
@@ -1505,13 +1505,13 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A2ACA) (tstamp 588512D5)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321FC) (tstamp 588512D5)
     (at 96.012 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/588571DE)
     (attr smd)
-    (fp_text reference LED7 (at 3.937 -0.127 90) (layer F.SilkS)
+    (fp_text reference LED7 (at -3.937 0.508 90) (layer F.SilkS)
       (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
@@ -1543,14 +1543,14 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A1FF9) (tstamp 588512DB)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 58932205) (tstamp 588512DB)
     (at 97.917 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/588571FC)
     (attr smd)
-    (fp_text reference LED8 (at 3.891857 -0.049 90) (layer F.SilkS) hide
-      (effects (font (size 1 1) (thickness 0.15)))
+    (fp_text reference LED8 (at -3.937 0.508 90) (layer F.SilkS)
+      (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
       (effects (font (size 1 1) (thickness 0.15)))
@@ -1581,14 +1581,14 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A1FF4) (tstamp 588512E1)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 5893220D) (tstamp 588512E1)
     (at 99.822 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/58857202)
     (attr smd)
-    (fp_text reference LED9 (at 3.673857 0.115 90) (layer F.SilkS) hide
-      (effects (font (size 1 1) (thickness 0.15)))
+    (fp_text reference LED9 (at -3.937 0.508 90) (layer F.SilkS)
+      (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
       (effects (font (size 1 1) (thickness 0.15)))
@@ -1619,13 +1619,13 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A2AC6) (tstamp 588512E7)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 58932224) (tstamp 588512E7)
     (at 101.727 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/58857208)
     (attr smd)
-    (fp_text reference LED10 (at 3.937 0.127 90) (layer F.SilkS)
+    (fp_text reference LED10 (at -4.191 -0.127 90) (layer F.SilkS)
       (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
@@ -1657,13 +1657,13 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A2ABC) (tstamp 588512ED)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321C3) (tstamp 588512ED)
     (at 73.152 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/588572CA)
     (attr smd)
-    (fp_text reference LED11 (at 4.191 0.127 90) (layer F.SilkS)
+    (fp_text reference LED11 (at -3.937 0.508 90) (layer F.SilkS)
       (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
@@ -1695,14 +1695,14 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A1FB1) (tstamp 588512F3)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321CC) (tstamp 588512F3)
     (at 75.057 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/588572E8)
     (attr smd)
-    (fp_text reference LED12 (at 4.318 0 90) (layer F.SilkS) hide
-      (effects (font (size 1 1) (thickness 0.15)))
+    (fp_text reference LED12 (at -3.937 0.508 90) (layer F.SilkS)
+      (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
       (effects (font (size 1 1) (thickness 0.15)))
@@ -1733,14 +1733,14 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A1F9E) (tstamp 588512F9)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321D0) (tstamp 588512F9)
     (at 76.962 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/588572EE)
     (attr smd)
-    (fp_text reference LED13 (at 4.318 0 90) (layer F.SilkS) hide
-      (effects (font (size 1 1) (thickness 0.15)))
+    (fp_text reference LED13 (at -3.937 0.508 90) (layer F.SilkS)
+      (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
       (effects (font (size 1 1) (thickness 0.15)))
@@ -1771,13 +1771,13 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A2ABE) (tstamp 588512FF)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321D3) (tstamp 588512FF)
     (at 78.867 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/588572F4)
     (attr smd)
-    (fp_text reference LED14 (at 4.191 0.127 90) (layer F.SilkS)
+    (fp_text reference LED14 (at -3.937 0.508 90) (layer F.SilkS)
       (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
@@ -1809,13 +1809,13 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A2ABF) (tstamp 58851305)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321D5) (tstamp 58851305)
     (at 80.772 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/588573CA)
     (attr smd)
-    (fp_text reference LED15 (at 4.191 0.127 90) (layer F.SilkS)
+    (fp_text reference LED15 (at -3.937 0.508 90) (layer F.SilkS)
       (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
@@ -1847,14 +1847,14 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A1F79) (tstamp 5885130B)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321DD) (tstamp 5885130B)
     (at 82.677 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/588573E8)
     (attr smd)
-    (fp_text reference LED16 (at 4.318 0 90) (layer F.SilkS) hide
-      (effects (font (size 1 1) (thickness 0.15)))
+    (fp_text reference LED16 (at -3.937 0.508 90) (layer F.SilkS)
+      (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
       (effects (font (size 1 1) (thickness 0.15)))
@@ -1885,14 +1885,14 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A1F74) (tstamp 58851311)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321E2) (tstamp 58851311)
     (at 84.582 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/588573EE)
     (attr smd)
-    (fp_text reference LED17 (at 4.318 0 90) (layer F.SilkS) hide
-      (effects (font (size 1 1) (thickness 0.15)))
+    (fp_text reference LED17 (at -3.937 0.508 90) (layer F.SilkS)
+      (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
       (effects (font (size 1 1) (thickness 0.15)))
@@ -1923,13 +1923,13 @@
     )
   )
 
-  (module LEDs:LED_0805 (layer F.Cu) (tedit 588A2AC1) (tstamp 58851317)
+  (module LEDs:LED_0805 (layer F.Cu) (tedit 589321E6) (tstamp 58851317)
     (at 86.487 96.393 90)
     (descr "LED 0805 smd package")
     (tags "LED led 0805 SMD smd SMT smt smdled SMDLED smtled SMTLED")
     (path /58851FF0/588573F4)
     (attr smd)
-    (fp_text reference LED18 (at 4.191 0.127 90) (layer F.SilkS)
+    (fp_text reference LED18 (at -3.937 0.508 90) (layer F.SilkS)
       (effects (font (size 0.8 0.8) (thickness 0.15)))
     )
     (fp_text value LED_Small (at 0 1.55 90) (layer F.Fab) hide
@@ -4247,14 +4247,14 @@
     (pad 1 np_thru_hole circle (at 0 0) (size 3.2 3.2) (drill 3.2) (layers *.Cu *.Mask))
   )
 
-  (module Mounting_Holes:MountingHole_3.2mm_M3 (layer F.Cu) (tedit 56D1B4CB) (tstamp 589F821C)
+  (module Mounting_Holes:MountingHole_3.2mm_M3 (layer F.Cu) (tedit 58932134) (tstamp 589F821C)
     (at 40.64 96.52)
     (descr "Mounting Hole 3.2mm, no annular, M3")
     (tags "mounting hole 3.2mm no annular m3")
     (fp_text reference REF** (at 0 -4.2) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
     )
-    (fp_text value MountingHole_3.2mm_M3 (at 0 4.2) (layer F.Fab)
+    (fp_text value MountingHole_3.2mm_M3 (at 0 4.2) (layer F.Fab) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_circle (center 0 0) (end 3.2 0) (layer Cmts.User) (width 0.15))
@@ -4262,14 +4262,14 @@
     (pad 1 np_thru_hole circle (at 0 0) (size 3.2 3.2) (drill 3.2) (layers *.Cu *.Mask))
   )
 
-  (module Mounting_Holes:MountingHole_3.2mm_M3 (layer F.Cu) (tedit 56D1B4CB) (tstamp 589F8229)
+  (module Mounting_Holes:MountingHole_3.2mm_M3 (layer F.Cu) (tedit 58932201) (tstamp 589F8229)
     (at 99.06 104.775)
     (descr "Mounting Hole 3.2mm, no annular, M3")
     (tags "mounting hole 3.2mm no annular m3")
-    (fp_text reference REF** (at 0 -4.2) (layer F.SilkS)
+    (fp_text reference REF** (at 0 -4.2) (layer F.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
-    (fp_text value MountingHole_3.2mm_M3 (at 0 4.2) (layer F.Fab)
+    (fp_text value MountingHole_3.2mm_M3 (at 0 4.2) (layer F.Fab) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_circle (center 0 0) (end 3.2 0) (layer Cmts.User) (width 0.15))
@@ -5010,11 +5010,11 @@
   (segment (start 76.835 114.427) (end 100.584 114.427) (width 0.3) (layer B.Cu) (net 78) (tstamp 58925825))
   (segment (start 62.865 114.554) (end 64.897 114.554) (width 0.3) (layer B.Cu) (net 78) (tstamp 58925715))
   (segment (start 100.584 114.427) (end 101.981 113.03) (width 0.3) (layer B.Cu) (net 78) (tstamp 58925725))
-  (segment (start 51.816 116.967) (end 55.245 116.967) (width 0.3) (layer B.Cu) (net 78))
-  (segment (start 56.515 115.697) (end 61.722 115.697) (width 0.3) (layer B.Cu) (net 78) (tstamp 589250CF))
+  (segment (start 51.816 116.967) (end 54.991 116.967) (width 0.3) (layer B.Cu) (net 78))
+  (segment (start 56.261 115.697) (end 61.722 115.697) (width 0.3) (layer B.Cu) (net 78) (tstamp 589250CF))
   (via (at 101.981 113.03) (size 0.6) (drill 0.4) (layers F.Cu B.Cu) (net 78))
   (segment (start 100.795 113.03) (end 101.981 113.03) (width 0.3) (layer F.Cu) (net 78) (tstamp 589250F4))
-  (segment (start 55.245 116.967) (end 56.515 115.697) (width 0.3) (layer B.Cu) (net 78) (tstamp 589253DD))
+  (segment (start 54.991 116.967) (end 56.261 115.697) (width 0.3) (layer B.Cu) (net 78) (tstamp 589253DD))
   (segment (start 46.863 109.0295) (end 46.863 112.014) (width 0.3) (layer B.Cu) (net 78))
   (segment (start 49.123 105.69) (end 48.895 105.918) (width 0.3) (layer F.Cu) (net 78) (tstamp 58924EA2))
   (segment (start 48.895 105.918) (end 46.355 105.918) (width 0.3) (layer F.Cu) (net 78) (tstamp 58924EAE))
