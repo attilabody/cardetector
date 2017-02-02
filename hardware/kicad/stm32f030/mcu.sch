@@ -367,9 +367,9 @@ F 3 "" H 8550 4400 50  0000 C CNN
 $EndComp
 Text Label 4000 3450 0    60   ~ 0
 RXD
-Text Label 4000 4400 0    60   ~ 0
-SWC
 Text Label 4000 4500 0    60   ~ 0
+SWC
+Text Label 4000 4400 0    60   ~ 0
 SWD
 Wire Wire Line
 	6050 2600 6050 2750
@@ -415,8 +415,6 @@ Wire Wire Line
 Wire Wire Line
 	7850 4900 7850 4800
 Wire Wire Line
-	4250 4150 4350 4150
-Wire Wire Line
 	4300 4250 4350 4250
 Wire Wire Line
 	3050 3850 4350 3850
@@ -441,14 +439,6 @@ Wire Wire Line
 	4050 2600 4050 2650
 Wire Wire Line
 	4250 2600 4250 2650
-Wire Wire Line
-	4250 4150 4250 4500
-Wire Wire Line
-	4250 4500 3900 4500
-Wire Wire Line
-	3900 4400 4300 4400
-Wire Wire Line
-	4300 4400 4300 4250
 Wire Wire Line
 	4050 3950 4350 3950
 Wire Wire Line
@@ -503,4 +493,14 @@ Wire Wire Line
 	3900 3450 4350 3450
 Text Label 4000 3350 0    60   ~ 0
 TXD
+Wire Wire Line
+	4350 4150 4250 4150
+Wire Wire Line
+	4250 4150 4250 4400
+Wire Wire Line
+	4250 4400 3900 4400
+Wire Wire Line
+	4300 4250 4300 4500
+Wire Wire Line
+	4300 4500 3900 4500
 $EndSCHEMATC
