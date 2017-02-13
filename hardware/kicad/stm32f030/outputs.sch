@@ -148,7 +148,7 @@ F 1 "RELAY OUT 1" V 3250 1450 50  0000 C CNN
 F 2 "Connectors:bornier3" H 3150 1450 50  0001 C CNN
 F 3 "" H 3150 1450 50  0000 C CNN
 	1    3150 1450
-	0    1    -1   0   
+	0    -1   -1   0   
 $EndComp
 $Comp
 L TACTILE_SW SW1
@@ -395,7 +395,7 @@ F 1 "RELAY OUT 2" V 3250 4100 50  0000 C CNN
 F 2 "Connectors:bornier3" H 3150 4100 50  0001 C CNN
 F 3 "" H 3150 4100 50  0000 C CNN
 	1    3150 4100
-	0    1    -1   0   
+	0    -1   -1   0   
 $EndComp
 $Comp
 L TACTILE_SW SW2
@@ -551,7 +551,7 @@ U 1 1 588501DD
 P 3900 4850
 F 0 "D2" H 3850 4930 50  0000 L CNN
 F 1 "D_Small" H 3750 4770 50  0000 L CNN
-F 2 "Diodes_SMD:MELF_Standard" V 3900 4850 50  0001 C CNN
+F 2 "Diodes_SMD:D_MiniMELF_Standard" V 3900 4850 50  0001 C CNN
 F 3 "" V 3900 4850 50  0000 C CNN
 	1    3900 4850
 	0    1    1    0   
@@ -562,7 +562,7 @@ U 1 1 5885052E
 P 3900 2200
 F 0 "D1" H 3850 2280 50  0000 L CNN
 F 1 "D_Small" H 3750 2120 50  0000 L CNN
-F 2 "Diodes_SMD:MELF_Standard" V 3900 2200 50  0001 C CNN
+F 2 "Diodes_SMD:D_MiniMELF_Standard" V 3900 2200 50  0001 C CNN
 F 3 "" V 3900 2200 50  0000 C CNN
 	1    3900 2200
 	0    1    1    0   

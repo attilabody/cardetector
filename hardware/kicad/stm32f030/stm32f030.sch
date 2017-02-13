@@ -68,7 +68,7 @@ F 1 "5VIN" V 4800 4500 50  0000 C CNN
 F 2 "Connectors:bornier2" H 4700 4500 50  0001 C CNN
 F 3 "" H 4700 4500 50  0000 C CNN
 	1    4700 4500
-	-1   0    0    -1  
+	-1   0    0    1   
 $EndComp
 $Comp
 L GND #PWR01
