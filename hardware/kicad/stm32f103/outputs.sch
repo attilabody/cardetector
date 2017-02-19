@@ -36,12 +36,12 @@ LIBS:jumpers
 LIBS:relay
 LIBS:transformer
 LIBS:stm32
-LIBS:stm32f030-cache
+LIBS:stm32f103-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 3 6
+Sheet 3 5
 Title ""
 Date ""
 Rev ""
