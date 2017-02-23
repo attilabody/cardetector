@@ -242,15 +242,6 @@ Wire Wire Line
 	5100 4650 5000 4650
 Connection ~ 5000 4650
 $Sheet
-S 6700 3250 800  300 
-U 58851FF0
-F0 "ledbar" 60
-F1 "ledbar.sch" 60
-F2 "scl" I L 6700 3400 60 
-F3 "sda" B L 6700 3500 60 
-F4 "reset" I L 6700 3300 60 
-$EndSheet
-$Sheet
 S 5600 2750 800  800 
 U 5884C938
 F0 "MCU" 60
@@ -259,32 +250,19 @@ F2 "active1" O R 6400 2950 60
 F3 "active2" O R 6400 2850 60 
 F4 "osc1" I L 5600 3050 60 
 F5 "osc2" I L 5600 2900 60 
-F6 "scl" O R 6400 3400 60 
-F7 "sda" B R 6400 3500 60 
-F8 "reset" O R 6400 3300 60 
+F6 "scl" O R 6400 3350 60 
+F7 "sda" B R 6400 3450 60 
 $EndSheet
-Wire Wire Line
-	6400 3300 6700 3300
-Wire Wire Line
-	6400 3400 6700 3400
-Wire Wire Line
-	6400 3500 6700 3500
 $Sheet
-S 6750 4000 750  300 
+S 6700 3250 750  300 
 U 589C1D7A
 F0 "EEPROM" 60
 F1 "eeprom.sch" 60
-F2 "scl" I L 6750 4100 60 
-F3 "sda" B L 6750 4200 60 
+F2 "scl" I L 6700 3350 60 
+F3 "sda" B L 6700 3450 60 
 $EndSheet
 Wire Wire Line
-	6750 4200 6500 4200
+	6400 3350 6700 3350
 Wire Wire Line
-	6500 4200 6500 3500
-Connection ~ 6500 3500
-Wire Wire Line
-	6750 4100 6600 4100
-Wire Wire Line
-	6600 4100 6600 3400
-Connection ~ 6600 3400
+	6400 3450 6700 3450
 $EndSCHEMATC
