@@ -41,7 +41,7 @@ EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 2 6
+Sheet 2 5
 Title ""
 Date ""
 Rev ""
@@ -60,7 +60,7 @@ F 1 "78601/9C" H 2600 5350 50  0000 C CNN
 F 2 "cardetector:Murata_Impulse_Transformer" H 2600 5650 50  0001 C CNN
 F 3 "" H 2600 5650 50  0000 C CNN
 	1    2600 5650
-	-1   0    0    1   
+	-1   0    0    -1  
 $EndComp
 $Comp
 L R_Small R14
@@ -104,7 +104,7 @@ F 1 "LOOP2" V 1450 5650 50  0000 C CNN
 F 2 "Connectors:bornier3" H 1350 5650 50  0001 C CNN
 F 3 "" H 1350 5650 50  0000 C CNN
 	1    1350 5650
-	-1   0    0    -1  
+	-1   0    0    1   
 $EndComp
 $Comp
 L C_Small C10

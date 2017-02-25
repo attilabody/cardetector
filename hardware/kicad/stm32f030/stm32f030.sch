@@ -41,7 +41,7 @@ EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 6
+Sheet 1 5
 Title ""
 Date ""
 Rev ""
@@ -201,13 +201,9 @@ S 6700 2750 800  300
 U 5884BC52
 F0 "outputs" 60
 F1 "outputs.sch" 60
-F2 "active1" I L 6700 2850 60 
-F3 "active2" I L 6700 2950 60 
+F2 "active1" I L 6700 2950 60 
+F3 "active2" I L 6700 2850 60 
 $EndSheet
-Wire Wire Line
-	5300 2900 5600 2900
-Wire Wire Line
-	5300 3050 5600 3050
 Wire Wire Line
 	6400 2850 6700 2850
 Wire Wire Line
@@ -248,8 +244,8 @@ F0 "MCU" 60
 F1 "mcu.sch" 60
 F2 "active1" O R 6400 2950 60 
 F3 "active2" O R 6400 2850 60 
-F4 "osc1" I L 5600 3050 60 
-F5 "osc2" I L 5600 2900 60 
+F4 "osc1" I L 5600 2900 60 
+F5 "osc2" I L 5600 3050 60 
 F6 "scl" O R 6400 3350 60 
 F7 "sda" B R 6400 3450 60 
 $EndSheet
@@ -265,4 +261,8 @@ Wire Wire Line
 	6400 3350 6700 3350
 Wire Wire Line
 	6400 3450 6700 3450
+Wire Wire Line
+	5300 3050 5600 3050
+Wire Wire Line
+	5300 2900 5600 2900
 $EndSCHEMATC

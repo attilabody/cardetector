@@ -41,7 +41,7 @@ EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 5 6
+Sheet 4 5
 Title ""
 Date ""
 Rev ""
@@ -372,8 +372,6 @@ Wire Wire Line
 Wire Wire Line
 	8800 4800 8800 4900
 Wire Wire Line
-	7750 4250 9450 4250
-Wire Wire Line
 	7750 3150 8400 3150
 Wire Wire Line
 	8950 3150 8950 3250
@@ -468,9 +466,6 @@ Wire Wire Line
 Wire Wire Line
 	3950 3250 3950 4900
 Wire Wire Line
-	3200 4750 3950 4750
-Connection ~ 3950 4750
-Wire Wire Line
 	3950 3250 3900 3250
 Wire Wire Line
 	3900 3450 4350 3450
@@ -486,34 +481,23 @@ Wire Wire Line
 	4300 4250 4300 4500
 Wire Wire Line
 	4300 4500 3900 4500
+Wire Wire Line
+	8100 4450 8200 4450
+Connection ~ 8200 4450
+Wire Wire Line
+	7900 4450 7800 4450
+Connection ~ 7800 4450
+Wire Wire Line
+	7750 4250 9450 4250
 $Comp
-L Crystal_GND3 Y1
-U 1 1 5895F20E
+L Crystal_Small Y1
+U 1 1 58B1F379
 P 8000 4450
-F 0 "Y1" H 8000 4675 50  0000 C CNN
-F 1 "12MHz" H 8000 4600 50  0000 C CNN
-F 2 "Crystals:Crystal_SMD_3225_4Pads" H 8000 4450 50  0001 C CNN
+F 0 "Y1" H 8000 4550 50  0000 C CNN
+F 1 "8MHz" H 8000 4350 50  0000 C CNN
+F 2 "Crystals:Crystal_HC49-4H_Vertical" H 8000 4450 50  0001 C CNN
 F 3 "" H 8000 4450 50  0000 C CNN
 	1    8000 4450
 	1    0    0    -1  
 $EndComp
-$Comp
-L GND #PWR045
-U 1 1 5895F412
-P 8000 4900
-F 0 "#PWR045" H 8000 4650 50  0001 C CNN
-F 1 "GND" H 8000 4750 50  0000 C CNN
-F 2 "" H 8000 4900 50  0000 C CNN
-F 3 "" H 8000 4900 50  0000 C CNN
-	1    8000 4900
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	8000 4900 8000 4650
-Wire Wire Line
-	8150 4450 8200 4450
-Connection ~ 8200 4450
-Wire Wire Line
-	7850 4450 7800 4450
-Connection ~ 7800 4450
 $EndSCHEMATC
