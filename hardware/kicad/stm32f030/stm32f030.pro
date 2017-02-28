@@ -1,4 +1,4 @@
-update=2017. jan. 22., vasárnap, 11:27:42 CET
+update=2017. febr. 27., hétfő, 09:45:47 CET
 version=1
 last_client=kicad
 [pcbnew]
@@ -66,3 +66,4 @@ LibName34=jumpers
 LibName35=relay
 LibName36=transformer
 LibName37=stm32
+LibName38=switches

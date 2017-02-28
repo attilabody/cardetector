@@ -36,6 +36,7 @@ LIBS:jumpers
 LIBS:relay
 LIBS:transformer
 LIBS:stm32
+LIBS:switches
 LIBS:stm32f030-cache
 EELAYER 25 0
 EELAYER END
@@ -150,17 +151,6 @@ F 3 "" H 3150 1450 50  0000 C CNN
 	1    3150 1450
 	0    -1   -1   0   
 $EndComp
-$Comp
-L TACTILE_SW SW1
-U 1 1 575F7842
-P 2400 2550
-F 0 "SW1" H 2550 2660 50  0000 C CNN
-F 1 "TACTILE_SW" H 2420 2410 50  0001 C CNN
-F 2 "Buttons_Switches_THT:SW_PUSH_6mm" H 2400 2550 50  0001 C CNN
-F 3 "" H 2400 2550 50  0000 C CNN
-	1    2400 2550
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	2550 3100 2800 3100
 Wire Wire Line
@@ -211,15 +201,6 @@ Wire Wire Line
 Wire Wire Line
 	2600 2550 2650 2550
 Connection ~ 2650 2850
-Wire Wire Line
-	2600 2650 2650 2650
-Connection ~ 2650 2650
-Wire Wire Line
-	2150 2650 2200 2650
-Wire Wire Line
-	2150 2000 2150 2650
-Wire Wire Line
-	2150 2550 2200 2550
 $Comp
 L +5V #PWR028
 U 1 1 575F7873
@@ -231,7 +212,6 @@ F 3 "" H 2150 2000 50  0000 C CNN
 	1    2150 2000
 	1    0    0    -1  
 $EndComp
-Connection ~ 2150 2550
 $Comp
 L R_Small R16
 U 1 1 575F787A
@@ -285,7 +265,7 @@ Wire Wire Line
 	3750 3450 4550 3450
 Connection ~ 4550 3450
 Connection ~ 4150 3450
-Text HLabel 1900 3100 0    50   Input ~ 0
+Text HLabel 1900 5750 0    50   Input ~ 0
 active1
 $Comp
 L LED_Small LED1
@@ -397,17 +377,6 @@ F 3 "" H 3150 4100 50  0000 C CNN
 	1    3150 4100
 	0    -1   -1   0   
 $EndComp
-$Comp
-L TACTILE_SW SW2
-U 1 1 5884C4BD
-P 2400 5200
-F 0 "SW2" H 2550 5310 50  0000 C CNN
-F 1 "TACTILE_SW" H 2420 5060 50  0001 C CNN
-F 2 "Buttons_Switches_THT:SW_PUSH_6mm" H 2400 5200 50  0001 C CNN
-F 3 "" H 2400 5200 50  0000 C CNN
-	1    2400 5200
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	2550 5750 2800 5750
 Wire Wire Line
@@ -458,15 +427,6 @@ Wire Wire Line
 Wire Wire Line
 	2600 5200 2650 5200
 Connection ~ 2650 5500
-Wire Wire Line
-	2600 5300 2650 5300
-Connection ~ 2650 5300
-Wire Wire Line
-	2150 5300 2200 5300
-Wire Wire Line
-	2150 4650 2150 5300
-Wire Wire Line
-	2150 5200 2200 5200
 $Comp
 L +5V #PWR031
 U 1 1 5884C4ED
@@ -478,7 +438,6 @@ F 3 "" H 2150 4650 50  0000 C CNN
 	1    2150 4650
 	1    0    0    -1  
 $EndComp
-Connection ~ 2150 5200
 $Comp
 L R_Small R21
 U 1 1 5884C4F4
@@ -532,7 +491,7 @@ Wire Wire Line
 	3750 6100 4550 6100
 Connection ~ 4550 6100
 Connection ~ 4150 6100
-Text HLabel 1900 5750 0    50   Input ~ 0
+Text HLabel 1900 3100 0    50   Input ~ 0
 active2
 $Comp
 L LED_Small LED2
@@ -587,4 +546,34 @@ Wire Wire Line
 Wire Wire Line
 	3900 2500 3750 2500
 Connection ~ 3750 2500
+$Comp
+L SW_Push SW1
+U 1 1 58B3F079
+P 2400 2550
+F 0 "SW1" H 2450 2650 50  0000 L CNN
+F 1 "SW_Push" H 2400 2490 50  0001 C CNN
+F 2 "cardetector:TS_362" H 2400 2750 50  0001 C CNN
+F 3 "" H 2400 2750 50  0000 C CNN
+	1    2400 2550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2200 2550 2150 2550
+Wire Wire Line
+	2150 2550 2150 2000
+$Comp
+L SW_Push SW2
+U 1 1 58B3F67F
+P 2400 5200
+F 0 "SW2" H 2450 5300 50  0000 L CNN
+F 1 "SW_Push" H 2400 5140 50  0001 C CNN
+F 2 "cardetector:TS_362" H 2400 5400 50  0001 C CNN
+F 3 "" H 2400 5400 50  0000 C CNN
+	1    2400 5200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2200 5200 2150 5200
+Wire Wire Line
+	2150 5200 2150 4650
 $EndSCHEMATC

@@ -36,6 +36,7 @@ LIBS:jumpers
 LIBS:relay
 LIBS:transformer
 LIBS:stm32
+LIBS:switches
 LIBS:stm32f030-cache
 EELAYER 25 0
 EELAYER END
@@ -337,7 +338,7 @@ F 3 "" H 5650 5550 50  0000 C CNN
 	1    5650 5550
 	0    1    1    0   
 $EndComp
-Text HLabel 5950 5550 2    60   Input ~ 0
+Text HLabel 5950 2450 2    60   Input ~ 0
 osc1
 $Comp
 L D_Zener_Small ZD3
@@ -647,7 +648,7 @@ F 3 "" H 5650 2450 50  0000 C CNN
 	1    5650 2450
 	0    1    1    0   
 $EndComp
-Text HLabel 5950 2450 2    60   Input ~ 0
+Text HLabel 5950 5550 2    60   Input ~ 0
 osc2
 $Comp
 L D_Zener_Small ZD1

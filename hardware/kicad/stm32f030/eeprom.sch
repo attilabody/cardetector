@@ -36,12 +36,13 @@ LIBS:jumpers
 LIBS:relay
 LIBS:transformer
 LIBS:stm32
+LIBS:switches
 LIBS:stm32f030-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 6 5
+Sheet 5 5
 Title ""
 Date ""
 Rev ""
@@ -120,41 +121,4 @@ Wire Wire Line
 	5600 3700 5600 3650
 Wire Wire Line
 	5600 2900 5600 2850
-$Comp
-L C_Small C18
-U 1 1 589CB0CF
-P 6300 3550
-F 0 "C18" H 6310 3620 50  0000 L CNN
-F 1 "100n" H 6310 3470 50  0000 L CNN
-F 2 "Capacitors_SMD:C_0805_HandSoldering" H 6300 3550 50  0001 C CNN
-F 3 "" H 6300 3550 50  0000 C CNN
-	1    6300 3550
-	1    0    0    -1  
-$EndComp
-$Comp
-L +3.3V #PWR048
-U 1 1 589CB128
-P 6300 3400
-F 0 "#PWR048" H 6300 3250 50  0001 C CNN
-F 1 "+3.3V" H 6300 3540 50  0000 C CNN
-F 2 "" H 6300 3400 50  0000 C CNN
-F 3 "" H 6300 3400 50  0000 C CNN
-	1    6300 3400
-	1    0    0    -1  
-$EndComp
-$Comp
-L GND #PWR049
-U 1 1 589CB139
-P 6300 3700
-F 0 "#PWR049" H 6300 3450 50  0001 C CNN
-F 1 "GND" H 6300 3550 50  0000 C CNN
-F 2 "" H 6300 3700 50  0000 C CNN
-F 3 "" H 6300 3700 50  0000 C CNN
-	1    6300 3700
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	6300 3700 6300 3650
-Wire Wire Line
-	6300 3450 6300 3400
 $EndSCHEMATC

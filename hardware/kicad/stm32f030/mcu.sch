@@ -36,6 +36,7 @@ LIBS:jumpers
 LIBS:relay
 LIBS:transformer
 LIBS:stm32
+LIBS:switches
 LIBS:stm32f030-cache
 EELAYER 25 0
 EELAYER END
@@ -181,17 +182,6 @@ F 3 "" H 8550 4900 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L TACTILE_SW SW3
-U 1 1 5884DF9D
-P 8600 3150
-F 0 "SW3" H 8750 3260 50  0000 C CNN
-F 1 "RESET" H 8620 3010 50  0000 C CNN
-F 2 "Buttons_Switches_THT:SW_PUSH_6mm" H 8600 3150 50  0001 C CNN
-F 3 "" H 8600 3150 50  0000 C CNN
-	1    8600 3150
-	-1   0    0    -1  
-$EndComp
-$Comp
 L GND #PWR039
 U 1 1 5884E164
 P 8950 3250
@@ -244,7 +234,7 @@ F 1 "SWD" V 3800 4550 50  0000 C CNN
 F 2 "Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm" H 3700 4500 50  0001 C CNN
 F 3 "" H 3700 4500 50  0000 C CNN
 	1    3700 4500
-	-1   0    0    -1  
+	-1   0    0    1   
 $EndComp
 $Comp
 L GND #PWR041
@@ -356,9 +346,9 @@ F 3 "" H 8550 4400 50  0000 C CNN
 $EndComp
 Text Label 4000 3450 0    60   ~ 0
 RXD
-Text Label 4000 4500 0    60   ~ 0
+Text Label 4000 4600 0    60   ~ 0
 SWC
-Text Label 4000 4400 0    60   ~ 0
+Text Label 4000 4500 0    60   ~ 0
 SWD
 Wire Wire Line
 	6050 2600 6050 2750
@@ -372,7 +362,7 @@ Wire Wire Line
 Wire Wire Line
 	8800 4800 8800 4900
 Wire Wire Line
-	7750 3150 8400 3150
+	7750 3150 8250 3150
 Wire Wire Line
 	8950 3150 8950 3250
 Wire Wire Line
@@ -380,9 +370,6 @@ Wire Wire Line
 Connection ~ 7950 3150
 Wire Wire Line
 	7950 2600 7950 2750
-Wire Wire Line
-	3950 4600 3900 4600
-Connection ~ 3950 4600
 Wire Wire Line
 	7800 4050 7800 4600
 Wire Wire Line
@@ -448,17 +435,7 @@ Wire Wire Line
 	8350 3350 7750 3350
 Connection ~ 8550 4550
 Wire Wire Line
-	8800 3150 8950 3150
-Wire Wire Line
-	8400 3250 8350 3250
-Wire Wire Line
-	8350 3250 8350 3150
-Connection ~ 8350 3150
-Wire Wire Line
-	8800 3250 8850 3250
-Wire Wire Line
-	8850 3250 8850 3150
-Connection ~ 8850 3150
+	8650 3150 8950 3150
 Wire Wire Line
 	6050 4900 6050 4650
 Wire Wire Line
@@ -474,13 +451,13 @@ TXD
 Wire Wire Line
 	4350 4150 4250 4150
 Wire Wire Line
-	4250 4150 4250 4400
+	4250 4150 4250 4500
 Wire Wire Line
-	4250 4400 3900 4400
+	4250 4500 3900 4500
 Wire Wire Line
-	4300 4250 4300 4500
+	4300 4250 4300 4600
 Wire Wire Line
-	4300 4500 3900 4500
+	4300 4600 3900 4600
 Wire Wire Line
 	8100 4450 8200 4450
 Connection ~ 8200 4450
@@ -498,6 +475,20 @@ F 1 "8MHz" H 8000 4350 50  0000 C CNN
 F 2 "Crystals:Crystal_HC49-4H_Vertical" H 8000 4450 50  0001 C CNN
 F 3 "" H 8000 4450 50  0000 C CNN
 	1    8000 4450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3900 4400 3950 4400
+Connection ~ 3950 4400
+$Comp
+L SW_Push SW3
+U 1 1 58B3FA54
+P 8450 3150
+F 0 "SW3" H 8500 3250 50  0000 L CNN
+F 1 "SW_Push" H 8450 3090 50  0000 C CNN
+F 2 "cardetector:TS_362" H 8450 3350 50  0001 C CNN
+F 3 "" H 8450 3350 50  0000 C CNN
+	1    8450 3150
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC
