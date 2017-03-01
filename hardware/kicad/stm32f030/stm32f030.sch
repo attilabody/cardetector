@@ -28,13 +28,6 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:button
-LIBS:con-wago
-LIBS:gdt
-LIBS:irlz44nto220v
-LIBS:jumpers
-LIBS:relay
-LIBS:transformer
 LIBS:stm32
 LIBS:switches
 LIBS:stm32f030-cache
