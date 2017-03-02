@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=/home/compi/work/cardetector/cardrtector/firmware/stm32/Inc
+HeaderPath=/home/compi/work/cardetector/cardrtector/firmware/stm32/F030F4Px/Inc
 HeaderFiles=stm32f0xx_it.h;stm32f0xx_hal_conf.h;main.h;gpio.h;i2c.h;tim.h;usart.h;
-SourcePath=/home/compi/work/cardetector/cardrtector/firmware/stm32/Src
+SourcePath=/home/compi/work/cardetector/cardrtector/firmware/stm32/F030F4Px/Src
 SourceFiles=stm32f0xx_it.h;stm32f0xx_hal_conf.h;main.h;stm32f0xx_it.c;stm32f0xx_hal_msp.c;main.c;gpio.h;i2c.h;tim.h;usart.h;gpio.c;i2c.c;tim.c;usart.c;
 
 [PreviousLibFiles]

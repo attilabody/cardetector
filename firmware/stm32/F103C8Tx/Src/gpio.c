@@ -55,10 +55,49 @@
 void MX_GPIO_Init(void)
 {
 
+  GPIO_InitTypeDef GPIO_InitStruct;
+
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, ACTIVE1_Pin|ACTIVE2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, LD11_Pin|LD12_Pin|LD13_Pin|LD14_Pin 
+                          |LD15_Pin|LD27_Pin|LD28_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, LD16_Pin|LD17_Pin|LD18_Pin|LD21_Pin 
+                          |LD22_Pin|LD23_Pin|LD24_Pin|LD25_Pin 
+                          |LD26_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : PCPin PCPin */
+  GPIO_InitStruct.Pin = ACTIVE1_Pin|ACTIVE2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PAPin PAPin PAPin PAPin 
+                           PAPin PAPin PAPin */
+  GPIO_InitStruct.Pin = LD11_Pin|LD12_Pin|LD13_Pin|LD14_Pin 
+                          |LD15_Pin|LD27_Pin|LD28_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PBPin PBPin PBPin PBPin 
+                           PBPin PBPin PBPin PBPin 
+                           PBPin */
+  GPIO_InitStruct.Pin = LD16_Pin|LD17_Pin|LD18_Pin|LD21_Pin 
+                          |LD22_Pin|LD23_Pin|LD24_Pin|LD25_Pin 
+                          |LD26_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
