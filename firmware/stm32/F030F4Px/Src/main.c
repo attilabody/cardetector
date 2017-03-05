@@ -39,6 +39,8 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
+#include <cardetector_common/usart.h>
+#include <cardetector_common/i2clcd.h>
 
 /* USER CODE END Includes */
 
@@ -66,7 +68,8 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+  I2cMaster_Status	*i2cst;
+  I2cLcd_Status		i2clcd;
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
