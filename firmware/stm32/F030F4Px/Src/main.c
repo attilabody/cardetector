@@ -41,6 +41,7 @@
 /* USER CODE BEGIN Includes */
 #include <cardetector_common/usart.h>
 #include <cardetector_common/i2clcd.h>
+#include <cardetector_common/strutil.h>
 
 /* USER CODE END Includes */
 
@@ -48,6 +49,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+#define LCDADDR (0x27 << 1)
 
 /* USER CODE END PV */
 
@@ -88,17 +90,31 @@ int main(void)
   MX_USART1_UART_Init();
 
   /* USER CODE BEGIN 2 */
+  i2cst = I2cMaster_Init(&hi2c1);
+  I2cLcd_Init(&i2clcd, i2cst, LCDADDR );
+  I2cLcd_InitDisplay(&i2clcd);
+  I2cLcd_PrintStr(&i2clcd, "Hello!");
+
+  UsartInit(&huart1);
+  UsartSend("Hello!\r\n", 8, 1);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint32_t	u = 0;
+  char	buffer[11];
   while (1)
   {
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-
+	  HAL_Delay(100);
+	  uint8_t size = uitodec(u++, buffer);
+	  I2cLcd_SetCursor(&i2clcd, 0, 1);
+	  I2cLcd_PrintStr(&i2clcd, buffer);
+	  UsartSend(buffer,size, 1);
+	  UsartSend("\r\n", 2, 1);
   }
   /* USER CODE END 3 */
 
@@ -120,7 +136,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL4;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
   RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {

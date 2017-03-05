@@ -24,6 +24,6 @@ HAL_StatusTypeDef I2cLcd_Clear(I2cLcd_Status *st);
 HAL_StatusTypeDef I2cLcd_Home(I2cLcd_Status *st);
 HAL_StatusTypeDef I2cLcd_SetCursor(I2cLcd_Status *st, uint8_t x, uint8_t y);
 HAL_StatusTypeDef I2cLcd_PrintStr(I2cLcd_Status *st, const char *str);
-size_t I2cLcd_PrintInt(I2cLcd_Status *st, unsigned int u, uint8_t hex);
+size_t I2cLcd_PrintInt(I2cLcd_Status *st, uint32_t u, uint8_t hex);
 
 #endif /* CARDETECTOR_COMMON_INC_CARDETECTOR_COMMON_I2CLCD_H_ */

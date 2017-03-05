@@ -9,12 +9,6 @@ volatile uint16_t	g_txStart = 0, g_txCount = 0, g_chunkSize = 0;
 const uint16_t		g_size = sizeof(g_buffer);
 
 ////////////////////////////////////////////////////////////////////
-void InitUsart(UART_HandleTypeDef *huart)
-{
-	g_huart = huart;
-}
-
-////////////////////////////////////////////////////////////////////
 static inline void EnableIrq(uint8_t wasEnabled) {
 	if(wasEnabled) __enable_irq();
 }
