@@ -39,6 +39,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
+#include "config.h"
 #include <cardetector_common/usart.h>
 #include <cardetector_common/i2clcd.h>
 #include <cardetector_common/strutil.h>
@@ -51,6 +52,59 @@
 /* Private variables ---------------------------------------------------------*/
 #define LCDADDR (0x27 << 1)
 
+enum STATES
+{
+	BELOW = 0,
+	BASE,
+	ABOVE,
+	ACTIVE,
+	TIMEOUT,
+	STATECOUNT
+};
+
+const char g_stateSyms[] = "-|+#*";
+typedef struct
+{
+	uint8_t		magic;
+	int8_t		shifts[STATECOUNT];
+	uint8_t		sumshift, tlimit;
+	uint16_t	divider;
+	uint8_t		mccount;			//measure cycle count
+} CONFIG;
+
+CONFIG 		g_config =
+{
+	  0xA5
+	, {SHIFT_BELOW, SHIFT_BASE, SHIFT_ABOVE, SHIFT_ACTIVE, SHIFT_TIMEOUT}	//below, above, active, timeout
+	, SHIFT_SUM		//shift
+	, TIMELIMIT		//tlimit
+	, DIVIDER		//divider
+	, MCCOUNT		//mccntexp
+};
+
+typedef struct
+{
+	uint32_t	sum;
+	uint32_t	accumulator;
+	uint32_t	lastMeasured;
+	uint32_t	activeStart;
+	int32_t		correction;
+	int16_t		diff;
+	uint16_t	tolerance;
+	uint16_t	threshold;
+	uint16_t	avg;
+	uint16_t	prevCapture;
+	uint8_t		initialized;
+	uint8_t		counter;
+	enum STATES	state;
+	//uint32_t	debug[MCCOUNT];
+} CHANNELSTATUS;
+
+CHANNELSTATUS g_statuses[2] = {
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, BELOW},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, BELOW}
+};
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,10 +113,47 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
+void DisplayResults(I2cLcd_Status *i2clcd, uint8_t line);
 
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+#ifdef GENERATE_SWEEP
+#define PWM_DELAY	2
+#define PWM_STEP	1
+
+//////////////////////////////////////////////////////////////////////////////
+void HAL_SYSTICK_Callback(void)
+{
+	static uint16_t	counter = PWM_DELAY;
+	static uint8_t	up = 1;
+	static uint16_t	pwm = 0;
+
+	//return;
+
+	if(! --counter)
+	{
+		counter = PWM_DELAY;
+
+		if(up) {
+			if(pwm < htim14.Init.Period) {
+				pwm += PWM_STEP;
+			} else {
+				pwm = htim14.Init.Period;
+				up = 0;
+			}
+		} else {
+			if(pwm > PWM_STEP) {
+				pwm -= PWM_STEP;
+			} else {
+				pwm = 0;
+				up = 1;
+			}
+		}
+		__HAL_TIM_SetCompare(&htim14, TIM_CHANNEL_1, pwm);
+	}
+}
+#endif	//	GENERATE_SWEEP
 
 /* USER CODE END 0 */
 
@@ -93,28 +184,31 @@ int main(void)
   i2cst = I2cMaster_Init(&hi2c1);
   I2cLcd_Init(&i2clcd, i2cst, LCDADDR );
   I2cLcd_InitDisplay(&i2clcd);
-  I2cLcd_PrintStr(&i2clcd, "Hello!");
 
   UsartInit(&huart1);
-  UsartSend("Hello!\r\n", 8, 1);
 
+#ifdef GENERATE_SWEEP
+  HAL_TIM_Base_Start_IT(&htim14);
+  HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);
+  __HAL_TIM_SetCompare(&htim14, TIM_CHANNEL_1, 256);
+#endif	//	GENERATE_SWEEP
+
+  HAL_TIM_IC_Start_IT(&htim16, TIM_CHANNEL_1);
+  HAL_TIM_IC_Start_IT(&htim17, TIM_CHANNEL_1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint32_t	u = 0;
-  char	buffer[11];
+
   while (1)
   {
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
 	  HAL_Delay(100);
-	  uint8_t size = uitodec(u++, buffer);
-	  I2cLcd_SetCursor(&i2clcd, 0, 1);
-	  I2cLcd_PrintStr(&i2clcd, buffer);
-	  UsartSend(buffer,size, 1);
-	  UsartSend("\r\n", 2, 1);
+	  DisplayResults(&i2clcd, 0);
+	  //DisplayResults(&i2clcd, 1);
+
   }
   /* USER CODE END 3 */
 
@@ -177,6 +271,112 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+////////////////////////////////////////////////////////////////////
+void DisplayResults(I2cLcd_Status *i2clcd, uint8_t line)
+{
+	CHANNELSTATUS st;
+
+	uint8_t				irqEnabled = __get_PRIMASK() == 0;
+	st = g_statuses[line];
+	if(irqEnabled) __enable_irq();
+
+	UsartSend(&g_stateSyms[st.state], 1, 1);
+	UsartSend(" ", 1, 1);
+	UsartSendUint(st.sum, 1, 1);
+	UsartSend(", ", 2, 1);
+	UsartSendUint(st.avg, 1, 1);
+	UsartSend(", ", 2, 1);
+	UsartSendUint(st.lastMeasured, 1, 1);
+	UsartSend(", ", 2, 1);
+	UsartSendInt(st.diff, 0, 1);
+	UsartSend(", ", 2, 1);
+	UsartSendUint(st.tolerance, 0, 1);
+	UsartSend(", ", 2, 1);
+	UsartSendUint(st.threshold, 0, 1);
+	UsartSend(", ", 2, 1);
+	UsartSendInt(st.correction, 0, 1);
+	UsartSend("\r\n", 2, 1);
+
+}
+
+volatile uint32_t g_basz = 0;
+//////////////////////////////////////////////////////////////////////////////
+void detect(CHANNELSTATUS *st, TIM_HandleTypeDef *htim)
+{
+	int8_t		shift;
+	int16_t		diff;
+	uint16_t	lastDelta;
+	uint16_t	capturedValue;
+
+	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+	{
+		capturedValue = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+		if(st->initialized)
+		{
+			lastDelta = capturedValue - st->prevCapture;
+			if(lastDelta > 0xffff)
+				++ g_basz;
+			if(!st->sum)
+				st->sum = ((uint32_t)lastDelta * g_config.mccount) << g_config.sumshift;
+			else
+			{
+				//HAL_GPIO_TogglePin(ACTIVE2_GPIO_Port, ACTIVE2_Pin);
+
+				st->accumulator += lastDelta;
+				//st->debug[st->counter] = lastDelta;
+				if(++st->counter == g_config.mccount)
+				{
+					//HAL_GPIO_TogglePin(ACTIVE1_GPIO_Port, ACTIVE1_Pin);
+
+					st->lastMeasured = st->accumulator;
+					st->accumulator = 0;
+					st->counter = 0;
+
+					st->avg = st->sum >> g_config.sumshift;
+					st->threshold = st->avg / g_config.divider;
+					st->diff = (int32_t)st->lastMeasured - st->avg;
+					st->tolerance = st->threshold >> SHIFT_TOLERANCE;
+
+					diff = -st->diff;
+
+					if (diff < 0)
+						st->state = st->tolerance + diff < 0 ? BELOW:BASE;
+					else if(diff < st->tolerance)
+						st->state = BASE;
+					else if(diff < st->threshold)
+						st->state = ABOVE;
+					else if(st->state < ACTIVE) {	//!ACTIVE && !TIMEOUT
+						st->activeStart = HAL_GetTick();
+						st->state = ACTIVE;
+					} else if(HAL_GetTick() - st->activeStart > TIMELIMIT * 1000)
+						st->state = TIMEOUT;
+
+					shift = g_config.shifts[st->state];
+					if(shift != SCHAR_MIN) {
+						st->correction = (shift >= 0) ? (((int32_t)st->diff) << shift) : (((int32_t)st->diff) >> -shift);
+						st->sum += st->correction;
+					} else
+						st->correction = 0;
+				}
+			}
+		} else
+			st->initialized = 1;
+
+		st->prevCapture = capturedValue;
+	}
+
+}
+
+//////////////////////////////////////////////////////////////////////////////
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
+	if( htim->Instance == TIM16)
+		detect(&g_statuses[0], htim);
+	else if( htim->Instance == TIM17)
+		detect(&g_statuses[1], htim);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 /* USER CODE END 4 */
 

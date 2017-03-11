@@ -36,6 +36,11 @@
 			<location>PARENT-1-PROJECT_LOC/startup_stm32f030x6.s</location>
 		</link>
 		<link>
+			<name>Application/User/config.h</name>
+			<type>1</type>
+			<location>PARENT-2-PROJECT_LOC/Src/config.h</location>
+		</link>
+		<link>
 			<name>Application/User/gpio.c</name>
 			<type>1</type>
 			<location>PARENT-2-PROJECT_LOC/Src/gpio.c</location>

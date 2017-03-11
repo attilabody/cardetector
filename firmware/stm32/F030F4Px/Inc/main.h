@@ -40,6 +40,7 @@
 /* USER CODE END Includes */
 
 /* Private define ------------------------------------------------------------*/
+#define T14_RELOAD 500
 
 #define ACTIVE1_Pin GPIO_PIN_5
 #define ACTIVE1_GPIO_Port GPIOA

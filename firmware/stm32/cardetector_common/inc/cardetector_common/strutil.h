@@ -12,8 +12,10 @@
 #include <inttypes.h>
 
 //////////////////////////////////////////////////////////////////////////////
-size_t uitodec(unsigned int data, char* buffer);
-size_t uitohex(unsigned int data, char* buffer);
+size_t uitodec(char* buffer, unsigned int data);
+size_t uitohex(char* buffer, unsigned int data);
+size_t itodec(char* buffer, int data);
+size_t itohex(char* buffer, int data);
 
 //////////////////////////////////////////////////////////////////////////////
 inline void strrev(char *first, char *last)

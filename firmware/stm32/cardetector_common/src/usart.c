@@ -1,4 +1,5 @@
 #include <cardetector_common/usart.h>
+#include <cardetector_common/strutil.h>
 
 #include <string.h>
 #include <inttypes.h>
@@ -84,7 +85,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 }
 
 ////////////////////////////////////////////////////////////////////
-uint16_t  UsartSend(const void *buffer, uint16_t count, uint8_t block)
+uint16_t UsartSend(const void *buffer, uint16_t count, uint8_t block)
 {
 	uint16_t  sent = 0, copied;
 
@@ -100,5 +101,43 @@ uint16_t  UsartSend(const void *buffer, uint16_t count, uint8_t block)
 	}
 
 	return sent;
+}
+
+////////////////////////////////////////////////////////////////////
+uint16_t UsartSendStr(const char *buffer, uint8_t block)
+{
+	uint16_t  count = 0;
+
+	const char *tmp = buffer;
+	while(*tmp++) ++count;
+
+	return UsartSend(buffer, count, block);
+}
+
+////////////////////////////////////////////////////////////////////
+uint16_t UsartSendInt(int32_t data, uint8_t hex, uint8_t block)
+{
+	uint8_t	count = 0;
+	char	buffer[12], *tmp = buffer;
+
+	if(data < 0) {
+		*tmp++ = '-';
+		data = -data;
+		++count;
+	}
+	count += hex ? uitohex(tmp, data) : uitodec(tmp, data);
+
+	return UsartSend(buffer, count, block);
+}
+
+////////////////////////////////////////////////////////////////////
+uint16_t UsartSendUint(uint32_t data, uint8_t hex, uint8_t block)
+{
+	uint8_t	count = 0;
+	char	buffer[11];
+
+	count = hex ? uitohex(buffer, data) : uitodec(buffer, data);
+
+	return UsartSend(buffer, count, block);
 }
 

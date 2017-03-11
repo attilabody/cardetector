@@ -2,7 +2,7 @@
 #include <cardetector_common/strutil.h>
 
 //////////////////////////////////////////////////////////////////////////////
-size_t uitodec( unsigned int data, char* buffer)
+size_t uitodec(char* buffer, unsigned int data)
 {
 	char *b2 = buffer;
 	if(!data) {
@@ -24,7 +24,7 @@ size_t uitodec( unsigned int data, char* buffer)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-size_t uitohex(unsigned int data, char* buffer)
+size_t uitohex(char* buffer, unsigned int data)
 {
 	char *b2 = buffer;
 
@@ -45,4 +45,26 @@ size_t uitohex(unsigned int data, char* buffer)
 
 	strrev(buffer, b2);
     return ret;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+size_t itodec(char* buffer, int data)
+{
+	if(data < 0) {
+		*buffer++ = '-';
+		return uitodec(buffer, -data) + 1;
+	}
+
+	return uitodec(buffer, data);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+size_t itohex(char* buffer, int data)
+{
+	if(data < 0) {
+		*buffer++ = '-';
+		return uitohex(buffer, -data) + 1;
+	}
+	return uitohex(buffer, data);
 }

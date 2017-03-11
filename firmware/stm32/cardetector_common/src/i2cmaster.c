@@ -4,6 +4,7 @@
  *  Created on: Mar 4, 2017
  *      Author: compi
  */
+#include <cardetector_common/stm32_hal.h>
 #include <cardetector_common/i2cmaster.h>
 
 #ifndef COUNTOF
