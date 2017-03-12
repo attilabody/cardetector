@@ -4,25 +4,24 @@
  *  Created on: Mar 4, 2017
  *      Author: compi
  */
-#include <cardetector_common/pcf8574.h>
-#include <cardetector_common/i2cmaster.h>
+#include <stm32plus/pcf8574.h>
+#include <stm32plus/i2cmaster.h>
 
-void Pcf8574_Init(Pcf8574_Status *st, I2cMaster_State *i2cst, uint16_t i2cAddress, I2cMaster_Mode mode)
+void Pcf8574_Init(Pcf8574_Status *st, I2cMaster_State *i2cst, uint16_t i2cAddress)
 {
 	st->m_i2cStatus = i2cst;
 	st->m_i2cAddress = i2cAddress;
 	st->m_data = 0;
-	st->m_mode = mode;
 }
 
 inline HAL_StatusTypeDef Pcf8574_Read(Pcf8574_Status * const st)
 {
-	return I2cMaster_Read(st->m_i2cStatus, st->m_i2cAddress, &st->m_data, sizeof(st->m_data), st->m_mode);
+	return I2cMaster_Read_IT(st->m_i2cStatus, st->m_i2cAddress, &st->m_data, sizeof(st->m_data));
 }
 
 inline HAL_StatusTypeDef Pcf8574_Write(Pcf8574_Status * const st)
 {
-	return I2cMaster_Write(st->m_i2cStatus, st->m_i2cAddress, &st->m_data, sizeof(st->m_data), st->m_mode);
+	return I2cMaster_Write_IT(st->m_i2cStatus, st->m_i2cAddress, &st->m_data, sizeof(st->m_data));
 }
 
 HAL_StatusTypeDef Pcf8574_WritePort(Pcf8574_Status *st, uint8_t value)

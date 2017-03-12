@@ -4,8 +4,8 @@
  *  Created on: Mar 5, 2017
  *      Author: compi
  */
-#include <cardetector_common/i2clcd.h>
-#include "cardetector_common/strutil.h"
+#include <stm32plus/i2clcd.h>
+#include "stm32plus/strutil.h"
 
 // commands
 #define LCD_CLEARDISPLAY 0x01
@@ -81,7 +81,7 @@ void I2cLcd_Init(I2cLcd_State *st, I2cMaster_State *i2cst, uint16_t i2cAddress)
 // 200 us @ 100kHz
 inline HAL_StatusTypeDef I2cLcd_SendData(I2cLcd_State *st)
 {
-	return I2cMaster_Write(st->m_i2c, st->m_i2cAddress, &st->m_data, sizeof(st->m_data), It);
+	return I2cMaster_Write(st->m_i2c, st->m_i2cAddress, &st->m_data, sizeof(st->m_data));
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -39,10 +39,12 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
+#include <string.h>
 #include "config.h"
-#include <cardetector_common/usart.h>
-#include <cardetector_common/i2clcd.h>
-#include <cardetector_common/strutil.h>
+#include <stm32plus/usart.h>
+#include <stm32plus/i2clcd.h>
+#include <stm32plus/i2ceeprom.h>
+#include <stm32plus/strutil.h>
 
 /* USER CODE END Includes */
 
@@ -105,6 +107,9 @@ CHANNELSTATUS g_statuses[2] = {
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, BELOW}
 };
 
+static const char	g_wrbuf[] = "0123456789ABCDEF";
+uint8_t				g_rdbuf[16];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -113,7 +118,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-void DisplayResults(I2cLcd_Status *i2clcd, uint8_t line);
+void DisplayResults(I2cLcd_State *i2clcd, uint8_t line);
 
 /* USER CODE END PFP */
 
@@ -161,8 +166,13 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  I2cMaster_Status	*i2cst;
-  I2cLcd_Status		i2clcd;
+  I2cMaster_State		*i2c;
+#ifdef USE_LCD
+  I2cLcd_State			i2clcd;
+#endif //	USE_LCD
+  I2cEEPROM_State		i2ceeprom;
+  volatile uint32_t		i2cErr = HAL_I2C_ERROR_NONE;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -181,11 +191,26 @@ int main(void)
   MX_USART1_UART_Init();
 
   /* USER CODE BEGIN 2 */
-  i2cst = I2cMaster_Init(&hi2c1);
-  I2cLcd_Init(&i2clcd, i2cst, LCDADDR );
+  i2c = I2cMaster_Init(&hi2c1);
+#ifdef USE_LCD
+  I2cLcd_Init(&i2clcd, i2c, LCDADDR );
   I2cLcd_InitDisplay(&i2clcd);
+#endif	//	USE_LCD
 
+#define EESTART	0
+
+  memset(g_rdbuf, 0, sizeof(g_rdbuf));
+  I2cEEPROM_Init(&i2ceeprom, i2c, EEPROMADDR, 2, 32);
+  i2cErr = I2cEEPROM_Read(&i2ceeprom, EESTART, g_rdbuf, sizeof(g_rdbuf));
+  i2cErr = I2cEEPROM_Write(&i2ceeprom, EESTART, g_wrbuf, sizeof(g_wrbuf)-1);
+  memset(g_rdbuf, 0, sizeof(g_rdbuf));
+  i2cErr = I2cEEPROM_Read(&i2ceeprom, EESTART, g_rdbuf, sizeof(g_rdbuf));
+  i2cErr = I2cEEPROM_Read(&i2ceeprom, EESTART+2, g_rdbuf, sizeof(g_rdbuf));
+  I2cMaster_WaitCallback(i2c);
+
+#ifdef USE_SERIAL
   UsartInit(&huart1);
+#endif	//	USE_SERIAL
 
 #ifdef GENERATE_SWEEP
   HAL_TIM_Base_Start_IT(&htim14);
@@ -206,7 +231,11 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 	  HAL_Delay(100);
+#ifdef USE_LCD
 	  DisplayResults(&i2clcd, 0);
+#else
+	  DisplayResults(NULL, 0);
+#endif
 	  //DisplayResults(&i2clcd, 1);
 
   }
@@ -272,14 +301,14 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 ////////////////////////////////////////////////////////////////////
-void DisplayResults(I2cLcd_Status *i2clcd, uint8_t line)
+void DisplayResults(I2cLcd_State *i2clcd, uint8_t line)
 {
-	CHANNELSTATUS st;
-
-	uint8_t				irqEnabled = __get_PRIMASK() == 0;
-	st = g_statuses[line];
+	uint8_t			irqEnabled = __get_PRIMASK() == 0;
+	__disable_irq();
+	CHANNELSTATUS	st = g_statuses[line];
 	if(irqEnabled) __enable_irq();
 
+#ifdef USE_SERIAL
 	UsartSend(&g_stateSyms[st.state], 1, 1);
 	UsartSend(" ", 1, 1);
 	UsartSendUint(st.sum, 1, 1);
@@ -296,7 +325,15 @@ void DisplayResults(I2cLcd_Status *i2clcd, uint8_t line)
 	UsartSend(", ", 2, 1);
 	UsartSendInt(st.correction, 0, 1);
 	UsartSend("\r\n", 2, 1);
+#endif	//	USE_SERIAL
 
+#ifdef USE_LCD
+	I2cLcd_SetCursor(i2clcd, 0, 0);
+	I2cLcd_PrintChar(i2clcd, g_stateSyms[st.state]);
+	I2cLcd_PrintChar(i2clcd, ' ');
+	I2cLcd_PrintInt(i2clcd, st.diff, 0);
+	I2cLcd_PrintStr(i2clcd, "   ");
+#endif	//	USE_LCD
 }
 
 volatile uint32_t g_basz = 0;

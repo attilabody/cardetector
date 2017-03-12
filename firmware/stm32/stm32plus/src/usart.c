@@ -1,5 +1,5 @@
-#include <cardetector_common/usart.h>
-#include <cardetector_common/strutil.h>
+#include <stm32plus/usart.h>
+#include <stm32plus/strutil.h>
 
 #include <string.h>
 #include <inttypes.h>

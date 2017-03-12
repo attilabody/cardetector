@@ -33,7 +33,7 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.863091246" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.size" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.815147560" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.571711274" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="../../../../cardetector_common/inc"/>
+									<listOptionValue builtIn="false" value="../../../../stm32plus/inc"/>
 									<listOptionValue builtIn="false" value="../../../Inc"/>
 									<listOptionValue builtIn="false" value="../../../Drivers/STM32F0xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="../../../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy"/>
@@ -77,7 +77,7 @@
 					</folderInfo>
 					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.514445970.1878455296" name="main.c" rcbsApplicability="disable" resourcePath="Application/User/main.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.1340294042">
 						<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.1340294042" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461">
-							<option id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.2144670612" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" value="fr.ac6.managedbuild.gnu.c.optimization.level.debug" valueType="enumerated"/>
+							<option id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.2144670612" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" value="fr.ac6.managedbuild.gnu.c.optimization.level.debug" valueType="enumerated"/>
 							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.1103443667" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
 							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.1519173596" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
 						</tool>
@@ -121,7 +121,7 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.863091246" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.size" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.815147560" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.571711274" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="../../../../cardetector_common/inc"/>
+									<listOptionValue builtIn="false" value="../../../../stm32plus/inc"/>
 									<listOptionValue builtIn="false" value="../../../Inc"/>
 									<listOptionValue builtIn="false" value="../../../Drivers/STM32F0xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="../../../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy"/>

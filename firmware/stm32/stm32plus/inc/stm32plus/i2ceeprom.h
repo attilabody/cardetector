@@ -8,8 +8,8 @@
 #ifndef CARDETECTOR_COMMON_INC_CARDETECTOR_COMMON_I2CEEPROM_H_
 #define CARDETECTOR_COMMON_INC_CARDETECTOR_COMMON_I2CEEPROM_H_
 
-#include <cardetector_common/stm32_hal.h>
-#include <cardetector_common/i2cmaster.h>
+#include <stm32plus/stm32_hal.h>
+#include <stm32plus/i2cmaster.h>
 
 typedef struct _I2cEEPROM_State
 {

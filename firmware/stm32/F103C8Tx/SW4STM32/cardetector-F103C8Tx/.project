@@ -26,9 +26,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>cardetector_common</name>
+			<name>stm32plus</name>
 			<type>2</type>
-			<locationURI>PARENT-3-PROJECT_LOC/cardetector_common</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/stm32plus</locationURI>
 		</link>
 		<link>
 			<name>Application/SW4STM32/startup_stm32f103xb.s</name>

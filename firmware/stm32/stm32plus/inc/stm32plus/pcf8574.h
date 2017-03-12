@@ -8,17 +8,16 @@
 #ifndef CARDETECTOR_COMMON_INC_CARDETECTOR_COMMON_PCF8574_H_
 #define CARDETECTOR_COMMON_INC_CARDETECTOR_COMMON_PCF8574_H_
 
-#include <cardetector_common/i2cmaster.h>
+#include <stm32plus/i2cmaster.h>
 
 typedef struct _Pcf8574_Status
 {
 	I2cMaster_State 	*m_i2cStatus;
 	uint16_t			m_i2cAddress;
 	uint8_t				m_data;
-	I2cMaster_Mode		m_mode;
 } Pcf8574_Status;
 
-void Pcf8574_Init(Pcf8574_Status *st, I2cMaster_State *i2cst, uint16_t i2cAddress, I2cMaster_Mode mode);
+void Pcf8574_Init(Pcf8574_Status *st, I2cMaster_State *i2cst, uint16_t i2cAddress);
 HAL_StatusTypeDef Pcf8574_WritePort(Pcf8574_Status *st, uint8_t value);
 HAL_StatusTypeDef Pcf8574_WritePin(Pcf8574_Status *st, uint8_t pin, uint8_t value);
 HAL_StatusTypeDef Pcf8574_ReadPort(Pcf8574_Status *st, uint8_t * const value);

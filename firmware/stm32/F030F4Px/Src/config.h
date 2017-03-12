@@ -10,11 +10,9 @@
 
 #include <limits.h>
 
-//#define F_CPU 16000000UL
-//#define BAUD 115200
-
 #define USE_I2C
 #define USE_SERIAL
+#define USE_LCD
 
 //#define DEBUG_TIMERS
 #define DEBUG_DETECTOR
@@ -33,6 +31,7 @@
 
 #define TIMELIMIT			180	//	seconds
 
-#define LCD_I2C_ADDRESS	0x27
+#define LCDADDRESS	0x27
+#define EEPROMADDR 	0xA0
 
 #endif /* CONFIG_H_ */

@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <cardetector_common/strutil.h>
+#include <stm32plus/strutil.h>
 
 //////////////////////////////////////////////////////////////////////////////
 size_t uitodec(char* buffer, unsigned int data)

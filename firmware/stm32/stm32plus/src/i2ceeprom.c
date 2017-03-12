@@ -4,8 +4,8 @@
  *  Created on: Mar 11, 2017
  *      Author: compi
  */
-#include <cardetector_common/stm32_hal.h>
-#include <cardetector_common/i2ceeprom.h>
+#include <stm32plus/stm32_hal.h>
+#include <stm32plus/i2ceeprom.h>
 
 //////////////////////////////////////////////////////////////////////////////
 static uint32_t I2cEEPROM_PollStatus(I2cEEPROM_State *st)
@@ -13,7 +13,7 @@ static uint32_t I2cEEPROM_PollStatus(I2cEEPROM_State *st)
 	uint32_t	ret;
 	uint32_t	start = HAL_GetTick();
 
-	while((ret = I2cMaster_Write(st->i2c, st->i2cAddress, NULL, 0, Poll)) != HAL_I2C_ERROR_NONE) {
+	while((ret = I2cMaster_Write(st->i2c, st->i2cAddress, NULL, 0)) != HAL_I2C_ERROR_NONE) {
 		if(HAL_GetTick() - start >=10)
 			return ret;
 		HAL_Delay(1);
@@ -50,7 +50,7 @@ HAL_StatusTypeDef I2cEEPROM_Read(I2cEEPROM_State *st, uint32_t address, void* _b
 
 	while(length && ret == HAL_OK)
 	{
-		ret = I2cMaster_ReadMem(st->i2c, st->i2cAddress, address, st->addressLengt, buffer, toRead, It);
+		ret = I2cMaster_ReadMem_IT(st->i2c, st->i2cAddress, address, st->addressLengt, buffer, toRead);
 		length -= toRead;
 		buffer += toRead;
 		address += toRead;
@@ -77,7 +77,7 @@ HAL_StatusTypeDef I2cEEPROM_Write(I2cEEPROM_State *st, uint32_t address, const v
 			if(ret != HAL_OK)
 				return ret;
 		}
-		ret = I2cMaster_WriteMem(st->i2c, st->i2cAddress, address, st->addressLengt, buffer, toWrite, It);
+		ret = I2cMaster_WriteMem_IT(st->i2c, st->i2cAddress, address, st->addressLengt, buffer, toWrite);
 		st->needPoll = 1;
 		length -= toWrite;
 		buffer += toWrite;
