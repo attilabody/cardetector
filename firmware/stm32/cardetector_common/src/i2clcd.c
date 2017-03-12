@@ -67,7 +67,7 @@ static const uint8_t m_init[5] = {
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
-void I2cLcd_Init(I2cLcd_Status *st, I2cMaster_Status *i2cst, uint16_t i2cAddress)
+void I2cLcd_Init(I2cLcd_State *st, I2cMaster_State *i2cst, uint16_t i2cAddress)
 //: m_i2c(i2c)
 //, st->m_data(LCD_BACKLIGHT)
 //, m_i2cAddress(i2cAddress)
@@ -79,14 +79,14 @@ void I2cLcd_Init(I2cLcd_Status *st, I2cMaster_Status *i2cst, uint16_t i2cAddress
 
 //////////////////////////////////////////////////////////////////////////////
 // 200 us @ 100kHz
-inline HAL_StatusTypeDef I2cLcd_SendData(I2cLcd_Status *st)
+inline HAL_StatusTypeDef I2cLcd_SendData(I2cLcd_State *st)
 {
 	return I2cMaster_Write(st->m_i2c, st->m_i2cAddress, &st->m_data, sizeof(st->m_data), It);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // 400 us @ 100kHz
-inline HAL_StatusTypeDef I2cLcd_Epulse(I2cLcd_Status *st)
+inline HAL_StatusTypeDef I2cLcd_Epulse(I2cLcd_State *st)
 {
 	HAL_StatusTypeDef	ret;
 	st->m_data |= En;
@@ -99,7 +99,7 @@ inline HAL_StatusTypeDef I2cLcd_Epulse(I2cLcd_Status *st)
 
 //////////////////////////////////////////////////////////////////////////////
 // 600 us @ 100kHz
-inline HAL_StatusTypeDef I2cLcd_SendNibble(I2cLcd_Status *st, uint8_t nibble)
+inline HAL_StatusTypeDef I2cLcd_SendNibble(I2cLcd_State *st, uint8_t nibble)
 {
 	HAL_StatusTypeDef ret;
 	st->m_data = ((st->m_data & 0x0f) | (nibble & 0xf0));
@@ -110,7 +110,7 @@ inline HAL_StatusTypeDef I2cLcd_SendNibble(I2cLcd_Status *st, uint8_t nibble)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-inline HAL_StatusTypeDef I2cLcd_SendByte(I2cLcd_Status *st, uint8_t b, uint8_t isCmd)
+inline HAL_StatusTypeDef I2cLcd_SendByte(I2cLcd_State *st, uint8_t b, uint8_t isCmd)
 {
 	HAL_StatusTypeDef ret;
 
@@ -129,7 +129,7 @@ inline HAL_StatusTypeDef I2cLcd_SendByte(I2cLcd_Status *st, uint8_t b, uint8_t i
 }
 
 //////////////////////////////////////////////////////////////////////////////
-HAL_StatusTypeDef I2cLcd_InitDisplay(I2cLcd_Status *st )
+HAL_StatusTypeDef I2cLcd_InitDisplay(I2cLcd_State *st )
 {
 	HAL_StatusTypeDef ret;
 	uint8_t count;
@@ -158,7 +158,7 @@ HAL_StatusTypeDef I2cLcd_InitDisplay(I2cLcd_Status *st )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-HAL_StatusTypeDef I2cLcd_Clear(I2cLcd_Status *st)
+HAL_StatusTypeDef I2cLcd_Clear(I2cLcd_State *st)
 {
 	HAL_StatusTypeDef ret = I2cLcd_SendByte(st, LCD_CLEARDISPLAY, 1);	// clear display, set cursor position to zero
 	HAL_Delay(3);												// this command takes a long time!
@@ -166,7 +166,7 @@ HAL_StatusTypeDef I2cLcd_Clear(I2cLcd_Status *st)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-HAL_StatusTypeDef I2cLcd_Home(I2cLcd_Status *st)
+HAL_StatusTypeDef I2cLcd_Home(I2cLcd_State *st)
 {
 	HAL_StatusTypeDef ret = I2cLcd_SendByte(st, LCD_RETURNHOME, 1);		// set cursor position to zero
 	HAL_Delay(2);												// this command takes a long time!
@@ -174,13 +174,13 @@ HAL_StatusTypeDef I2cLcd_Home(I2cLcd_Status *st)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-HAL_StatusTypeDef I2cLcd_SetCursor(I2cLcd_Status *st, uint8_t x, uint8_t y)
+HAL_StatusTypeDef I2cLcd_SetCursor(I2cLcd_State *st, uint8_t x, uint8_t y)
 {
 	return I2cLcd_SendByte(st, LCD_SETDDRAMADDR | (x + m_rowOffsets[y & 3]), 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////
-HAL_StatusTypeDef I2cLcd_PrintStr(I2cLcd_Status *st, const char *str)
+HAL_StatusTypeDef I2cLcd_PrintStr(I2cLcd_State *st, const char *str)
 {
 	HAL_StatusTypeDef ret = HAL_OK;
 	while(*str) {
@@ -192,7 +192,13 @@ HAL_StatusTypeDef I2cLcd_PrintStr(I2cLcd_Status *st, const char *str)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-size_t I2cLcd_PrintInt(I2cLcd_Status *st, uint32_t u, uint8_t hex)
+uint32_t I2cLcd_PrintChar(I2cLcd_State *st, const char c)
+{
+	return I2cLcd_SendByte(st, c, 0);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+size_t I2cLcd_PrintUint(I2cLcd_State *st, uint32_t u, uint8_t hex)
 {
 	char	buffer[11];
 	size_t ret = hex ? uitohex(buffer, u) : uitodec(buffer, u);
@@ -200,6 +206,21 @@ size_t I2cLcd_PrintInt(I2cLcd_Status *st, uint32_t u, uint8_t hex)
 	return ret;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+size_t I2cLcd_PrintInt(I2cLcd_State *st, int32_t i, uint8_t hex)
+{
+	char	buffer[12];
+	char	*tmp = buffer;
+	size_t ret = 0;
+	if(i < 0) {
+		*tmp++ = '-';
+		i = -i;
+		ret = 1;
+	}
+	ret += hex ? uitohex(tmp, i) : uitodec(tmp, i);
+	I2cLcd_PrintStr(st, buffer);
+	return ret;
+}
 
 //#endif	//	#if defined(HAVE_I2C) && defined(USE_I2C)
 

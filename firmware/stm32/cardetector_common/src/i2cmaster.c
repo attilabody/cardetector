@@ -25,22 +25,22 @@ typedef enum
 }  I2cMaster_CallbackType;
 
 //////////////////////////////////////////////////////////////////////////////
- struct _I2cMaster_Status {
-	I2C_HandleTypeDef					*m_hi2c;
-	volatile I2cMaster_CallbackType		m_expectedCallback;
-	uint32_t 							m_callbackError;
+ struct _I2cMaster_State {
+	I2C_HandleTypeDef					*hi2c;
+	volatile I2cMaster_CallbackType		expectedCallback;
+	uint32_t 							callbackError;
 };
 
-I2cMaster_Status	g_i2cStatuses[2];
+I2cMaster_State	g_i2cStatuses[2];
 uint8_t				g_numI2cStatuses = 0;
 
 //////////////////////////////////////////////////////////////////////////////
-inline I2cMaster_Status *FindStatus(I2C_HandleTypeDef *hi2c)
+inline I2cMaster_State *FindStatus(I2C_HandleTypeDef *hi2c)
 {
-	I2cMaster_Status	*st = g_i2cStatuses;
+	I2cMaster_State	*st = g_i2cStatuses;
 
 	for(st = g_i2cStatuses; st < &g_i2cStatuses[g_numI2cStatuses]; ++st)
-		if(hi2c == st->m_hi2c)
+		if(hi2c == st->hi2c)
 			return st;
 	return NULL;
 }
@@ -48,14 +48,14 @@ inline I2cMaster_Status *FindStatus(I2C_HandleTypeDef *hi2c)
 //////////////////////////////////////////////////////////////////////////////
 uint8_t I2cMaster_Callback(I2C_HandleTypeDef *hi2c, I2cMaster_CallbackType type)
 {
-	I2cMaster_Status	*st = FindStatus(hi2c);
+	I2cMaster_State	*st = FindStatus(hi2c);
 
 	if(!st)
 		return 0;
 
-	if(st->m_expectedCallback == type || type == ErrorCallback ) {
-		st->m_expectedCallback = None;
-		st->m_callbackError = type == ErrorCallback ? HAL_I2C_GetError(hi2c) : HAL_I2C_ERROR_NONE;
+	if(st->expectedCallback == type || type == ErrorCallback ) {
+		st->expectedCallback = None;
+		st->callbackError = type == ErrorCallback ? HAL_I2C_GetError(hi2c) : HAL_I2C_ERROR_NONE;
 	}
 	return 1;
 }
@@ -97,105 +97,119 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-I2cMaster_Status * I2cMaster_Init(I2C_HandleTypeDef *hi2c)
+I2cMaster_State * I2cMaster_Init(I2C_HandleTypeDef *hi2c)
 {
 	if(g_numI2cStatuses == COUNTOF(g_i2cStatuses))
 		return NULL;
 
-	I2cMaster_Status *st = &g_i2cStatuses[g_numI2cStatuses++];
-	st->m_hi2c = hi2c;
-	st->m_expectedCallback = None;
-	st->m_callbackError = HAL_I2C_ERROR_NONE;
+	I2cMaster_State *st = &g_i2cStatuses[g_numI2cStatuses++];
+	st->hi2c = hi2c;
+	st->expectedCallback = None;
+	st->callbackError = HAL_I2C_ERROR_NONE;
 
 	return st;
 }
 
 //////////////////////////////////////////////////////////////////////////////
-inline uint32_t WaitCallback(I2cMaster_Status *st)
+HAL_StatusTypeDef I2cMaster_WaitCallback(I2cMaster_State *st)
 {
-	while(st->m_expectedCallback != None) {}
-	return st->m_callbackError;
+	while(st->expectedCallback != None) {}
+	return st->callbackError ? HAL_ERROR : HAL_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
-HAL_StatusTypeDef I2cMaster_Write(I2cMaster_Status *st, const uint16_t i2cAddress, uint8_t *data, uint8_t size, I2cMaster_Mode mode)
+uint32_t I2cMaster_GetCallbackError(I2cMaster_State *st)
 {
-	if(WaitCallback(st) != HAL_I2C_ERROR_NONE)
+	uint32_t ret = st->callbackError;
+	st->callbackError = HAL_I2C_ERROR_NONE;
+	return ret;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+uint32_t I2cMaster_GetI2cError(I2cMaster_State *st)
+{
+	return HAL_I2C_GetError(st->hi2c);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+HAL_StatusTypeDef I2cMaster_Write(I2cMaster_State *st, const uint16_t i2cAddress, const uint8_t *data, uint8_t size, I2cMaster_Mode mode)
+{
+	if(I2cMaster_WaitCallback(st) != HAL_OK)
 		return HAL_ERROR;
 	if(mode == Poll) {
-		return HAL_I2C_Master_Transmit(st->m_hi2c, i2cAddress, data, size, HAL_MAX_DELAY);
+		return HAL_I2C_Master_Transmit(st->hi2c, i2cAddress, (uint8_t*)data, size, HAL_MAX_DELAY);
 	} else {
 		HAL_StatusTypeDef ret;
 		if(mode == It) {
-			ret = HAL_I2C_Master_Transmit_IT(st->m_hi2c, i2cAddress, data, size);
+			ret = HAL_I2C_Master_Transmit_IT(st->hi2c, i2cAddress, (uint8_t*)data, size);
 		} else {
-			ret = HAL_I2C_Master_Transmit_DMA(st->m_hi2c, i2cAddress, data, size);
+			ret = HAL_I2C_Master_Transmit_DMA(st->hi2c, i2cAddress, (uint8_t*)data, size);
 		}
 		if(ret == HAL_OK) {
-			st->m_expectedCallback = MasterTxCpltCallback;
+			st->expectedCallback = MasterTxCpltCallback;
 		}
 		return ret;
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////////
-HAL_StatusTypeDef I2cMaster_Read(I2cMaster_Status *st, const uint16_t i2cAddress, uint8_t *data, uint8_t size, I2cMaster_Mode mode)
+HAL_StatusTypeDef I2cMaster_Read(I2cMaster_State *st, const uint16_t i2cAddress, uint8_t *data, uint8_t size, I2cMaster_Mode mode)
 {
-	if(WaitCallback(st) != HAL_I2C_ERROR_NONE)
+	if(I2cMaster_WaitCallback(st) != HAL_OK)
 		return HAL_ERROR;
 	if(mode == Poll) {
-		return HAL_I2C_Master_Receive(st->m_hi2c, i2cAddress, data, size, HAL_MAX_DELAY);
+		return HAL_I2C_Master_Receive(st->hi2c, i2cAddress, data, size, HAL_MAX_DELAY);
 	} else {
 		HAL_StatusTypeDef ret;
 		if(mode == It) {
-			ret = HAL_I2C_Master_Receive_IT(st->m_hi2c, i2cAddress, data, size);
+			ret = HAL_I2C_Master_Receive_IT(st->hi2c, i2cAddress, data, size);
 		} else {
-			ret = HAL_I2C_Master_Receive_DMA(st->m_hi2c, i2cAddress, data, size);
+			ret = HAL_I2C_Master_Receive_DMA(st->hi2c, i2cAddress, data, size);
 		}
 		if(ret == HAL_OK) {
-			st->m_expectedCallback = MasterRxCpltCallback;
+			st->expectedCallback = MasterRxCpltCallback;
 		}
 		return ret;
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////////
-HAL_StatusTypeDef I2cMaster_WriteMem(I2cMaster_Status *st, const uint16_t i2cAddress, uint16_t memAddr, uint8_t memAddrSize, uint8_t *data, uint16_t size, I2cMaster_Mode mode)
+HAL_StatusTypeDef I2cMaster_WriteMem(I2cMaster_State *st, const uint16_t i2cAddress, uint16_t memAddr, uint8_t memAddrSize, const uint8_t *data, uint16_t size, I2cMaster_Mode mode)
 {
-	if(WaitCallback(st) != HAL_I2C_ERROR_NONE)
+	if(I2cMaster_WaitCallback(st) != HAL_OK)
 		return HAL_ERROR;
 	if(mode == Poll) {
-		return HAL_I2C_Mem_Write(st->m_hi2c, i2cAddress, memAddr, memAddrSize, data, size, HAL_MAX_DELAY);
+		return HAL_I2C_Mem_Write(st->hi2c, i2cAddress, memAddr, memAddrSize, (uint8_t*)data, size, HAL_MAX_DELAY);
 	} else {
 		HAL_StatusTypeDef ret;
 		if(mode == It) {
-			ret = HAL_I2C_Mem_Write_IT(st->m_hi2c, i2cAddress, memAddr, memAddrSize, data, size);
+			ret = HAL_I2C_Mem_Write_IT(st->hi2c, i2cAddress, memAddr, memAddrSize, (uint8_t*)data, size);
 		} else {
-			ret = HAL_I2C_Mem_Write_DMA(st->m_hi2c, i2cAddress, memAddr, memAddrSize, data, size);
+			ret = HAL_I2C_Mem_Write_DMA(st->hi2c, i2cAddress, memAddr, memAddrSize, (uint8_t*)data, size);
 		}
 		if(ret == HAL_OK) {
-			st->m_expectedCallback = MemTxCpltCallback;
+			st->expectedCallback = MemTxCpltCallback;
 		}
 		return ret;
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////////
-HAL_StatusTypeDef I2cMaster_ReadMem(I2cMaster_Status *st, const uint16_t i2cAddress, uint16_t memAddr, uint8_t memAddrSize, uint8_t *data, uint16_t size, I2cMaster_Mode mode)
+HAL_StatusTypeDef I2cMaster_ReadMem(I2cMaster_State *st, const uint16_t i2cAddress, uint16_t memAddr, uint8_t memAddrSize, uint8_t *data, uint16_t size, I2cMaster_Mode mode)
 {
-	if(WaitCallback(st) != HAL_I2C_ERROR_NONE)
+	if(I2cMaster_WaitCallback(st) != HAL_OK)
 		return HAL_ERROR;
 	if(mode == Poll) {
-		return HAL_I2C_Mem_Read(st->m_hi2c, i2cAddress, memAddr, memAddrSize, data, size, HAL_MAX_DELAY);
+		return HAL_I2C_Mem_Read(st->hi2c, i2cAddress, memAddr, memAddrSize, data, size, HAL_MAX_DELAY);
 	} else {
 		HAL_StatusTypeDef ret;
 		if(mode == It) {
-			ret = HAL_I2C_Mem_Read_IT(st->m_hi2c, i2cAddress, memAddr, memAddrSize, data, size);
+			ret = HAL_I2C_Mem_Read_IT(st->hi2c, i2cAddress, memAddr, memAddrSize, data, size);
 		} else {
-			ret = HAL_I2C_Mem_Read_DMA(st->m_hi2c, i2cAddress, memAddr, memAddrSize, data, size);
+			ret = HAL_I2C_Mem_Read_DMA(st->hi2c, i2cAddress, memAddr, memAddrSize, data, size);
 		}
 		if(ret == HAL_OK) {
-			st->m_expectedCallback = MemRxCpltCallback;
+			st->expectedCallback = MemRxCpltCallback;
 		}
 		return ret;
 	}

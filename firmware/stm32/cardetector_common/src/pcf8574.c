@@ -7,7 +7,7 @@
 #include <cardetector_common/pcf8574.h>
 #include <cardetector_common/i2cmaster.h>
 
-void Pcf8574_Init(Pcf8574_Status *st, I2cMaster_Status *i2cst, uint16_t i2cAddress, I2cMaster_Mode mode)
+void Pcf8574_Init(Pcf8574_Status *st, I2cMaster_State *i2cst, uint16_t i2cAddress, I2cMaster_Mode mode)
 {
 	st->m_i2cStatus = i2cst;
 	st->m_i2cAddress = i2cAddress;
