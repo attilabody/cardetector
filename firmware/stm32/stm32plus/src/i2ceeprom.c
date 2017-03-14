@@ -7,6 +7,9 @@
 #include <stm32plus/stm32_hal.h>
 #include <stm32plus/i2ceeprom.h>
 
+#define I2CMASTER_RD I2cMaster_ReadMem
+#define I2CMASTER_WR I2cMaster_WriteMem
+
 //////////////////////////////////////////////////////////////////////////////
 static uint32_t I2cEEPROM_PollStatus(I2cEEPROM_State *st)
 {
@@ -50,7 +53,7 @@ HAL_StatusTypeDef I2cEEPROM_Read(I2cEEPROM_State *st, uint32_t address, void* _b
 
 	while(length && ret == HAL_OK)
 	{
-		ret = I2cMaster_ReadMem_IT(st->i2c, st->i2cAddress, address, st->addressLengt, buffer, toRead);
+		ret = I2CMASTER_RD(st->i2c, st->i2cAddress, address, st->addressLengt, buffer, toRead);
 		length -= toRead;
 		buffer += toRead;
 		address += toRead;
@@ -77,7 +80,7 @@ HAL_StatusTypeDef I2cEEPROM_Write(I2cEEPROM_State *st, uint32_t address, const v
 			if(ret != HAL_OK)
 				return ret;
 		}
-		ret = I2cMaster_WriteMem_IT(st->i2c, st->i2cAddress, address, st->addressLengt, buffer, toWrite);
+		ret = I2CMASTER_WR(st->i2c, st->i2cAddress, address, st->addressLengt, buffer, toWrite);
 		st->needPoll = 1;
 		length -= toWrite;
 		buffer += toWrite;

@@ -55,8 +55,12 @@
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-static const uint8_t m_rowOffsets[4]  =  { 0x00, 0x40, 0x14, 0x54 };
-static const uint8_t m_init[5] = {
+static const uint8_t g_rowOffsets[4]  =  { 0x00, 0x40, 0x14, 0x54 };
+static const uint8_t g_initNibbles[4] = {
+		0x30, 0x30, 0x30, 0x20
+};
+
+static const uint8_t g_initBytes[5] = {
 		0x28,
 		0x01,	//clear display
 		0x06,	//increment mode, no display shift
@@ -68,20 +72,17 @@ static const uint8_t m_init[5] = {
 //
 //////////////////////////////////////////////////////////////////////////////
 void I2cLcd_Init(I2cLcd_State *st, I2cMaster_State *i2cst, uint16_t i2cAddress)
-//: m_i2c(i2c)
-//, st->m_data(LCD_BACKLIGHT)
-//, m_i2cAddress(i2cAddress)
 {
-	st->m_i2c = i2cst;
-	st->m_data = LCD_BACKLIGHT;
-	st->m_i2cAddress = i2cAddress;
+	st->i2c = i2cst;
+	st->data = LCD_BACKLIGHT;
+	st->i2cAddress = i2cAddress;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // 200 us @ 100kHz
 inline HAL_StatusTypeDef I2cLcd_SendData(I2cLcd_State *st)
 {
-	return I2cMaster_Write(st->m_i2c, st->m_i2cAddress, &st->m_data, sizeof(st->m_data));
+	return I2cMaster_Write(st->i2c, st->i2cAddress, &st->data, sizeof(st->data));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -89,9 +90,9 @@ inline HAL_StatusTypeDef I2cLcd_SendData(I2cLcd_State *st)
 inline HAL_StatusTypeDef I2cLcd_Epulse(I2cLcd_State *st)
 {
 	HAL_StatusTypeDef	ret;
-	st->m_data |= En;
+	st->data |= En;
 	ret = I2cLcd_SendData(st);
-	st->m_data &= ~En;
+	st->data &= ~En;
 	if(ret == HAL_OK)
 		return I2cLcd_SendData(st);
 	return ret;
@@ -102,7 +103,7 @@ inline HAL_StatusTypeDef I2cLcd_Epulse(I2cLcd_State *st)
 inline HAL_StatusTypeDef I2cLcd_SendNibble(I2cLcd_State *st, uint8_t nibble)
 {
 	HAL_StatusTypeDef ret;
-	st->m_data = ((st->m_data & 0x0f) | (nibble & 0xf0));
+	st->data = ((st->data & 0x0f) | (nibble & 0xf0));
 	ret = I2cLcd_SendData(st);
 	if(ret == HAL_OK)
 		return I2cLcd_Epulse(st);
@@ -114,12 +115,12 @@ inline HAL_StatusTypeDef I2cLcd_SendByte(I2cLcd_State *st, uint8_t b, uint8_t is
 {
 	HAL_StatusTypeDef ret;
 
-	st->m_data = ((st->m_data & 0x0f & ~Rs) | (b & 0xf0) | (isCmd ? 0 : Rs));
+	st->data = ((st->data & 0x0f & ~Rs) | (b & 0xf0) | (isCmd ? 0 : Rs));
 	ret = I2cLcd_SendData(st);
 	if(ret == HAL_OK) {
 		ret = I2cLcd_Epulse(st);
 		if(ret == HAL_OK) {
-			st->m_data = ((st->m_data & 0x0f & ~Rs) | ((b & 0x0f) << 4) | (isCmd ? 0 : Rs));
+			st->data = ((st->data & 0x0f & ~Rs) | ((b & 0x0f) << 4) | (isCmd ? 0 : Rs));
 			ret = I2cLcd_SendData(st);
 			if(ret == HAL_OK)
 				return I2cLcd_Epulse(st);
@@ -134,26 +135,21 @@ HAL_StatusTypeDef I2cLcd_InitDisplay(I2cLcd_State *st )
 	HAL_StatusTypeDef ret;
 	uint8_t count;
 
-	st->m_data = LCD_BACKLIGHT;
-	ret = I2cLcd_SendData(st);
-	if(ret == HAL_OK) {
+	st->data = LCD_BACKLIGHT;
+	if((ret = I2cLcd_SendData(st)) == HAL_OK)
+	{
 		HAL_Delay(500);
-		ret = I2cLcd_SendNibble(st, 0x30);
-		if(ret == HAL_OK) {
+		for(count = 0; count < sizeof(g_initNibbles); count++){
+			if((ret = I2cLcd_SendNibble(st, g_initNibbles[count])) != HAL_OK)
+				return ret;
 			HAL_Delay(5);
-			ret = I2cLcd_SendNibble(st, 0x30);
-			if(ret == HAL_OK) {
-				ret = I2cLcd_SendNibble(st, 0x30);
-				if(ret == HAL_OK) {
-					ret = I2cLcd_SendNibble(st, 0x20);
-					if(ret == HAL_OK)
-						for (count = 0; count < sizeof(m_init); count++) {
-							ret = I2cLcd_SendByte(st, m_init[count], 1);
-							if(ret != HAL_OK)
-								return ret;
-							HAL_Delay(3);
-						}
-	}}}}
+		}
+		for (count = 0; count < sizeof(g_initBytes); count++) {
+			if((ret = I2cLcd_SendByte(st, g_initBytes[count], 1)) != HAL_OK)
+				return ret;
+			HAL_Delay(3);
+		}
+	}
 	return ret;
 }
 
@@ -176,7 +172,7 @@ HAL_StatusTypeDef I2cLcd_Home(I2cLcd_State *st)
 //////////////////////////////////////////////////////////////////////////////
 HAL_StatusTypeDef I2cLcd_SetCursor(I2cLcd_State *st, uint8_t x, uint8_t y)
 {
-	return I2cLcd_SendByte(st, LCD_SETDDRAMADDR | (x + m_rowOffsets[y & 3]), 1);
+	return I2cLcd_SendByte(st, LCD_SETDDRAMADDR | (x + g_rowOffsets[y & 3]), 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////

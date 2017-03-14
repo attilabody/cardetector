@@ -12,9 +12,9 @@
 
 typedef struct _Pcf8574_Status
 {
-	I2cMaster_State 	*m_i2cStatus;
-	uint16_t			m_i2cAddress;
-	uint8_t				m_data;
+	I2cMaster_State 	*i2cStatus;
+	uint16_t			i2cAddress;
+	uint8_t				data;
 } Pcf8574_Status;
 
 void Pcf8574_Init(Pcf8574_Status *st, I2cMaster_State *i2cst, uint16_t i2cAddress);

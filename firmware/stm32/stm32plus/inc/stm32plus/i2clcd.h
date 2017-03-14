@@ -13,9 +13,9 @@
 
 typedef struct _I2cLcd_State
 {
-	I2cMaster_State	*m_i2c;
-	uint8_t				m_data;
-	uint16_t			m_i2cAddress;
+	I2cMaster_State	*i2c;
+	uint8_t			data;
+	uint16_t		i2cAddress;
 } I2cLcd_State;
 
 void I2cLcd_Init(I2cLcd_State *st, I2cMaster_State *i2cst, uint16_t i2cAddress);
