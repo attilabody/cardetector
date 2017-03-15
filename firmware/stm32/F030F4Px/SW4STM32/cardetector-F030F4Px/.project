@@ -26,6 +26,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>cardetector_common</name>
+			<type>2</type>
+			<locationURI>PARENT-3-PROJECT_LOC/cardetector_common</locationURI>
+		</link>
+		<link>
 			<name>stm32plus</name>
 			<type>2</type>
 			<locationURI>PARENT-3-PROJECT_LOC/stm32plus</locationURI>
@@ -36,9 +41,9 @@
 			<locationURI>PARENT-1-PROJECT_LOC/startup_stm32f030x6.s</locationURI>
 		</link>
 		<link>
-			<name>Application/User/config.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/Src/config.h</locationURI>
+			<name>Application/User/Inc</name>
+			<type>2</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Inc</locationURI>
 		</link>
 		<link>
 			<name>Application/User/gpio.c</name>

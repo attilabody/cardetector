@@ -51,7 +51,6 @@
 #define ACTIVE2_Pin GPIO_PIN_1
 #define ACTIVE2_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-
 /* USER CODE END Private defines */
 
 /**

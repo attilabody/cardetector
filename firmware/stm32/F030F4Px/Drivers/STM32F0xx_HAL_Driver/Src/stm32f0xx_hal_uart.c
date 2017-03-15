@@ -2737,25 +2737,25 @@ HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart)
 HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart)
 {
   uint16_t* tmp;
-  uint16_t  uhMask = huart->Mask;
   uint16_t  uhdata;
 
   /* Check that a Rx process is ongoing */
   if(huart->RxState == HAL_UART_STATE_BUSY_RX)
   {
-    uhdata = (uint16_t) READ_REG(huart->Instance->RDR);
+    uhdata = (uint16_t) READ_REG(huart->Instance->RDR) & huart->Mask;
     if ((huart->Init.WordLength == UART_WORDLENGTH_9B) && (huart->Init.Parity == UART_PARITY_NONE))
     {
       tmp = (uint16_t*) huart->pRxBuffPtr ;
-      *tmp = (uint16_t)(uhdata & uhMask);
+      *tmp = uhdata;
       huart->pRxBuffPtr +=2U;
     }
     else
     {
-      *huart->pRxBuffPtr++ = (uint8_t)(uhdata & (uint8_t)uhMask);
+      *huart->pRxBuffPtr++ = (uint8_t)(uhdata);
     }
 
-    if(--huart->RxXferCount == 0U)
+
+    if(--huart->RxXferCount == 0U || uhdata == (uint16_t)'\r' || uhdata == (uint16_t)'\n' || !uhdata)
     {
       /* Disable the UART Parity Error Interrupt and RXNE interrupt*/
       CLEAR_BIT(huart->Instance->CR1, (USART_CR1_RXNEIE | USART_CR1_PEIE));
