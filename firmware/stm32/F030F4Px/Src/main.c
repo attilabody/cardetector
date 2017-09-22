@@ -155,6 +155,17 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+#ifndef USE_SERIAL
+#undef DEBUG_SERIAL
+#define MX_USART1_UART_Init()
+#endif
+
+#ifndef USE_I2C
+#undef USE_LCD
+#undef USE_LEDBAR
+#define MX_I2C1_Init()
+#endif
+
 
   /* USER CODE END Init */
 
@@ -174,6 +185,7 @@ int main(void)
   MX_IWDG_Init();
 
   /* USER CODE BEGIN 2 */
+#ifdef USE_I2C
   g_i2c = I2cMaster_Init(&hi2c1);
   InitializeDisplay(g_i2c);
 
@@ -187,6 +199,7 @@ int main(void)
 			g_config = config;
 	}
   }
+#endif
 
 #ifdef USE_SERIAL
   UsartInit(&huart1);
@@ -201,8 +214,9 @@ int main(void)
   HAL_TIM_IC_Start_IT(&htim16, TIM_CHANNEL_1);
   HAL_TIM_IC_Start_IT(&htim17, TIM_CHANNEL_1);
 
+#ifdef USE_SERIAL
   HAL_UART_Receive_IT(&huart1, g_lineBuffer, sizeof(g_lineBuffer));
-
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -213,12 +227,14 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+#ifdef USE_SERIAL
 	  if(g_lineReceived) {
 		  ProcessInput(&g_config, (char*)g_lineBuffer);
 		  //DisplayInput(&i2clcd);
 		  g_lineReceived = 0;
 		  HAL_UART_Receive_IT(&huart1, g_lineBuffer, sizeof(g_lineBuffer));
 	  }
+#endif
 	  if(g_statuses[0].trigger) {
 		  DisplayResults(0);
 		  g_statuses[0].trigger = 0;
@@ -228,8 +244,7 @@ int main(void)
 		  g_statuses[1].trigger = 0;
 	  }
 
-	  //DisplayResults(&i2clcd, 1);
-
+	  HAL_IWDG_Refresh(&hiwdg);
   }
   /* USER CODE END 3 */
 
@@ -311,7 +326,7 @@ void DisplayResults(uint8_t line)
 	DETECTORSTATUS	st = g_statuses[line];
 	if(irqEnabled) __enable_irq();
 
-#ifdef USE_SERIAL
+#ifdef DEBUG_SERIAL
 	if(g_debug)
 	{
 		UsartSendUint(line, 0, 1);
@@ -333,18 +348,19 @@ void DisplayResults(uint8_t line)
 		UsartSendInt(st.correction, 0, 1);
 		UsartSend("\r\n", 2, 1);
 	}
-#endif	//	USE_SERIAL
+#endif	//	DEBUG_SERIAL
 
 #ifdef USE_LCD
-#if 0
 	I2cLcd_SetCursor(&g_lcd, 0, line);
 	I2cLcd_PrintChar(&g_lcd, g_stateSyms[st.state]);
 	I2cLcd_PrintChar(&g_lcd, ' ');
 	I2cLcd_PrintInt(&g_lcd, st.diff, 0);
 	I2cLcd_PrintStr(&g_lcd, "   ");
-#endif
-	UpdateBar(line, CalcBar(&st));
 #endif	//	USE_LCD
+
+#if defined(USE_LCD) || defined(USE_LEDBAR)
+	UpdateBar(line, CalcBar(&st));
+#endif
 }
 
 //TODO: REMOVE DEBUG CODE
