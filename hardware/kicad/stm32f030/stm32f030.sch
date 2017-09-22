@@ -3,31 +3,7 @@ LIBS:power
 LIBS:device
 LIBS:transistors
 LIBS:conn
-LIBS:linear
 LIBS:regul
-LIBS:74xx
-LIBS:cmos4000
-LIBS:adc-dac
-LIBS:memory
-LIBS:xilinx
-LIBS:microcontrollers
-LIBS:dsp
-LIBS:microchip
-LIBS:analog_switches
-LIBS:motorola
-LIBS:texas
-LIBS:intel
-LIBS:audio
-LIBS:interface
-LIBS:digital-audio
-LIBS:philips
-LIBS:display
-LIBS:cypress
-LIBS:siliconi
-LIBS:opto
-LIBS:atmel
-LIBS:contrib
-LIBS:valves
 LIBS:stm32
 LIBS:switches
 LIBS:stm32f030-cache
@@ -84,17 +60,6 @@ F 1 "+5V" H 5000 4240 50  0000 C CNN
 F 2 "" H 5000 4100 50  0000 C CNN
 F 3 "" H 5000 4100 50  0000 C CNN
 	1    5000 4100
-	1    0    0    -1  
-$EndComp
-$Comp
-L LM1117-3.3 U1
-U 1 1 5884B3D9
-P 5750 4500
-F 0 "U1" H 5850 4250 50  0000 C CNN
-F 1 "LM1117-3.3" H 5750 4750 50  0000 C CNN
-F 2 "TO_SOT_Packages_SMD:SOT-223" H 5750 4500 50  0001 C CNN
-F 3 "" H 5750 4500 50  0000 C CNN
-	1    5750 4500
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -259,4 +224,15 @@ Wire Wire Line
 	5300 3050 5600 3050
 Wire Wire Line
 	5300 2900 5600 2900
+$Comp
+L AP1117-33 U1
+U 1 1 59C162EF
+P 5750 4500
+F 0 "U1" H 5600 4625 50  0000 C CNN
+F 1 "AP1117-33" H 5750 4625 50  0000 L CNN
+F 2 "TO_SOT_Packages_SMD:SOT-223-3Lead_TabPin2" H 5750 4700 50  0001 C CNN
+F 3 "" H 5850 4250 50  0001 C CNN
+	1    5750 4500
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

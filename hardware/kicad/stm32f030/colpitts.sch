@@ -3,30 +3,7 @@ LIBS:power
 LIBS:device
 LIBS:transistors
 LIBS:conn
-LIBS:linear
 LIBS:regul
-LIBS:74xx
-LIBS:cmos4000
-LIBS:adc-dac
-LIBS:memory
-LIBS:xilinx
-LIBS:microcontrollers
-LIBS:dsp
-LIBS:microchip
-LIBS:analog_switches
-LIBS:motorola
-LIBS:texas
-LIBS:intel
-LIBS:audio
-LIBS:interface
-LIBS:digital-audio
-LIBS:philips
-LIBS:display
-LIBS:cypress
-LIBS:siliconi
-LIBS:opto
-LIBS:contrib
-LIBS:valves
 LIBS:stm32
 LIBS:switches
 LIBS:stm32f030-cache
@@ -197,17 +174,6 @@ F 2 "Resistors_SMD:R_0603_HandSoldering" H 3650 5850 50  0001 C CNN
 F 3 "" H 3650 5850 50  0000 C CNN
 	1    3650 5850
 	0    1    1    0   
-$EndComp
-$Comp
-L BSS138 Q3
-U 1 1 588475CA
-P 4000 5800
-F 0 "Q3" H 3850 5950 50  0000 L CNN
-F 1 "BSS138" H 3800 5550 50  0000 L CNN
-F 2 "TO_SOT_Packages_SMD:SOT-23" H 4200 5725 50  0001 L CIN
-F 3 "" H 4000 5800 50  0000 L CNN
-	1    4000 5800
-	1    0    0    -1  
 $EndComp
 $Comp
 L GND #PWR012
@@ -509,17 +475,6 @@ F 3 "" H 3650 2750 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L BSS138 Q1
-U 1 1 5884A730
-P 4000 2700
-F 0 "Q1" H 3850 2850 50  0000 L CNN
-F 1 "BSS138" H 3800 2450 50  0000 L CNN
-F 2 "TO_SOT_Packages_SMD:SOT-23" H 4200 2625 50  0001 L CIN
-F 3 "" H 4000 2700 50  0000 L CNN
-	1    4000 2700
-	1    0    0    -1  
-$EndComp
-$Comp
 L GND #PWR020
 U 1 1 5884A737
 P 4100 3550
@@ -737,7 +692,7 @@ Wire Wire Line
 Wire Wire Line
 	3750 5850 3800 5850
 Wire Wire Line
-	4100 6650 4100 6000
+	4100 6650 4100 6050
 Wire Wire Line
 	3900 4750 3900 4650
 Wire Wire Line
@@ -747,7 +702,7 @@ Wire Wire Line
 Wire Wire Line
 	5000 4950 5000 5850
 Wire Wire Line
-	4100 4950 4100 5600
+	4100 4950 4100 5650
 Connection ~ 3200 5150
 Wire Wire Line
 	3900 4950 3900 5150
@@ -822,7 +777,7 @@ Wire Wire Line
 Wire Wire Line
 	3750 2750 3800 2750
 Wire Wire Line
-	4100 3550 4100 2900
+	4100 3550 4100 2950
 Wire Wire Line
 	3900 1650 3900 1550
 Wire Wire Line
@@ -832,7 +787,7 @@ Wire Wire Line
 Wire Wire Line
 	5000 1850 5000 2750
 Wire Wire Line
-	4100 1850 4100 2500
+	4100 1850 4100 2550
 Connection ~ 3200 2050
 Wire Wire Line
 	3900 1850 3900 2050
@@ -924,4 +879,26 @@ Wire Wire Line
 	1550 2350 2300 2350
 Wire Wire Line
 	1550 2750 2300 2750
+$Comp
+L BSS138 Q1
+U 1 1 59C1242F
+P 4000 2750
+F 0 "Q1" H 4200 2825 50  0000 L CNN
+F 1 "BSS138" H 4200 2750 50  0000 L CNN
+F 2 "TO_SOT_Packages_SMD:SOT-23" H 4200 2675 50  0001 L CIN
+F 3 "" H 4000 2750 50  0001 L CNN
+	1    4000 2750
+	1    0    0    -1  
+$EndComp
+$Comp
+L BSS138 Q3
+U 1 1 59C12ACE
+P 4000 5850
+F 0 "Q3" H 4200 5925 50  0000 L CNN
+F 1 "BSS138" H 4200 5850 50  0000 L CNN
+F 2 "TO_SOT_Packages_SMD:SOT-23" H 4200 5775 50  0001 L CIN
+F 3 "" H 4000 5850 50  0001 L CNN
+	1    4000 5850
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
