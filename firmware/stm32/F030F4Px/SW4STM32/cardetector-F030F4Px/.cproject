@@ -76,17 +76,8 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.514445970.1160033273" name="userinput.c" rcbsApplicability="disable" resourcePath="cardetector_common/src/userinput.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.1148166861">
-						<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.1148166861" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461">
-							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.458390311" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
-							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.1826716534" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
-						</tool>
-						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.812374641" name="Resource Custom Build Step">
-							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.604763225" name="Resource Custom Build Step Input Type">
-								<additionalInput kind="additionalinputdependency"/>
-							</inputType>
-							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.368236108" name="Resource Custom Build Step Output Type"/>
-						</tool>
+					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.514445970.228472925" name="iwdg.c" rcbsApplicability="disable" resourcePath="Application/User/iwdg.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.147084151">
+						<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.147084151" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461"/>
 					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
@@ -197,4 +188,5 @@
 		</configuration>
 		<configuration configurationName="Release"/>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>

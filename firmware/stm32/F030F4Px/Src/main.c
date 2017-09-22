@@ -3,6 +3,11 @@
   * File Name          : main.c
   * Description        : Main program body
   ******************************************************************************
+  ** This notice applies to any and all portions of this file
+  * that are not between comment pairs USER CODE BEGIN and
+  * USER CODE END. Other portions of this file, whether 
+  * inserted by the user or by software development tools
+  * are owned by their respective copyright owners.
   *
   * COPYRIGHT(c) 2017 STMicroelectronics
   *
@@ -34,6 +39,7 @@
 #include "main.h"
 #include "stm32f0xx_hal.h"
 #include "i2c.h"
+#include "iwdg.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -89,7 +95,6 @@ uint8_t				g_debug = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void Error_Handler(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -149,8 +154,16 @@ int main(void)
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
   /* Configure the system clock */
   SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
@@ -158,6 +171,7 @@ int main(void)
   MX_TIM16_Init();
   MX_TIM17_Init();
   MX_USART1_UART_Init();
+  MX_IWDG_Init();
 
   /* USER CODE BEGIN 2 */
   g_i2c = I2cMaster_Init(&hi2c1);
@@ -232,16 +246,17 @@ void SystemClock_Config(void)
 
     /**Initializes the CPU, AHB and APB busses clocks 
     */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL3;
   RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
     /**Initializes the CPU, AHB and APB busses clocks 
@@ -254,7 +269,7 @@ void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_I2C1;
@@ -262,7 +277,7 @@ void SystemClock_Config(void)
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_SYSCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
     /**Configure the Systick interrupt time 
@@ -426,14 +441,14 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
   * @param  None
   * @retval None
   */
-void Error_Handler(void)
+void _Error_Handler(char * file, int line)
 {
-  /* USER CODE BEGIN Error_Handler */
+  /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   while(1) 
   {
   }
-  /* USER CODE END Error_Handler */ 
+  /* USER CODE END Error_Handler_Debug */ 
 }
 
 #ifdef USE_FULL_ASSERT

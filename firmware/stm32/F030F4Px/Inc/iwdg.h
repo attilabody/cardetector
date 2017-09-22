@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : TIM.h
+  * File Name          : IWDG.h
   * Description        : This file provides code for the configuration
-  *                      of the TIM instances.
+  *                      of the IWDG instances.
   ******************************************************************************
   ** This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
@@ -37,8 +37,8 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __tim_H
-#define __tim_H
+#ifndef __iwdg_H
+#define __iwdg_H
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -51,8 +51,7 @@
 
 /* USER CODE END Includes */
 
-extern TIM_HandleTypeDef htim16;
-extern TIM_HandleTypeDef htim17;
+extern IWDG_HandleTypeDef hiwdg;
 
 /* USER CODE BEGIN Private defines */
 
@@ -60,8 +59,7 @@ extern TIM_HandleTypeDef htim17;
 
 extern void _Error_Handler(char *, int);
 
-void MX_TIM16_Init(void);
-void MX_TIM17_Init(void);
+void MX_IWDG_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
@@ -70,7 +68,7 @@ void MX_TIM17_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ tim_H */
+#endif /*__ iwdg_H */
 
 /**
   * @}

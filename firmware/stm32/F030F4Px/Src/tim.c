@@ -4,6 +4,11 @@
   * Description        : This file provides code for the configuration
   *                      of the TIM instances.
   ******************************************************************************
+  ** This notice applies to any and all portions of this file
+  * that are not between comment pairs USER CODE BEGIN and
+  * USER CODE END. Other portions of this file, whether 
+  * inserted by the user or by software development tools
+  * are owned by their respective copyright owners.
   *
   * COPYRIGHT(c) 2017 STMicroelectronics
   *
@@ -58,12 +63,12 @@ void MX_TIM16_Init(void)
   htim16.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim16) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
   if (HAL_TIM_IC_Init(&htim16) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
   sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
@@ -72,7 +77,7 @@ void MX_TIM16_Init(void)
   sConfigIC.ICFilter = 1;
   if (HAL_TIM_IC_ConfigChannel(&htim16, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
 }
@@ -90,12 +95,12 @@ void MX_TIM17_Init(void)
   htim17.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim17) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
   if (HAL_TIM_IC_Init(&htim17) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
   sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
@@ -104,7 +109,7 @@ void MX_TIM17_Init(void)
   sConfigIC.ICFilter = 1;
   if (HAL_TIM_IC_ConfigChannel(&htim17, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
 }
@@ -118,7 +123,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
   /* USER CODE BEGIN TIM16_MspInit 0 */
 
   /* USER CODE END TIM16_MspInit 0 */
-    /* Peripheral clock enable */
+    /* TIM16 clock enable */
     __HAL_RCC_TIM16_CLK_ENABLE();
   
     /**TIM16 GPIO Configuration    
@@ -131,13 +136,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
     GPIO_InitStruct.Alternate = GPIO_AF5_TIM16;
     HAL_GPIO_Init(OSC1_GPIO_Port, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = OSC1_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(OSC1_GPIO_Port, &GPIO_InitStruct);
-
-    /* Peripheral interrupt init */
+    /* TIM16 interrupt Init */
     HAL_NVIC_SetPriority(TIM16_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(TIM16_IRQn);
   /* USER CODE BEGIN TIM16_MspInit 1 */
@@ -149,7 +148,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
   /* USER CODE BEGIN TIM17_MspInit 0 */
 
   /* USER CODE END TIM17_MspInit 0 */
-    /* Peripheral clock enable */
+    /* TIM17 clock enable */
     __HAL_RCC_TIM17_CLK_ENABLE();
   
     /**TIM17 GPIO Configuration    
@@ -162,13 +161,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
     GPIO_InitStruct.Alternate = GPIO_AF5_TIM17;
     HAL_GPIO_Init(OSC2_GPIO_Port, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = OSC2_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(OSC2_GPIO_Port, &GPIO_InitStruct);
-
-    /* Peripheral interrupt init */
+    /* TIM17 interrupt Init */
     HAL_NVIC_SetPriority(TIM17_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(TIM17_IRQn);
   /* USER CODE BEGIN TIM17_MspInit 1 */
@@ -193,9 +186,8 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
     */
     HAL_GPIO_DeInit(OSC1_GPIO_Port, OSC1_Pin);
 
-    /* Peripheral interrupt Deinit*/
+    /* TIM16 interrupt Deinit */
     HAL_NVIC_DisableIRQ(TIM16_IRQn);
-
   /* USER CODE BEGIN TIM16_MspDeInit 1 */
 
   /* USER CODE END TIM16_MspDeInit 1 */
@@ -213,9 +205,8 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
     */
     HAL_GPIO_DeInit(OSC2_GPIO_Port, OSC2_Pin);
 
-    /* Peripheral interrupt Deinit*/
+    /* TIM17 interrupt Deinit */
     HAL_NVIC_DisableIRQ(TIM17_IRQn);
-
   /* USER CODE BEGIN TIM17_MspDeInit 1 */
 
   /* USER CODE END TIM17_MspDeInit 1 */
