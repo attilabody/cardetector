@@ -100,8 +100,8 @@ static size_t filltxbuffer(unsigned char *buffer, size_t count)
 	size_t	copied = 0;
 	while(g_txcount < sizeof(g_txbuffer) && count--) {
 		unsigned char pos = g_txstart + g_txcount++;
-		if(pos >= SERIAL_RX_BUFFER_SIZE)
-			pos -= SERIAL_RX_BUFFER_SIZE;
+		if(pos >= SERIAL_TX_BUFFER_SIZE)
+			pos -= SERIAL_TX_BUFFER_SIZE;
 		g_txbuffer[pos] = *buffer++;
 		++copied;
 	}
