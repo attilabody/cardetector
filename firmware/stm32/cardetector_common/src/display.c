@@ -22,6 +22,7 @@ void InitializeDisplay(I2cMaster_State *i2c)
 #endif
 }
 
+#if defined(USE_LCD) || defined(USE_LEDBAR)
 ////////////////////////////////////////////////////////////////////
 uint8_t CalcBar(const volatile DETECTORSTATUS *channel)
 {
@@ -82,3 +83,4 @@ void UpdateBar(uint8_t line, int8_t chars)
 	Pcf8574_WritePort(&g_ledbars[line],led);
 #endif	//	USE_LEDBAR
 }
+#endif	//	defined(USE_LCD) || defined(USE_LEDBAR)

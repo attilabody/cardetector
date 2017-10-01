@@ -10,7 +10,7 @@
 
 #define USE_I2C
 #define USE_SERIAL
-#define DEBUG_SERIAL
+//#define DEBUG_SERIAL
 #define USE_LCD
 //#define USE_LEDBAR
 
@@ -29,7 +29,7 @@
 #define MCCOUNT			8
 #define	SHIFT_TOLERANCE	2
 
-#define TIMELIMIT			180	//	seconds
+#define TIMELIMIT		180	//	seconds
 
 #define LCDADDRESS	(0x27 << 1)
 #define LEDBAR1ADDRESS (0x20 << 1)
