@@ -10,13 +10,14 @@
 
 #define USE_I2C
 #define USE_SERIAL
-//#define DEBUG_SERIAL
 #define USE_LCD
 //#define USE_LEDBAR
 
 //#define DEBUG_TIMERS
 #define DEBUG_DETECTOR
 //#define DEBUG_SERIALIN
+#define DEBUG_SERIAL
+//#define DEBUG_LCD
 
 #define SHIFT_BELOW		4
 #define SHIFT_BASE		0

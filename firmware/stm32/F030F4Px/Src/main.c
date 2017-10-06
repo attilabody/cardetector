@@ -45,15 +45,13 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-#include <string.h>
-#include "config.h"
+#include <config.h>
 #include <globals.h>
 #include <cardetector_common/detector.h>
 #include <cardetector_common/display.h>
 #include <stm32plus/usart.h>
 #include <stm32plus/strutil.h>
 
-#include <globals.h>
 #include <cardetector_common/liveconfig.h>
 #include <cardetector_common/userinput.h>
 
@@ -88,7 +86,6 @@ I2cEEPROM_State		g_eeprom;
 uint8_t				g_lineBuffer[64];
 volatile uint8_t	g_lineReceived = 0;
 
-uint8_t				g_debug = 0;
 // globals.h end ///////////////////////////////////////////////////////////////
 
 /* USER CODE END PV */
@@ -182,12 +179,15 @@ int main(void)
   MX_TIM16_Init();
   MX_TIM17_Init();
   MX_USART1_UART_Init();
-  MX_IWDG_Init();
 
   /* USER CODE BEGIN 2 */
 #ifdef USE_I2C
   g_i2c = I2cMaster_Init(&hi2c1);
+
   InitializeDisplay(g_i2c);
+
+  MX_IWDG_Init();
+  HAL_IWDG_Refresh(&hiwdg);
 
   I2cEEPROM_Init(&g_eeprom, g_i2c, EEPROMADDR, 2, 32);
   {
@@ -228,12 +228,16 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 #ifdef USE_SERIAL
-	  if(g_lineReceived) {
-		  ProcessInput(&g_config, (char*)g_lineBuffer);
-		  //DisplayInput(&i2clcd);
-		  g_lineReceived = 0;
-		  HAL_UART_Receive_IT(&huart1, g_lineBuffer, sizeof(g_lineBuffer));
-	  }
+	if(g_lineReceived)
+	{
+	  UsartSendStr((char*)g_lineBuffer, 1);
+	  UsartSendStr("\r\n", 1);
+
+	  ProcessInput(&g_config, (char*)g_lineBuffer);
+	  //DisplayInput(&i2clcd);
+	  g_lineReceived = 0;
+	  HAL_UART_Receive_IT(&huart1, g_lineBuffer, sizeof(g_lineBuffer));
+	}
 #endif
 	  if(g_statuses[0].trigger) {
 		  DisplayResults(0);
@@ -327,30 +331,31 @@ void DisplayResults(uint8_t line)
 	if(irqEnabled) __enable_irq();
 
 #ifdef DEBUG_SERIAL
-	if(g_debug)
+	if(g_config.debug & (line+1))
 	{
-		UsartSendUint(line, 0, 1);
+		// index state sum avg lastMeasured diff tolerance threshold correction
+		UsartPrintUint(line, 0, 1);
 		UsartSend(": ", 2, 1);
 		UsartSend(&g_stateSyms[st.state], 1, 1);
 		UsartSend(" ", 1, 1);
-		UsartSendUint(st.sum, 1, 1);
+		UsartPrintUint(st.sum, -1, 1);
 		UsartSend(", ", 2, 1);
-		UsartSendUint(st.avg, 1, 1);
+		UsartPrintUint(st.avg, -1, 1);
 		UsartSend(", ", 2, 1);
-		UsartSendUint(st.lastMeasured, 1, 1);
+		UsartPrintUint(st.lastMeasured, -1, 1);
 		UsartSend(", ", 2, 1);
-		UsartSendInt(st.diff, 0, 1);
+		UsartPrintInt(st.diff, 0, 1);
 		UsartSend(", ", 2, 1);
-		UsartSendUint(st.tolerance, 0, 1);
+		UsartPrintUint(st.tolerance, 0, 1);
 		UsartSend(", ", 2, 1);
-		UsartSendUint(st.threshold, 0, 1);
+		UsartPrintUint(st.threshold, 0, 1);
 		UsartSend(", ", 2, 1);
-		UsartSendInt(st.correction, 0, 1);
+		UsartPrintInt(st.correction, 0, 1);
 		UsartSend("\r\n", 2, 1);
 	}
 #endif	//	DEBUG_SERIAL
 
-#ifdef USE_LCD
+#if defined(USE_LCD) && defined(DEBUG_LCD)
 	I2cLcd_SetCursor(&g_lcd, 0, line);
 	I2cLcd_PrintChar(&g_lcd, g_stateSyms[st.state]);
 	I2cLcd_PrintChar(&g_lcd, ' ');
@@ -364,7 +369,7 @@ void DisplayResults(uint8_t line)
 }
 
 //TODO: REMOVE DEBUG CODE
-volatile uint32_t g_basz = 0;
+//volatile uint32_t g_basz = 0;
 
 //////////////////////////////////////////////////////////////////////////////
 void detect(DETECTORSTATUS *st, TIM_HandleTypeDef *htim)
@@ -382,25 +387,25 @@ void detect(DETECTORSTATUS *st, TIM_HandleTypeDef *htim)
 			lastDelta = capturedValue - st->prevCapture;
 
 //TODO: REMOVE DEBUG CODE
-			if(lastDelta > 0xffff)
-				++ g_basz;
+//			if(lastDelta > 0xffff)
+//				++ g_basz;
 
-			if(!st->sum)
-				st->sum = ((uint32_t)lastDelta * g_config.mccount) << g_config.sumshift;
-			else
+			//HAL_GPIO_TogglePin(ACTIVE2_GPIO_Port, ACTIVE2_Pin);
+
+			st->accumulator += lastDelta;
+			//st->debug[st->counter] = lastDelta;
+			if(++st->counter == g_config.mccount)
 			{
-				//HAL_GPIO_TogglePin(ACTIVE2_GPIO_Port, ACTIVE2_Pin);
+				//HAL_GPIO_TogglePin(ACTIVE1_GPIO_Port, ACTIVE1_Pin);
 
-				st->accumulator += lastDelta;
-				//st->debug[st->counter] = lastDelta;
-				if(++st->counter == g_config.mccount)
+				st->lastMeasured = st->accumulator;
+				st->accumulator = 0;
+				st->counter = 0;
+
+				if(!st->sum)
+					st->sum = (uint32_t)st->lastMeasured << g_config.sumshift;
+				else
 				{
-					//HAL_GPIO_TogglePin(ACTIVE1_GPIO_Port, ACTIVE1_Pin);
-
-					st->lastMeasured = st->accumulator;
-					st->accumulator = 0;
-					st->counter = 0;
-
 					st->avg = st->sum >> g_config.sumshift;
 					st->threshold = st->avg / g_config.thdiv;
 					st->diff = (int32_t)st->lastMeasured - st->avg;

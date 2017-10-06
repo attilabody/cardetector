@@ -21,5 +21,3 @@ extern I2cEEPROM_State	g_eeprom;
 
 extern uint8_t			g_lineBuffer[64];
 extern volatile uint8_t	g_lineReceived;
-
-extern uint8_t			g_debug;
