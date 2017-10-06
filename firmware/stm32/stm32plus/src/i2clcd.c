@@ -197,7 +197,7 @@ uint32_t I2cLcd_PrintChar(I2cLcd_State *st, const char c)
 size_t I2cLcd_PrintUint(I2cLcd_State *st, uint32_t u, uint8_t hex)
 {
 	char	buffer[11];
-	size_t ret = hex ? uitohex(buffer, u) : uitodec(buffer, u);
+	size_t ret = hex ? uitohex(buffer, u, hex) : uitodec(buffer, u);
 	I2cLcd_PrintStr(st, buffer);
 	return ret;
 }
@@ -213,7 +213,7 @@ size_t I2cLcd_PrintInt(I2cLcd_State *st, int32_t i, uint8_t hex)
 		i = -i;
 		ret = 1;
 	}
-	ret += hex ? uitohex(tmp, i) : uitodec(tmp, i);
+	ret += hex ? uitohex(tmp, i, hex) : uitodec(tmp, i);
 	I2cLcd_PrintStr(st, buffer);
 	return ret;
 }

@@ -19,6 +19,7 @@ typedef struct
 	uint8_t		tlimit;
 	uint16_t	thdiv;
 	uint8_t		mccount;			//measure cycle count
+	uint8_t		debug;
 } LIVECONFIG;
 
 

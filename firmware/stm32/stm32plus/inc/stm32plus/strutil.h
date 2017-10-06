@@ -12,8 +12,8 @@
 #include <inttypes.h>
 
 //////////////////////////////////////////////////////////////////////////////
-size_t uitodec(char* buffer, unsigned int data);
-size_t uitohex(char* buffer, unsigned int data);
+size_t uitodec(char* buffer, uint32_t data);
+size_t uitohex(char* buffer, uint32_t data, uint8_t chars);
 size_t itodec(char* buffer, int data);
 size_t itohex(char* buffer, int data);
 

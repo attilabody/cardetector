@@ -115,7 +115,7 @@ uint16_t UsartSendStr(const char *buffer, uint8_t block)
 }
 
 ////////////////////////////////////////////////////////////////////
-uint16_t UsartSendInt(int32_t data, uint8_t hex, uint8_t block)
+uint16_t UsartPrintInt(int32_t data, uint8_t hex, uint8_t block)
 {
 	uint8_t	count = 0;
 	char	buffer[12], *tmp = buffer;
@@ -125,18 +125,29 @@ uint16_t UsartSendInt(int32_t data, uint8_t hex, uint8_t block)
 		data = -data;
 		++count;
 	}
-	count += hex ? uitohex(tmp, data) : uitodec(tmp, data);
+	count += hex ? uitohex(tmp, data, hex) : uitodec(tmp, data);
 
 	return UsartSend(buffer, count, block);
 }
 
 ////////////////////////////////////////////////////////////////////
-uint16_t UsartSendUint(uint32_t data, uint8_t hex, uint8_t block)
+uint16_t UsartPrintUint(uint32_t data, uint8_t hex, uint8_t block)
 {
 	uint8_t	count = 0;
 	char	buffer[11];
 
-	count = hex ? uitohex(buffer, data) : uitodec(buffer, data);
+	count = hex ? uitohex(buffer, data, hex) : uitodec(buffer, data);
+
+	return UsartSend(buffer, count, block);
+}
+
+////////////////////////////////////////////////////////////////////
+uint16_t	UsartPrintByte(uint8_t data, uint8_t hex, uint8_t block)
+{
+	uint8_t	count = 0;
+	char	buffer[4];
+
+	count = hex ? uitohex(buffer, data, hex) : uitodec(buffer, data);
 
 	return UsartSend(buffer, count, block);
 }

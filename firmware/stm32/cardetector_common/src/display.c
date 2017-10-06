@@ -45,7 +45,7 @@ uint8_t CalcBar(const volatile DETECTORSTATUS *channel)
 ////////////////////////////////////////////////////////////////////
 void UpdateBar(uint8_t line, int8_t chars)
 {
-#if defined(USE_LCD)
+#if defined(USE_LCD) && !defined(DEBUG_LCD)
 	I2cLcd_SetCursor(&g_lcd, 0, line);
 	int8_t pos;
 	if (chars < 0) {

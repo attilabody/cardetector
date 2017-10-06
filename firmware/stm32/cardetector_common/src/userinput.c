@@ -125,7 +125,7 @@ void ShowParam(char const *name, int16_t value)
 {
 	UsartSendStr(name, 1);
 	UsartSendStr(": ", 1);
-	UsartSendInt(value, 0, 1);
+	UsartPrintInt(value, 0, 1);
 	UsartSendStr("\r\n", 1);
 }
 
@@ -173,8 +173,8 @@ void ProcessInput(LIVECONFIG *config, char const *buffer)
 
 	case 2:		//debug
 		if((InVal = GetIntParam(buffer, next - buffer, 1, 0)) >= 0)
-			g_debug = InVal != 0;
-		else g_debug = !g_debug;
+			g_config.debug = InVal;
+		else g_config.debug = g_config.debug ? 0 : -1;
 		break;
 
 	case 3:		//mccnt
