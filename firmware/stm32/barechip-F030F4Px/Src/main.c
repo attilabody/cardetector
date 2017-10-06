@@ -59,8 +59,15 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-uint32_t			g_counter = 0;
+#ifdef USE_I2C
 I2cMaster_State		*g_i2c;
+I2cEEPROM_State		g_eeprom;
+#endif
+
+uint8_t				g_lineBuffer[64];
+volatile uint8_t	g_lineReceived = 0;
+
+uint32_t			g_counter = 0;
 
 /* USER CODE END PV */
 
@@ -69,6 +76,7 @@ void SystemClock_Config(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
+void _ProcessInput(char const *buffer);
 
 /* USER CODE END PFP */
 
@@ -108,26 +116,56 @@ int main(void)
 #ifdef USE_I2C
   g_i2c = I2cMaster_Init(&hi2c1);
   InitializeDisplay(g_i2c);
+  I2cEEPROM_Init(&g_eeprom, g_i2c, EEPROMADDR, 2, 32);
 #endif
 
 #ifdef USE_SERIAL
   UsartInit(&huart1);
 #endif
 
-  #ifdef USE_I2C
+#ifdef USE_I2C
   I2cLcd_Clear(&g_lcd);
   I2cLcd_PrintStr(&g_lcd, "Hello!");
 #endif
+
+#if defined(USE_SERIAL) && defined(USE_I2C)
+  uint8_t			buffer[16];
+  HAL_StatusTypeDef	st;
+
+  st = I2cEEPROM_Read(&g_eeprom, 0, buffer, sizeof(buffer));
+  for(uint8_t i = 0; i<sizeof(buffer); ++i) {
+	  UsartPrintByte(buffer[i], 2, 1);
+	  UsartSendStr(" ", 1);
+  }
+  UsartSendStr("\r\n", 1);
+
+#endif
+
+  HAL_UART_Receive_IT(&huart1, g_lineBuffer, sizeof(g_lineBuffer));
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  UsartSendStr("Hello!\r\n", 1);
-	  ++g_counter;
+	  if(g_lineReceived) {
+		  _ProcessInput((char*)g_lineBuffer);
+		  //DisplayInput(&i2clcd);
+		  g_lineReceived = 0;
+		  HAL_UART_Receive_IT(&huart1, g_lineBuffer, sizeof(g_lineBuffer));
+	  }
+/*
+	  UsartSendStr("Hello! ", 1);
+	  UsartPrintInt(g_counter, -1, 1);
+	  UsartSendStr("\r\n", 1);
+*/
+#ifdef USE_I2C
 	  I2cLcd_SetCursor(&g_lcd, 0, 1);
-	  I2cLcd_PrintUint(&g_lcd, g_counter, 1);
+	  I2cLcd_PrintUint(&g_lcd, g_counter, 8);
+	  ++g_counter;
+#endif
+
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
@@ -195,6 +233,22 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+////////////////////////////////////////////////////////////////////
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart == &huart1)
+	{
+		g_lineBuffer[sizeof(g_lineBuffer) - 1 - huart->RxXferCount] = 0;
+		g_lineReceived = 1;
+	}
+}
+
+////////////////////////////////////////////////////////////////////
+void _ProcessInput(char const *buffer)
+{
+	UsartSendStr(buffer, 1);
+	UsartSendStr("\r\n", 1);
+}
 
 /* USER CODE END 4 */
 
