@@ -27,6 +27,9 @@ const CmdDesc	g_commands[] =
 	{ 5, "thdiv" },	//4
 	{ 4, "tlim" }, //5
 	{ 5, "shift" },	//6
+#if defined(USE_LEDBAR)
+	{ 3, "led" }, //7
+#endif
 	{ 0, NULL }
 };
 
@@ -171,7 +174,7 @@ void ProcessInput(LIVECONFIG *config, char const *buffer)
 		I2cEEPROM_Write(&g_eeprom, EESTART, config, sizeof(*config));
 		break;
 
-	case 2:		//debug
+	case 2:		//debug mask
 		if((InVal = GetIntParam(buffer, next - buffer, 1, 0)) >= 0)
 			g_config.debug = InVal;
 		else g_config.debug = g_config.debug ? 0 : -1;
@@ -204,5 +207,30 @@ void ProcessInput(LIVECONFIG *config, char const *buffer)
 				config->sumshift = InVal;
 		}
 		break;
+
+#if defined(USE_LEDBAR)
+	case 7:		//led channel val0 val1 val2 val3 val4 val5 val6 val7
+	{
+		uint8_t channel;
+		int		i;
+
+		InVal = GetIntParam(buffer, next - buffer, 1, 0);
+		if(InVal != INT_MIN) {
+			channel = InVal;
+			buffer = SkipWhitespaces(next);
+			next = FindWordEnd(buffer);
+			for(i=0; i<8; ++i) {
+				InVal = GetIntParam(buffer, next - buffer, 1, 0);
+				if(InVal != INT_MIN) {
+					g_config.ledbarvalues[channel][i] = InVal;
+					buffer = SkipWhitespaces(next);
+					next = FindWordEnd(buffer);
+				} else
+					break;
+			}
+		}
+	}
+		break;
+#endif
 	}
 }

@@ -10,8 +10,8 @@
 
 #define USE_I2C
 #define USE_SERIAL
-#define USE_LCD
-//#define USE_LEDBAR
+//#define USE_LCD
+#define USE_LEDBAR
 
 //#define DEBUG_TIMERS
 #define DEBUG_DETECTOR

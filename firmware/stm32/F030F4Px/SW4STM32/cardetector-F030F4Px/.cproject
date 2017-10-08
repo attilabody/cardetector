@@ -213,7 +213,7 @@
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Debug">
-			<resource resourceType="PROJECT" workspacePath="cardetector-F030F4Px"/>
+			<resource resourceType="PROJECT" workspacePath="/cardetector-F030F4Px"/>
 		</configuration>
 		<configuration configurationName="Release"/>
 	</storageModule>

@@ -3,9 +3,8 @@
 #include <globals.h>
 
 #if defined(USE_LCD)
-I2cLcd_State		g_lcd;
-#endif
-#if defined(USE_LEDBAR)
+I2cLcd_State	g_lcd;
+#elif defined(USE_LEDBAR)
 Pcf8574_Status	g_ledbars[2];
 #endif
 
@@ -15,8 +14,7 @@ void InitializeDisplay(I2cMaster_State *i2c)
 #if defined(USE_LCD)
 	I2cLcd_Init(&g_lcd, i2c, LCDADDRESS );
 	I2cLcd_InitDisplay(&g_lcd);
-#endif
-#if defined(USE_LEDBAR)
+#elif defined(USE_LEDBAR)
 	Pcf8574_Init(&g_ledbars[0], i2c, LEDBAR1ADDRESS);
 	Pcf8574_Init(&g_ledbars[1], i2c, LEDBAR2ADDRESS);
 #endif
@@ -45,7 +43,8 @@ uint8_t CalcBar(const volatile DETECTORSTATUS *channel)
 ////////////////////////////////////////////////////////////////////
 void UpdateBar(uint8_t line, int8_t chars)
 {
-#if defined(USE_LCD) && !defined(DEBUG_LCD)
+#if defined(USE_LCD)
+#if !defined(DEBUG_LCD)
 	I2cLcd_SetCursor(&g_lcd, 0, line);
 	int8_t pos;
 	if (chars < 0) {
@@ -65,9 +64,10 @@ void UpdateBar(uint8_t line, int8_t chars)
 		while (pos++ < 16)
 			I2cLcd_PrintChar(&g_lcd, ' ');
 	}
-#endif
-#if defined(USE_LEDBAR)
+#endif	//	! DEBUG_LCD
+#elif defined(USE_LEDBAR)
 	uint8_t	led = 0;
+//	uint8_t	led = chars < 0 ? 1 : chars < 0;
 
 #if !defined(LEDBAR_LTR)
 	if(chars < 0)

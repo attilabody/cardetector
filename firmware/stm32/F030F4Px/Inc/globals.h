@@ -12,12 +12,15 @@
 
 extern I2cMaster_State	*g_i2c;
 #if defined(USE_LCD)
-extern I2cLcd_State		g_lcd;
-#endif
-#if defined(USE_LEDBAR)
-extern Pcf8574_Status	g_ledbars[2];
-#endif
-extern I2cEEPROM_State	g_eeprom;
 
+extern I2cLcd_State		g_lcd;
+
+#elif defined(USE_LEDBAR)
+
+extern Pcf8574_Status	g_ledbars[2];
+
+#endif
+
+extern I2cEEPROM_State	g_eeprom;
 extern uint8_t			g_lineBuffer[64];
 extern volatile uint8_t	g_lineReceived;

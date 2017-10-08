@@ -8,6 +8,7 @@
 #ifndef CARDETECTOR_COMMON_INC_CARDETECTOR_COMMON_LIVECONFIG_H_
 #define CARDETECTOR_COMMON_INC_CARDETECTOR_COMMON_LIVECONFIG_H_
 
+#include <config.h>
 #include <inttypes.h>
 #include <cardetector_common/detector.h>
 
@@ -20,6 +21,9 @@ typedef struct
 	uint16_t	thdiv;
 	uint8_t		mccount;			//measure cycle count
 	uint8_t		debug;
+#if defined(USE_LEDBAR)
+	uint8_t		ledbarvalues[2][8];
+#endif	//	USE_LEDBAR
 } LIVECONFIG;
 
 
