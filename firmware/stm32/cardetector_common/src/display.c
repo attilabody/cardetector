@@ -1,7 +1,12 @@
 #include <config.h>
+#include <cardetector_common/liveconfig.h>
 #include <cardetector_common/display.h>
 #include <globals.h>
 
+//////////////////////////////////////////////////////////////////////////////
+extern LIVECONFIG	g_config;
+
+//////////////////////////////////////////////////////////////////////////////
 #if defined(USE_LCD)
 I2cLcd_State	g_lcd;
 #elif defined(USE_LEDBAR)
@@ -9,6 +14,7 @@ Pcf8574_Status	g_ledbars[2];
 #endif
 
 
+//////////////////////////////////////////////////////////////////////////////
 void InitializeDisplay(I2cMaster_State *i2c)
 {
 #if defined(USE_LCD)
@@ -66,21 +72,10 @@ void UpdateBar(uint8_t line, int8_t chars)
 	}
 #endif	//	! DEBUG_LCD
 #elif defined(USE_LEDBAR)
-	uint8_t	led = 0;
-//	uint8_t	led = chars < 0 ? 1 : chars < 0;
-
-#if !defined(LEDBAR_LTR)
-	if(chars < 0)
-		led = 1;
-	else if(chars > 0)
-		led = ((1 << chars) - 1) << 1;
-#else
-	if(chars < 0)
-		led = 0x80;
-	else if(chars > 0)
-		led = (~((1 << (7 - chars))-1)) & 0x7f;
-#endif
-	Pcf8574_WritePort(&g_ledbars[line],led);
+	Pcf8574_WritePort(
+			&g_ledbars[line],
+			g_config.ledbarvalues[line][chars < 0 ? 0 : chars + 1]
+		);
 #endif	//	USE_LEDBAR
 }
 #endif	//	defined(USE_LCD) || defined(USE_LEDBAR)

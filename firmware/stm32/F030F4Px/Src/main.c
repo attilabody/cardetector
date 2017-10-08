@@ -72,6 +72,13 @@ LIVECONFIG 		g_config =
 	, TIMELIMIT		//tlimit
 	, DIVIDER		//divider
 	, MCCOUNT		//mccntexp
+	, 1
+#if defined(USE_LEDBAR)
+	, {
+		  { 0, 1, 2, 6, 0xe, 0x1e, 0x3e, 0x7e }
+		, { 0, 1, 2, 6, 0xe, 0x1e, 0x3e, 0x7e }
+	  }
+#endif
 };
 
 DETECTORSTATUS g_statuses[2] = {
