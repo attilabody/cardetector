@@ -1,4 +1,4 @@
-update=2017. szept. 19., kedd, 15:38:52 CEST
+update=2017. okt. 18., szerda, 23:26:33 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -36,3 +36,13 @@ LibName4=conn
 LibName5=regul
 LibName6=stm32
 LibName7=switches
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
