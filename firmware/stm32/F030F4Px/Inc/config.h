@@ -10,8 +10,9 @@
 
 #define USE_I2C
 #define USE_SERIAL
-//#define USE_LCD
-#define USE_LEDBAR
+#define USE_LCD
+//#define USE_LEDBAR
+#define USE_EEPROM
 
 //#define DEBUG_TIMERS
 #define DEBUG_DETECTOR
@@ -38,3 +39,15 @@
 #define EEPROMADDR 	0xA0
 #define EESTART		0
 
+// enforcements
+#ifndef USE_SERIAL
+#undef DEBUG_SERIAL
+#define MX_USART1_UART_Init()
+#endif
+
+#ifndef USE_I2C
+#undef USE_LCD
+#undef USE_LEDBAR
+#undef USE_EEPROM
+#define MX_I2C1_Init()
+#endif

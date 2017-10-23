@@ -26,7 +26,6 @@ void InitializeDisplay(I2cMaster_State *i2c)
 #endif
 }
 
-#if defined(USE_LCD) || defined(USE_LEDBAR)
 ////////////////////////////////////////////////////////////////////
 uint8_t CalcBar(const volatile DETECTORSTATUS *channel)
 {
@@ -51,31 +50,34 @@ void UpdateBar(uint8_t line, int8_t chars)
 {
 #if defined(USE_LCD)
 #if !defined(DEBUG_LCD)
-	I2cLcd_SetCursor(&g_lcd, 0, line);
-	int8_t pos;
-	if (chars < 0) {
-		pos = -16;
-		while (pos < chars) {
-			I2cLcd_PrintChar(&g_lcd, ' ');
-			++pos;
+	if(!(g_config.debug & 4))
+	{
+		I2cLcd_SetCursor(&g_lcd, 0, line);
+		int8_t pos;
+		if (chars < 0) {
+			pos = -16;
+			while (pos < chars) {
+				I2cLcd_PrintChar(&g_lcd, ' ');
+				++pos;
+			}
+			while (chars++ < 0)
+				I2cLcd_PrintChar(&g_lcd, '<');
+		} else {
+			pos = 0;
+			while (chars--) {
+				I2cLcd_PrintChar(&g_lcd, pos < DISPLAY_TOP ? '>' : '#');
+				++pos;
+			}
+			while (pos++ < 16)
+				I2cLcd_PrintChar(&g_lcd, ' ');
 		}
-		while (chars++ < 0)
-			I2cLcd_PrintChar(&g_lcd, '<');
-	} else {
-		pos = 0;
-		while (chars--) {
-			I2cLcd_PrintChar(&g_lcd, pos < DISPLAY_TOP ? '>' : '#');
-			++pos;
-		}
-		while (pos++ < 16)
-			I2cLcd_PrintChar(&g_lcd, ' ');
 	}
 #endif	//	! DEBUG_LCD
 #elif defined(USE_LEDBAR)
+	uint8_t	value = chars ? g_config.ledbarvalues[line][chars < 0 ? 0 : chars] : 0;
 	Pcf8574_WritePort(
 			&g_ledbars[line],
-			g_config.ledbarvalues[line][chars < 0 ? 0 : chars + 1]
+			~value
 		);
 #endif	//	USE_LEDBAR
 }
-#endif	//	defined(USE_LCD) || defined(USE_LEDBAR)

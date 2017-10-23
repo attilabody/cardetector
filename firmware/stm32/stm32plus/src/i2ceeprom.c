@@ -38,7 +38,7 @@ void I2cEEPROM_Init(I2cEEPROM_State *st, I2cMaster_State *i2c, uint16_t I2cAddre
 HAL_StatusTypeDef I2cEEPROM_Read(I2cEEPROM_State *st, uint32_t address, void* _buffer, uint32_t length)
 {
 	uint32_t	ret = HAL_OK;
-	uint8_t		toRead;
+	uint16_t	toRead;
 	uint8_t		*buffer = (uint8_t*)_buffer;
 
 	if(st->needPoll) {
@@ -47,9 +47,7 @@ HAL_StatusTypeDef I2cEEPROM_Read(I2cEEPROM_State *st, uint32_t address, void* _b
 			return ret;
 	}
 
-	toRead  = st->pageLength - (address & (st->pageLength -1));
-	if(toRead > length)
-		toRead = length;
+	toRead = length > UINT16_MAX ? UINT16_MAX : length;
 
 	while(length && ret == HAL_OK)
 	{
@@ -57,7 +55,7 @@ HAL_StatusTypeDef I2cEEPROM_Read(I2cEEPROM_State *st, uint32_t address, void* _b
 		length -= toRead;
 		buffer += toRead;
 		address += toRead;
-		toRead = length < st->pageLength ? length : st->pageLength;
+		toRead = length > UINT16_MAX ? UINT16_MAX : length;
 	}
 	return ret;
 }

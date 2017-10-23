@@ -21,9 +21,7 @@ typedef struct
 	uint16_t	thdiv;
 	uint8_t		mccount;			//measure cycle count
 	uint8_t		debug;
-#if defined(USE_LEDBAR)
 	uint8_t		ledbarvalues[2][8];
-#endif	//	USE_LEDBAR
 } LIVECONFIG;
 
 

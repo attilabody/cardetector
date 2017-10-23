@@ -55,6 +55,8 @@
 #include <cardetector_common/liveconfig.h>
 #include <cardetector_common/userinput.h>
 
+
+
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -64,7 +66,7 @@
 
 const char g_stateSyms[] = "-|+#*";
 
-LIVECONFIG 		g_config =
+const LIVECONFIG g_config_default =
 {
 	  0xA5
 	, {SHIFT_BELOW, SHIFT_BASE, SHIFT_ABOVE, SHIFT_ACTIVE, SHIFT_TIMEOUT}	//below, above, active, timeout
@@ -72,28 +74,30 @@ LIVECONFIG 		g_config =
 	, TIMELIMIT		//tlimit
 	, DIVIDER		//divider
 	, MCCOUNT		//mccntexp
-	, 1
+	, 0
 #if defined(USE_LEDBAR)
 	, {
-		  { 0, 1, 2, 6, 0xe, 0x1e, 0x3e, 0x7e }
-		, { 0, 1, 2, 6, 0xe, 0x1e, 0x3e, 0x7e }
+		{ 1, 2, 6, 0xe, 0x1e, 0x3e, 0x7e, 0xfe },
+		{ 1, 2, 6, 0xe, 0x1e, 0x3e, 0x7e, 0xfe }
 	  }
 #endif
 };
 
-DETECTORSTATUS g_statuses[2] = {
-		{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, BASE, ACTIVE1_GPIO_Port, ACTIVE1_Pin},
-		{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, BASE, ACTIVE2_GPIO_Port, ACTIVE2_Pin}
-};
+LIVECONFIG 	g_config;
 
 // globals.h start /////////////////////////////////////////////////////////////
+#ifdef USE_I2C
 I2cMaster_State		*g_i2c;
-I2cEEPROM_State		g_eeprom;
+#endif
 
+#ifdef USE_EEPROM
+I2cEEPROM_State		g_eeprom;
+#endif
+
+#ifdef USE_SERIAL
 uint8_t				g_lineBuffer[64];
 volatile uint8_t	g_lineReceived = 0;
-
-// globals.h end ///////////////////////////////////////////////////////////////
+#endif
 
 /* USER CODE END PV */
 
@@ -159,24 +163,13 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-#ifndef USE_SERIAL
-#undef DEBUG_SERIAL
-#define MX_USART1_UART_Init()
-#endif
-
-#ifndef USE_I2C
-#undef USE_LCD
-#undef USE_LEDBAR
-#define MX_I2C1_Init()
-#endif
-
 
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
+  /*e USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
 
@@ -188,15 +181,18 @@ int main(void)
   MX_USART1_UART_Init();
 
   /* USER CODE BEGIN 2 */
+  g_config = g_config_default;
+
 #ifdef USE_I2C
   g_i2c = I2cMaster_Init(&hi2c1);
-
   InitializeDisplay(g_i2c);
+#endif
 
   MX_IWDG_Init();
   HAL_IWDG_Refresh(&hiwdg);
 
-  I2cEEPROM_Init(&g_eeprom, g_i2c, EEPROMADDR, 2, 32);
+#ifdef USE_EEPROM
+  I2cEEPROM_Init(&g_eeprom, g_i2c, EEPROMADDR, 1, 8);
   {
 	LIVECONFIG	config;
 
@@ -278,7 +274,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL3;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
   RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -320,6 +316,7 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 ////////////////////////////////////////////////////////////////////
+#ifdef USE_SERIAL
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if(huart == &huart1)
@@ -328,19 +325,23 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		g_lineReceived = 1;
 	}
 }
-
+#endif
 ////////////////////////////////////////////////////////////////////
 void DisplayResults(uint8_t line)
 {
+	//TODO: optimize
+#if defined(DEBUG_SERIAL) || defined(USE_LCD)
 	uint8_t			irqEnabled = __get_PRIMASK() == 0;
 	__disable_irq();
 	DETECTORSTATUS	st = g_statuses[line];
 	if(irqEnabled) __enable_irq();
+#endif
 
-#ifdef DEBUG_SERIAL
+#if defined(DEBUG_SERIAL)
 	if(g_config.debug & (line+1))
 	{
-		// index state sum avg lastMeasured diff tolerance threshold correction
+		// 1: | 20CDC000, 8336, 8337,         1,    10,        41,       1
+		//ch st sum,      avg,  lastMeasured, diff, tolerance, threshold correction
 		UsartPrintUint(line, 0, 1);
 		UsartSend(": ", 2, 1);
 		UsartSend(&g_stateSyms[st.state], 1, 1);
@@ -362,105 +363,27 @@ void DisplayResults(uint8_t line)
 	}
 #endif	//	DEBUG_SERIAL
 
-#if defined(USE_LCD) && defined(DEBUG_LCD)
+#if defined(USE_LCD)
+#if defined(DEBUG_LCD)
 	I2cLcd_SetCursor(&g_lcd, 0, line);
 	I2cLcd_PrintChar(&g_lcd, g_stateSyms[st.state]);
 	I2cLcd_PrintChar(&g_lcd, ' ');
 	I2cLcd_PrintInt(&g_lcd, st.diff, 0);
 	I2cLcd_PrintStr(&g_lcd, "   ");
+#else
+	if(g_config.debug & 4) {
+		uint32_t freq = ((uint32_t)((uint64_t)48000000*64 / st.lastMeasured));
+		I2cLcd_SetCursor(&g_lcd, 0, line);
+		I2cLcd_PrintUint(&g_lcd, freq, 0);
+	}
+#endif	//	DEBUG_LCD
+
 #endif	//	USE_LCD
 
 #if defined(USE_LCD) || defined(USE_LEDBAR)
 	UpdateBar(line, CalcBar(&st));
 #endif
 }
-
-//TODO: REMOVE DEBUG CODE
-//volatile uint32_t g_basz = 0;
-
-//////////////////////////////////////////////////////////////////////////////
-void detect(DETECTORSTATUS *st, TIM_HandleTypeDef *htim)
-{
-	int8_t		shift;
-	int16_t		diff;
-	uint16_t	lastDelta;
-	uint16_t	capturedValue;
-
-	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
-	{
-		capturedValue = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-		if(st->initialized)
-		{
-			lastDelta = capturedValue - st->prevCapture;
-
-//TODO: REMOVE DEBUG CODE
-//			if(lastDelta > 0xffff)
-//				++ g_basz;
-
-			//HAL_GPIO_TogglePin(ACTIVE2_GPIO_Port, ACTIVE2_Pin);
-
-			st->accumulator += lastDelta;
-			//st->debug[st->counter] = lastDelta;
-			if(++st->counter == g_config.mccount)
-			{
-				//HAL_GPIO_TogglePin(ACTIVE1_GPIO_Port, ACTIVE1_Pin);
-
-				st->lastMeasured = st->accumulator;
-				st->accumulator = 0;
-				st->counter = 0;
-
-				if(!st->sum)
-					st->sum = (uint32_t)st->lastMeasured << g_config.sumshift;
-				else
-				{
-					st->avg = st->sum >> g_config.sumshift;
-					st->threshold = st->avg / g_config.thdiv;
-					st->diff = (int32_t)st->lastMeasured - st->avg;
-					st->tolerance = st->threshold >> SHIFT_TOLERANCE;
-
-					diff = -st->diff;
-
-					if (diff < 0)
-						st->state = st->tolerance + diff < 0 ? BELOW:BASE;
-					else if(diff < st->tolerance)
-						st->state = BASE;
-					else if(diff < st->threshold)
-						st->state = ABOVE;
-					else if(st->state < ACTIVE) {	//!ACTIVE && !TIMEOUT
-						st->activeStart = HAL_GetTick();
-						st->state = ACTIVE;
-					} else if(HAL_GetTick() - st->activeStart > g_config.tlimit * 1000)
-						st->state = TIMEOUT;
-
-					shift = g_config.shifts[st->state];
-					if(shift != SCHAR_MIN) {
-						st->correction = (shift >= 0) ? (((int32_t)st->diff) << shift) : (((int32_t)st->diff) >> -shift);
-						st->sum += st->correction;
-					} else
-						st->correction = 0;
-
-					HAL_GPIO_WritePin((GPIO_TypeDef*)st->port, st->pin, st->state < ACTIVE ? GPIO_PIN_RESET : GPIO_PIN_SET);
-					st->trigger = 1;
-				}
-			}
-		} else
-			st->initialized = 1;
-
-		st->prevCapture = capturedValue;
-	}
-
-}
-
-//////////////////////////////////////////////////////////////////////////////
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
-{
-	if( htim->Instance == TIM16)
-		detect(&g_statuses[0], htim);
-	else if( htim->Instance == TIM17)
-		detect(&g_statuses[1], htim);
-}
-
-//////////////////////////////////////////////////////////////////////////////
 
 /* USER CODE END 4 */
 

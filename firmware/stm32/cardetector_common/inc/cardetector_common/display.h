@@ -14,9 +14,17 @@
 #if defined(USE_LCD)
 #	define DISPLAY_TOP 13
 #	define DISPLAY_LIMIT 16
-#elif defined(USE_LEDBAR)
+#else
 #	define DISPLAY_TOP 6
 #	define DISPLAY_LIMIT 7
+#endif
+
+#if defined(USE_LCD)
+extern I2cLcd_State		g_lcd;
+#endif
+
+#if defined(USE_LEDBAR)
+extern Pcf8574_Status	g_ledbars[2];
 #endif
 
 void InitializeDisplay(I2cMaster_State *i2c);

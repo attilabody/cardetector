@@ -77,7 +77,7 @@
 					</folderInfo>
 					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.514445970.1041449102" name="display.c" rcbsApplicability="disable" resourcePath="cardetector_common/src/display.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.650281575">
 						<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.650281575" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461">
-							<option id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.12210334" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.debug" valueType="enumerated"/>
+							<option id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.12210334" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.size" valueType="enumerated"/>
 							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.1573794793" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
 							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.796046326" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
 						</tool>
@@ -88,12 +88,25 @@
 							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.2007712971" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
 							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.2035855099" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
 						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.740364059" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.477978830" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1103170323" name="Resource Custom Build Step Output Type"/>
+						</tool>
 					</fileInfo>
 					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.514445970.358308088" name="stm32f0xx_hal_uart.c" rcbsApplicability="disable" resourcePath="Drivers/STM32F0xx_HAL_Driver/stm32f0xx_hal_uart.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.1342275347">
 						<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.1342275347" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461">
 							<option id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.1599400288" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.size" valueType="enumerated"/>
 							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.887212198" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
 							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.355759268" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.514445970.1242443509" name="i2c.c" rcbsApplicability="disable" resourcePath="Application/User/i2c.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.314109352">
+						<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.314109352" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461">
+							<option id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.1231658647" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.size" valueType="enumerated"/>
+							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.1662042286" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
+							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.1094651834" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
 						</tool>
 					</fileInfo>
 					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.514445970.1415849184" name="main.c" rcbsApplicability="disable" resourcePath="Application/User/main.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.1636860748">
@@ -190,6 +203,13 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.release.1775073657.136050377" name="main.c" rcbsApplicability="disable" resourcePath="Application/User/main.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.1913085885">
+						<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461.1913085885" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.752153461">
+							<option id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.946644598" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.size" valueType="enumerated"/>
+							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.729741448" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
+							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.1637656120" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
+						</tool>
+					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>

@@ -7,6 +7,9 @@
 #include <stm32plus/pcf8574.h>
 #include <stm32plus/i2cmaster.h>
 
+#define I2C_RD I2cMaster_Read
+#define I2C_WR I2cMaster_Write
+
 void Pcf8574_Init(Pcf8574_Status *st, I2cMaster_State *i2cst, uint16_t i2cAddress)
 {
 	st->i2cStatus = i2cst;
@@ -16,12 +19,12 @@ void Pcf8574_Init(Pcf8574_Status *st, I2cMaster_State *i2cst, uint16_t i2cAddres
 
 inline HAL_StatusTypeDef Pcf8574_Read(Pcf8574_Status * const st)
 {
-	return I2cMaster_Read_IT(st->i2cStatus, st->i2cAddress, &st->data, sizeof(st->data));
+	return I2C_RD(st->i2cStatus, st->i2cAddress, &st->data, sizeof(st->data));
 }
 
 inline HAL_StatusTypeDef Pcf8574_Write(Pcf8574_Status * const st)
 {
-	return I2cMaster_Write_IT(st->i2cStatus, st->i2cAddress, &st->data, sizeof(st->data));
+	return I2C_WR(st->i2cStatus, st->i2cAddress, &st->data, sizeof(st->data));
 }
 
 HAL_StatusTypeDef Pcf8574_WritePort(Pcf8574_Status *st, uint8_t value)

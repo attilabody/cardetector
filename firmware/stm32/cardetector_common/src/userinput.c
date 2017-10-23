@@ -25,10 +25,11 @@ const CmdDesc	g_commands[] =
 	{ 5, "debug" },	//2
 	{ 5, "mccnt" },	//3
 	{ 5, "thdiv" },	//4
-	{ 4, "tlim" }, //5
+	{ 4, "tlim" },	//5
 	{ 5, "shift" },	//6
+	{ 5, "reset" },	//7
 #if defined(USE_LEDBAR)
-	{ 3, "led" }, //7
+	{ 3, "led" },	//8
 #endif
 	{ 0, NULL }
 };
@@ -44,7 +45,8 @@ const CmdDesc	g_shifts[] =
 };
 
 //////////////////////////////////////////////////////////////////////////////
-extern LIVECONFIG	g_config;
+extern LIVECONFIG		g_config;
+extern const LIVECONFIG	g_config_default;
 
 const uint8_t	g_shiftDisps[] = { 0, 1, 2, 4 };
 
@@ -137,6 +139,7 @@ void ShowParams(LIVECONFIG *config)
 {
 	uint8_t u;
 
+
 	ShowParam(g_commands[3].cmd, config->mccount);
 	ShowParam(g_commands[4].cmd, config->thdiv);
 	ShowParam(g_commands[5].cmd, config->tlimit);
@@ -149,6 +152,21 @@ void ShowParams(LIVECONFIG *config)
 		);
 	}
 	UsartSendStr("\r\n", 1);
+#if defined(USE_LEDBAR)
+	UsartSendStr("\r\nLeds\r\n", 1);
+	{
+		uint8_t	idx;
+		uint8_t	line;
+
+		for(line = 0; line < 2; ++line) {
+			for(idx = 0; idx < 8; ++idx) {
+				UsartSendStr(" 0x", 1);
+				UsartPrintByte(g_config.ledbarvalues[line][idx], 2, 1);
+			}
+			UsartSendStr("\r\n", 1);
+		}
+	}
+#endif
 
 }
 
@@ -171,7 +189,9 @@ void ProcessInput(LIVECONFIG *config, char const *buffer)
 		break;
 
 	case 1:		//save
+#if defined(USE_EEPROM)
 		I2cEEPROM_Write(&g_eeprom, EESTART, config, sizeof(*config));
+#endif
 		break;
 
 	case 2:		//debug mask
@@ -208,8 +228,12 @@ void ProcessInput(LIVECONFIG *config, char const *buffer)
 		}
 		break;
 
+	case 7:	//	reset
+		g_config = g_config_default;
+		break;
+
+	case 8:		//led channel val0 val1 val2 val3 val4 val5 val6 val7
 #if defined(USE_LEDBAR)
-	case 7:		//led channel val0 val1 val2 val3 val4 val5 val6 val7
 	{
 		uint8_t channel;
 		int		i;
@@ -230,7 +254,23 @@ void ProcessInput(LIVECONFIG *config, char const *buffer)
 			}
 		}
 	}
-		break;
 #endif
+	break;
+
+	default:
+#if defined(USE_SERIAL)
+	{
+		const CmdDesc *cmd = g_commands;
+
+		UsartSend("\r\nUsage: ", 9, 1);
+		while(cmd->len) {
+			UsartSend(cmd->cmd, cmd->len, 1);
+			UsartSend(" ", 1, 1);
+			++cmd;
+		}
+		UsartSend("\r\n",2, 1);
+	}
+#endif
+		break;
 	}
 }
