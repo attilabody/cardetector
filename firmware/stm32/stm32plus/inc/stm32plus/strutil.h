@@ -5,11 +5,15 @@
  *      Author: compi
  */
 
-#ifndef APPLICATION_USER_STRUTIL_H_
-#define APPLICATION_USER_STRUTIL_H_
+#ifndef _STM32PLUS_STRUTIL_H_
+#define _STM32PLUS_STRUTIL_H_
 
 #include <stddef.h>
 #include <inttypes.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 size_t uitodec(char* buffer, uint32_t data);
@@ -34,5 +38,8 @@ inline char tochr(const uint8_t in, const uint8_t upper)
 	return in + ((in < 10) ? '0' : (upper ? 'A' : 'a') - 10);
 }
 
+#ifdef __cplusplus
+}
+#endif
 
-#endif /* APPLICATION_USER_STRUTIL_H_ */
+#endif /* _STM32PLUS_STRUTIL_H_ */

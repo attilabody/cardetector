@@ -4,10 +4,10 @@
 #include <string.h>
 #include <inttypes.h>
 
-UART_HandleTypeDef	*g_huart = NULL;
-uint8_t				g_buffer[128];
-volatile uint16_t	g_txStart = 0, g_txCount = 0, g_chunkSize = 0;
-const uint16_t		g_size = sizeof(g_buffer);
+static UART_HandleTypeDef	*g_huart = NULL;
+static uint8_t				g_buffer[128];
+static volatile uint16_t	g_txStart = 0, g_txCount = 0, g_chunkSize = 0;
+static const uint16_t		g_size = sizeof(g_buffer);
 
 ////////////////////////////////////////////////////////////////////
 static inline void EnableIrq(uint8_t wasEnabled) {
@@ -82,6 +82,12 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 				st = HAL_UART_Transmit_IT(huart, g_buffer + g_txStart, g_chunkSize);
 		}
 	}
+}
+
+////////////////////////////////////////////////////////////////////
+void UsartInit(UART_HandleTypeDef* huart)
+{
+	g_huart = huart;
 }
 
 ////////////////////////////////////////////////////////////////////
