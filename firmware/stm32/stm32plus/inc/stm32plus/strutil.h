@@ -22,21 +22,8 @@ size_t itodec(char* buffer, int data);
 size_t itohex(char* buffer, int data);
 
 //////////////////////////////////////////////////////////////////////////////
-inline void strrev(char *first, char *last)
-{
-	char tmp;
-	while(last > first) {
-		tmp = *first;
-		*first++ = *last;
-		*last-- = tmp;
-	}
-}
-
-//////////////////////////////////////////////////////////////////////////////
-inline char tochr(const uint8_t in, const uint8_t upper)
-{
-	return in + ((in < 10) ? '0' : (upper ? 'A' : 'a') - 10);
-}
+void strrev(char *first, char *last);
+char tochr(const uint8_t in, const uint8_t upper);
 
 #ifdef __cplusplus
 }

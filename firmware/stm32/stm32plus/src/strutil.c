@@ -2,6 +2,23 @@
 #include <stm32plus/strutil.h>
 
 //////////////////////////////////////////////////////////////////////////////
+void strrev(char *first, char *last)
+{
+	char tmp;
+	while(last > first) {
+		tmp = *first;
+		*first++ = *last;
+		*last-- = tmp;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////
+char tochr(const uint8_t in, const uint8_t upper)
+{
+	return in + ((in < 10) ? '0' : (upper ? 'A' : 'a') - 10);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 size_t uitodec(char* buffer, uint32_t data)
 {
 	char *b2 = buffer;

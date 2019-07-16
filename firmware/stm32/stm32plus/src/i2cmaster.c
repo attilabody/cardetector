@@ -35,7 +35,7 @@ I2cMaster_State	g_i2cStatuses[2];
 uint8_t			g_numI2cStatuses = 0;
 
 //////////////////////////////////////////////////////////////////////////////
-inline I2cMaster_State *FindStatus(I2C_HandleTypeDef *hi2c)
+I2cMaster_State *FindStatus(I2C_HandleTypeDef *hi2c)
 {
 	I2cMaster_State	*st = g_i2cStatuses;
 

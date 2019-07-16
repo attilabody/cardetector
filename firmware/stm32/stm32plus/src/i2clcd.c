@@ -80,14 +80,14 @@ void I2cLcd_Init(I2cLcd_State *st, I2cMaster_State *i2cst, uint16_t i2cAddress)
 
 //////////////////////////////////////////////////////////////////////////////
 // 200 us @ 100kHz
-inline HAL_StatusTypeDef I2cLcd_SendData(I2cLcd_State *st)
+HAL_StatusTypeDef I2cLcd_SendData(I2cLcd_State *st)
 {
 	return I2cMaster_Write(st->i2c, st->i2cAddress, &st->data, sizeof(st->data));
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // 400 us @ 100kHz
-inline HAL_StatusTypeDef I2cLcd_Epulse(I2cLcd_State *st)
+HAL_StatusTypeDef I2cLcd_Epulse(I2cLcd_State *st)
 {
 	HAL_StatusTypeDef	ret;
 	st->data |= En;
@@ -100,7 +100,7 @@ inline HAL_StatusTypeDef I2cLcd_Epulse(I2cLcd_State *st)
 
 //////////////////////////////////////////////////////////////////////////////
 // 600 us @ 100kHz
-inline HAL_StatusTypeDef I2cLcd_SendNibble(I2cLcd_State *st, uint8_t nibble)
+HAL_StatusTypeDef I2cLcd_SendNibble(I2cLcd_State *st, uint8_t nibble)
 {
 	HAL_StatusTypeDef ret;
 	st->data = ((st->data & 0x0f) | (nibble & 0xf0));
@@ -111,7 +111,7 @@ inline HAL_StatusTypeDef I2cLcd_SendNibble(I2cLcd_State *st, uint8_t nibble)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-inline HAL_StatusTypeDef I2cLcd_SendByte(I2cLcd_State *st, uint8_t b, uint8_t isCmd)
+HAL_StatusTypeDef I2cLcd_SendByte(I2cLcd_State *st, uint8_t b, uint8_t isCmd)
 {
 	HAL_StatusTypeDef ret;
 
