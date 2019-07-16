@@ -2753,8 +2753,7 @@ HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart)
       *huart->pRxBuffPtr++ = (uint8_t)(uhdata & (uint8_t)uhMask);
     }
 
-
-    if(--huart->RxXferCount == 0U || uhdata == (uint16_t)'\r' || uhdata == (uint16_t)'\n' || !uhdata)
+    if(--huart->RxXferCount == 0U)
     {
       /* Disable the UART Parity Error Interrupt and RXNE interrupt*/
       CLEAR_BIT(huart->Instance->CR1, (USART_CR1_RXNEIE | USART_CR1_PEIE));
